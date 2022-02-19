@@ -22,9 +22,6 @@ void Representation::Game::run() {
     // font
     text.setFont(font);
 
-    // string to display
-    text.setString("Hello World!");
-
     // size (in pixels)
     text.setCharacterSize(24);
 
