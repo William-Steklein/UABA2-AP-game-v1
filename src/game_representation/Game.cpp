@@ -38,15 +38,16 @@ void Representation::Game::run() {
         Core::Stopwatch::getInstance().PhysicsUpdate(
                 std::bind(&Core::World::update, _world.get(), std::placeholders::_1, std::placeholders::_2));
 
-        // fps counter
+        // render fps counter
         _window->setTitle(std::to_string(std::lround(Core::Stopwatch::getInstance().getAverageFps())));
 
-        // draw
         if (_world->getUserInputMap()->get_user_input_stream)
             text.setString(_world->getConsoleText());
 
         _window->clear(sf::Color(127, 128, 118));
         _window->draw(text);
+
+        // render sfml
         _window->display();
 //        draw();
     }
