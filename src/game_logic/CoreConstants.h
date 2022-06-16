@@ -1,5 +1,5 @@
-#ifndef UABA2_AP_PROJECT_CORECONSTANTS_H
-#define UABA2_AP_PROJECT_CORECONSTANTS_H
+#ifndef GAMEENGINE_CORECONSTANTS_H
+#define GAMEENGINE_CORECONSTANTS_H
 
 #include <limits>
 
@@ -23,4 +23,4 @@ namespace CoreConstants {
     extern const bool loadAI;
 } // namespace CoreConstants
 
-#endif // UABA2_AP_PROJECT_CORECONSTANTS_H
+#endif // GAMEENGINE_CORECONSTANTS_H

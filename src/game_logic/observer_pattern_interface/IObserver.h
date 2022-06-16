@@ -1,5 +1,5 @@
-#ifndef UABA2_AP_PROJECT_IOBSERVER_H
-#define UABA2_AP_PROJECT_IOBSERVER_H
+#ifndef GAMEENGINE_IOBSERVER_H
+#define GAMEENGINE_IOBSERVER_H
 
 #include <string>
 
@@ -12,4 +12,4 @@ namespace Core {
     };
 } // namespace Core
 
-#endif // UABA2_AP_PROJECT_IOBSERVER_H
+#endif // GAMEENGINE_IOBSERVER_H

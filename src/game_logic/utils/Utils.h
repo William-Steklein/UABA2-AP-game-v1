@@ -1,5 +1,5 @@
-#ifndef UABA2_AP_PROJECT_UTILS_H
-#define UABA2_AP_PROJECT_UTILS_H
+#ifndef GAMEENGINE_UTILS_H
+#define GAMEENGINE_UTILS_H
 
 #include <cmath>
 
@@ -14,4 +14,5 @@ namespace CoreUtils {
 
     void fRadianMod(float &angle);
 } // namespace CoreUtils
-#endif // UABA2_AP_PROJECT_UTILS_H
+
+#endif // GAMEENGINE_UTILS_H

@@ -1,5 +1,5 @@
-#ifndef UABA2_AP_PROJECT_ISUBJECT_H
-#define UABA2_AP_PROJECT_ISUBJECT_H
+#ifndef GAMEENGINE_ISUBJECT_H
+#define GAMEENGINE_ISUBJECT_H
 
 #include "IObserver.h"
 #include <memory>
@@ -20,4 +20,4 @@ namespace Core {
         virtual void notifyObservers(const std::string &event);
     };
 }
-#endif // UABA2_AP_PROJECT_ISUBJECT_H
+#endif // GAMEENGINE_ISUBJECT_H

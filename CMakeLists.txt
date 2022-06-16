@@ -4,16 +4,25 @@ set(CMAKE_CXX_STANDARD 20)
 set(APP_EXE GameEngine)
 
 if (WIN32)
+    # Windows
     add_link_options(-static -static-libgcc -static-libstdc++)
-    # -mwindows removes the console window
-#    set(CMAKE_CXX_FLAGS "-pthread -mwindows")
+
     set(CMAKE_CXX_FLAGS "-pthread")
-#    if (cmake-build-release)
-#    else ()
-#    endif ()
+
+    if (CMAKE_BUILD_TYPE MATCHES "Release")
+        # -mwindows removes the console window
+        set(CMAKE_CXX_FLAGS "-pthread -O3 -mwindows")
+    endif ()
 else ()
+    # Linux & macOS
     set(CMAKE_CXX_FLAGS "-pthread")
+
+    if (CMAKE_BUILD_TYPE MATCHES "Release")
+        set(CMAKE_CXX_FLAGS "-pthread -O3")
+    endif ()
 endif ()
+
+message(${CMAKE_CXX_FLAGS})
 
 project(${APP_EXE})
 
