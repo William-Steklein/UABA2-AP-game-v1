@@ -26,7 +26,9 @@ else ()
 endif ()
 
 add_subdirectory(src)
-add_subdirectory(apps)
+
+add_executable(${PROJECT_NAME} ./apps/app.cpp)
+target_link_libraries(${PROJECT_NAME} GameLib)
 
 # data
 file(COPY "./data" DESTINATION "${CMAKE_BINARY_DIR}")
