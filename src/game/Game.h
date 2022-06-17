@@ -1,7 +1,7 @@
 #ifndef GAMEENGINE_GAME_H
 #define GAMEENGINE_GAME_H
 
-#include "../game_logic/World.h"
+#include "core/World.h"
 #include "RepresentationConstants.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>

@@ -1,7 +1,7 @@
 #ifndef GAMEENGINE_WORLD_H
 #define GAMEENGINE_WORLD_H
 
-#include "./utils/Stopwatch.h"
+#include "utils/Stopwatch.h"
 #include "utils/UserInputMap.h"
 #include "EventManager.h"
 #include <memory>

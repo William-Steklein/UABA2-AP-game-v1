@@ -13,7 +13,7 @@ Representation::Game::~Game() = default;
 void Representation::Game::run() {
 
     sf::Font font;
-    if (!font.loadFromFile("./assets/fonts/PT_Sans/PTSans-Regular.ttf")) {
+    if (!font.loadFromFile("./data/fonts/PT_Sans/PTSans-Regular.ttf")) {
         std::cout << "Error" << std::endl;
     }
 
