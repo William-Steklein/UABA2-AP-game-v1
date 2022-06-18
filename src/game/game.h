@@ -1,8 +1,8 @@
 #ifndef GAMEENGINE_GAME_H
 #define GAMEENGINE_GAME_H
 
-#include "core/World.h"
-#include "RepresentationConstants.h"
+#include "core/world.h"
+#include "constants.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -15,7 +15,7 @@ namespace Representation {
 
         std::unique_ptr<sf::RenderWindow> _window;
 
-        std::unique_ptr<Core::World> _world;
+        std::unique_ptr<World> _world;
 
     public:
         Game();

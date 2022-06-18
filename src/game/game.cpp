@@ -1,61 +1,36 @@
-#include "Game.h"
+#include "game.h"
 
 Representation::Game::Game()
-        : _screen_width(RepresentationConstants::screen_width), _screen_height(RepresentationConstants::screen_height),
+        : _screen_width(constants::screen_width), _screen_height(constants::screen_height),
           _running(true) {
-    _window = std::make_unique<sf::RenderWindow>(sf::VideoMode(_screen_width, _screen_height), "SFML_test");
+    _window = std::make_unique<sf::RenderWindow>(sf::VideoMode(_screen_width, _screen_height), "GameEngine");
 
-    _world = std::make_unique<Core::World>();
+    _world = std::make_unique<World>();
 }
 
 Representation::Game::~Game() = default;
 
 void Representation::Game::run() {
-
-    sf::Font font;
-    if (!font.loadFromFile("./data/fonts/PT_Sans/PTSans-Regular.ttf")) {
-        return;
-    }
-
-    sf::Text text;
-
-    // font
-    text.setFont(font);
-
-    // size (in pixels)
-    text.setCharacterSize(24);
-
-    text.setFillColor(sf::Color::Black);
-
     while (_running) {
         // sleep
-        Core::Stopwatch::getInstance().sleep_frame();
+        Stopwatch::getInstance().sleep_frame();
+
+        // physics update
+        Stopwatch::getInstance().PhysicsUpdate(
+                std::bind(&World::update, _world.get(), std::placeholders::_1, std::placeholders::_2));
 
         // sfml events
         handleEvents();
 
-        // physics update
-        Core::Stopwatch::getInstance().PhysicsUpdate(
-                std::bind(&Core::World::update, _world.get(), std::placeholders::_1, std::placeholders::_2));
-
-        // render fps counter
-        _window->setTitle(std::to_string(std::lround(Core::Stopwatch::getInstance().getAverageFps())));
-
-        if (_world->getUserInputMap()->get_user_input_stream)
-            text.setString(_world->getConsoleText());
-
-        _window->clear(sf::Color(127, 128, 118));
-        _window->draw(text);
-
-        // render sfml
-        _window->display();
-//        draw();
+        draw();
     }
 }
 
 void Representation::Game::draw() {
     _window->clear(sf::Color(127, 128, 118));
 
+    // render fps counter
+    _window->setTitle(std::to_string(std::lround(Stopwatch::getInstance().getAverageFps())));
 
     _window->display();
 }
@@ -63,12 +38,12 @@ void Representation::Game::draw() {
 void Representation::Game::handleEvents() {
     sf::Event event{};
     while (_window->pollEvent(event)) {
-        if (event.type == sf::Event::TextEntered && _world->getUserInputMap()->get_user_input_stream) {
+        if (event.type == sf::Event::TextEntered && _world->getUserInputMap()->get_input_stream) {
             char c = event.text.unicode;
-            if (c != 0x08 && _world->getUserInputMap()->user_input_stream.size() != 150)
-                _world->getUserInputMap()->user_input_stream += event.text.unicode;
-            else if (c == 0x08 && !_world->getUserInputMap()->user_input_stream.empty()) {
-                _world->getUserInputMap()->user_input_stream.pop_back();
+            if (c != 0x08 && _world->getUserInputMap()->input_stream.size() != 150)
+                _world->getUserInputMap()->input_stream += event.text.unicode;
+            else if (c == 0x08 && !_world->getUserInputMap()->input_stream.empty()) {
+                _world->getUserInputMap()->input_stream.pop_back();
             }
         }
 
