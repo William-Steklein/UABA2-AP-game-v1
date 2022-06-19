@@ -9,8 +9,3 @@ const float camera_view_x_min = -2;
 const float camera_view_x_max = 2;
 const float camera_view_y_min = -1.125;
 const float camera_view_y_max = 1.125;
-
-const bool generate_player = true;
-
-const float time_limit = 30;
-const bool loadAI = false;

@@ -29,29 +29,29 @@ Vector2f Camera::getPosition() const { return _position; }
 
 void Camera::setPosition(const Vector2f &position) { move(position - _position); }
 
-Vector2f Camera::getXBoundaries() const { return _camera_x_Boundaries; }
+Vector2f Camera::getXBounderies() const { return _camera_x_Boundaries; }
 
-Vector2f Camera::getYBoundaries() const { return _camera_y_Boundaries; }
+Vector2f Camera::getYBounderies() const { return _camera_y_Boundaries; }
 
-void Camera::setCameraBoundaries(float x_min, float x_max, float y_min, float y_max) {
+void Camera::setCameraBounderies(float x_min, float x_max, float y_min, float y_max) {
     _camera_x_Boundaries = {x_min, x_max};
     _camera_y_Boundaries = {y_min, y_max};
 }
 
-float Camera::getCamerawidth() const { return _camera_x_Boundaries.y - _camera_x_Boundaries.x; }
+float Camera::getCameraWidth() const { return _camera_x_Boundaries.y - _camera_x_Boundaries.x; }
 
-float Camera::getCameraheight() const { return _camera_y_Boundaries.y - _camera_y_Boundaries.x; }
+float Camera::getCameraHeight() const { return _camera_y_Boundaries.y - _camera_y_Boundaries.x; }
 
-Vector2f Camera::getRepresentationXBoundaries() const { return _representation_x_Boundaries; }
+Vector2f Camera::getGameXBoundaries() const { return _game_x_Boundaries; }
 
-Vector2f Camera::getRepresentationYBoundaries() const { return _representation_y_Boundaries; }
+Vector2f Camera::getGameYBoundaries() const { return _game_y_Boundaries; }
 
-void Camera::setRepresentationBoundaries(float x_min, float x_max, float y_min, float y_max) {
-    _representation_x_Boundaries = {x_min, x_max};
-    _representation_y_Boundaries = {y_min, y_max};
+void Camera::setGameBoundaries(float x_min, float x_max, float y_min, float y_max) {
+    _game_x_Boundaries = {x_min, x_max};
+    _game_y_Boundaries = {y_min, y_max};
 }
 
-Vector2f Camera::projectCoordinateWorldToRepresentation(const Vector2f &point) const {
+Vector2f Camera::projectCoordinateCoreToGame(const Vector2f &point) const {
     Vector2f new_point;
 
     float alpha_x{0};
@@ -69,28 +69,28 @@ Vector2f Camera::projectCoordinateWorldToRepresentation(const Vector2f &point) c
         alpha_y = 0;
 
     // linear interpolation of coordinate
-    new_point = {lerp(_representation_x_Boundaries.x, _representation_x_Boundaries.y, alpha_x),
-                 lerp(_representation_y_Boundaries.x, _representation_y_Boundaries.y, alpha_y)};
+    new_point = {lerp(_game_x_Boundaries.x, _game_x_Boundaries.y, alpha_x),
+                 lerp(_game_y_Boundaries.x, _game_y_Boundaries.y, alpha_y)};
 
     return new_point;
 }
 
-Vector2f Camera::projectCoordinateRepresentationToWorld(const Vector2f &point) const {
+Vector2f Camera::projectCoordinateGameToCore(const Vector2f &point) const {
     Vector2f new_point;
 
     float alpha_x{0};
     float alpha_y{0};
 
     // check if the limits are valid and calculate alpha value
-    if (_representation_x_Boundaries.y - _representation_x_Boundaries.x != 0)
-        alpha_x = (point.x - _representation_x_Boundaries.x) /
-                  (_representation_x_Boundaries.y - _representation_x_Boundaries.x);
+    if (_game_x_Boundaries.y - _game_x_Boundaries.x != 0)
+        alpha_x = (point.x - _game_x_Boundaries.x) /
+                  (_game_x_Boundaries.y - _game_x_Boundaries.x);
     else
         alpha_x = 0;
 
-    if (_representation_y_Boundaries.y - _representation_y_Boundaries.x != 0)
-        alpha_y = (point.y - _representation_y_Boundaries.x) /
-                  (_representation_y_Boundaries.y - _representation_y_Boundaries.x);
+    if (_game_y_Boundaries.y - _game_y_Boundaries.x != 0)
+        alpha_y = (point.y - _game_y_Boundaries.x) /
+                  (_game_y_Boundaries.y - _game_y_Boundaries.x);
     else
         alpha_y = 0;
 
@@ -102,8 +102,8 @@ Vector2f Camera::projectCoordinateRepresentationToWorld(const Vector2f &point) c
 }
 
 Vector2f
-Camera::projectCoordinateCustomToWorld(const Vector2f &point, float x_min, float x_max, float y_min,
-                                             float y_max) const {
+Camera::projectCoordinateCustomToCore(const Vector2f &point, float x_min, float x_max, float y_min,
+                                      float y_max) const {
     Vector2f new_point;
 
     float alpha_x{0};
@@ -130,10 +130,10 @@ Camera::projectCoordinateCustomToWorld(const Vector2f &point, float x_min, float
 Vector2f Camera::projectSize(const Vector2f &size) const {
     Vector2f new_size;
 
-    new_size.x = std::abs(((_representation_x_Boundaries.y - _representation_x_Boundaries.x) /
+    new_size.x = std::abs(((_game_x_Boundaries.y - _game_x_Boundaries.x) /
                            (_camera_x_Boundaries.y - _camera_x_Boundaries.x))) * size.x;
 
-    new_size.y = std::abs(((_representation_y_Boundaries.y - _representation_y_Boundaries.x) /
+    new_size.y = std::abs(((_game_y_Boundaries.y - _game_y_Boundaries.x) /
                            (_camera_y_Boundaries.y - _camera_y_Boundaries.x))) * size.y;
 
     return new_size;

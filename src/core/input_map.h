@@ -36,7 +36,7 @@ struct InputMap {
     bool esc{false};
 
     bool get_input_stream{false};
-    std::string input_stream{};
+    std::string input_stream;
 
     Vector2f mouse_pos_world;
     Vector2f mouse_pos_representation_window;

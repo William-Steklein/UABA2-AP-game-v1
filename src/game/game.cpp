@@ -1,6 +1,6 @@
 #include "game.h"
 
-Representation::Game::Game()
+Game::Game()
         : _screen_width(constants::screen_width), _screen_height(constants::screen_height),
           _running(true) {
     _window = std::make_unique<sf::RenderWindow>(sf::VideoMode(_screen_width, _screen_height), "GameEngine");
@@ -8,9 +8,9 @@ Representation::Game::Game()
     _world = std::make_unique<World>();
 }
 
-Representation::Game::~Game() = default;
+Game::~Game() = default;
 
-void Representation::Game::run() {
+void Game::run() {
     while (_running) {
         // sleep
         Stopwatch::getInstance().sleep_frame();
@@ -26,7 +26,7 @@ void Representation::Game::run() {
     }
 }
 
-void Representation::Game::draw() {
+void Game::draw() {
     _window->clear(sf::Color(127, 128, 118));
 
     // render fps counter
@@ -35,7 +35,7 @@ void Representation::Game::draw() {
     _window->display();
 }
 
-void Representation::Game::handleEvents() {
+void Game::handleEvents() {
     sf::Event event{};
     while (_window->pollEvent(event)) {
         if (event.type == sf::Event::TextEntered && _world->getUserInputMap()->get_input_stream) {
@@ -79,7 +79,7 @@ void Representation::Game::handleEvents() {
     }
 }
 
-void Representation::Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
+void Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
     switch (event.key.code) {
         case sf::Keyboard::A:
             _world->getUserInputMap()->a = pressed;
@@ -198,11 +198,11 @@ void Representation::Game::handleKeyboardInput(const sf::Event &event, bool pres
     }
 }
 
-void Representation::Game::handleMouseInput(const sf::Event &event, bool pressed) {
+void Game::handleMouseInput(const sf::Event &event, bool pressed) {
 
 }
 
-void Representation::Game::resizeWindow(unsigned int screen_width, unsigned int screen_height) {
+void Game::resizeWindow(unsigned int screen_width, unsigned int screen_height) {
     sf::View view = _window->getDefaultView();
     view.setSize({static_cast<float>(screen_width), static_cast<float>(screen_height)});
 

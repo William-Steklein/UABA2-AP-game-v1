@@ -12,8 +12,8 @@ private:
 
     Vector2f _camera_x_Boundaries;
     Vector2f _camera_y_Boundaries;
-    Vector2f _representation_x_Boundaries;
-    Vector2f _representation_y_Boundaries;
+    Vector2f _game_x_Boundaries;
+    Vector2f _game_y_Boundaries;
 
     bool _is_focused;
 
@@ -32,33 +32,33 @@ public:
 
     void setPosition(const Vector2f &position);
 
-    Vector2f getXBoundaries() const;
+    Vector2f getXBounderies() const;
 
-    Vector2f getYBoundaries() const;
+    Vector2f getYBounderies() const;
 
-    void setCameraBoundaries(float x_min, float x_max, float y_min, float y_max);
+    void setCameraBounderies(float x_min, float x_max, float y_min, float y_max);
 
-    float getCamerawidth() const;
+    float getCameraWidth() const;
 
-    float getCameraheight() const;
+    float getCameraHeight() const;
 
-    Vector2f getRepresentationXBoundaries() const;
+    Vector2f getGameXBoundaries() const;
 
-    Vector2f getRepresentationYBoundaries() const;
+    Vector2f getGameYBoundaries() const;
 
-    void setRepresentationBoundaries(float x_min, float x_max, float y_min, float y_max);
+    void setGameBoundaries(float x_min, float x_max, float y_min, float y_max);
 
-    Vector2f projectCoordinateWorldToRepresentation(const Vector2f &point) const;
+    Vector2f projectCoordinateCoreToGame(const Vector2f &point) const;
 
-    Vector2f projectCoordinateRepresentationToWorld(const Vector2f &point) const;
+    Vector2f projectCoordinateGameToCore(const Vector2f &point) const;
 
     Vector2f
-    projectCoordinateCustomToWorld(const Vector2f &point, float x_min, float x_max, float y_min, float y_max) const;
+    projectCoordinateCustomToCore(const Vector2f &point, float x_min, float x_max, float y_min, float y_max) const;
 
     Vector2f projectSize(const Vector2f &size) const;
 
     Vector2f projectSize(const Vector2f &size, float x_min, float x_max, float y_min,
-                               float y_max) const;
+                         float y_max) const;
 };
 
 #endif // GAMEENGINE_CAMERA_H
