@@ -1,5 +1,5 @@
-#ifndef GAMEENGINE_I_OBSERVER_H
-#define GAMEENGINE_I_OBSERVER_H
+#ifndef GAMEENGINE_IOBSERVER_H
+#define GAMEENGINE_IOBSERVER_H
 
 #include <string>
 
@@ -10,4 +10,4 @@ public:
     virtual void handleEvent(const std::string &event) = 0;
 };
 
-#endif // GAMEENGINE_I_OBSERVER_H
+#endif // GAMEENGINE_IOBSERVER_H

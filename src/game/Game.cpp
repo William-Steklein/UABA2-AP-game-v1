@@ -1,11 +1,12 @@
-#include "game.h"
+#include "Game.h"
 
 Game::Game()
         : _screen_width(constants::screen_width), _screen_height(constants::screen_height),
-          _running(true) {
+          _running(true), _entity_view_creator(new EntityViewCreator) {
     _window = std::make_unique<sf::RenderWindow>(sf::VideoMode(_screen_width, _screen_height), "GameEngine");
 
-    _world = std::make_unique<World>();
+
+    _world = std::make_unique<World>(_entity_view_creator, 0, _screen_width, _screen_height, 0);
 }
 
 Game::~Game() = default;
@@ -32,13 +33,19 @@ void Game::draw() {
     // render fps counter
     _window->setTitle(std::to_string(std::lround(Stopwatch::getInstance().getAverageFps())));
 
+    // render entity views
+    for (const auto &entity_view : _entity_view_creator->getEntityViews()) {
+        _window->draw(entity_view->getSprite());
+    }
+
+
     _window->display();
 }
 
 void Game::handleEvents() {
     sf::Event event{};
     while (_window->pollEvent(event)) {
-        if (event.type == sf::Event::TextEntered && _world->getUserInputMap()->get_input_stream) {
+        if (_world->getUserInputMap()->get_input_stream && event.type == sf::Event::TextEntered) {
             char c = event.text.unicode;
             if (c != 0x08 && _world->getUserInputMap()->input_stream.size() != 150)
                 _world->getUserInputMap()->input_stream += event.text.unicode;

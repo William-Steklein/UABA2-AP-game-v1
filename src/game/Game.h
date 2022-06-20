@@ -1,10 +1,13 @@
 #ifndef GAMEENGINE_GAME_H
 #define GAMEENGINE_GAME_H
 
-#include "core/world.h"
+
+#include "core/World.h"
 #include "constants.h"
+#include "EntityViewCreator.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <memory>
 
 class Game {
 private:
@@ -15,6 +18,7 @@ private:
     std::unique_ptr<sf::RenderWindow> _window;
 
     std::unique_ptr<World> _world;
+    std::shared_ptr<EntityViewCreator> _entity_view_creator;
 
 public:
     Game();

@@ -1,7 +1,7 @@
-#ifndef GAMEENGINE_INPUT_MAP_H
-#define GAMEENGINE_INPUT_MAP_H
+#ifndef GAMEENGINE_INPUTMAP_H
+#define GAMEENGINE_INPUTMAP_H
 
-#include "math/vector2f.h"
+#include "math/Vector2f.h"
 #include <string>
 
 struct InputMap {
@@ -48,4 +48,4 @@ struct InputMap {
     float mouse_wheel_delta{0};
 };
 
-#endif // GAMEENGINE_INPUT_MAP_H
+#endif // GAMEENGINE_INPUTMAP_H

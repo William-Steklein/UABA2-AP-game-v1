@@ -1,4 +1,4 @@
-#include "i_subject.h"
+#include "ISubject.h"
 
 void ISubject::addObserver(const std::shared_ptr<IObserver> &observer) { _observers.insert(observer); }
 

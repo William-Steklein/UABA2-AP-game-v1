@@ -1,7 +1,7 @@
-#ifndef GAMEENGINE_I_SUBJECT_H
-#define GAMEENGINE_I_SUBJECT_H
+#ifndef GAMEENGINE_ISUBJECT_H
+#define GAMEENGINE_ISUBJECT_H
 
-#include "i_observer.h"
+#include "IObserver.h"
 #include <memory>
 #include <set>
 
@@ -19,4 +19,4 @@ public:
     virtual void notifyObservers(const std::string &event);
 };
 
-#endif // GAMEENGINE_I_SUBJECT_H
+#endif // GAMEENGINE_ISUBJECT_H

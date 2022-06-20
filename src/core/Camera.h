@@ -1,7 +1,7 @@
 #ifndef GAMEENGINE_CAMERA_H
 #define GAMEENGINE_CAMERA_H
 
-#include "math/vector2f.h"
+#include "math/Vector2f.h"
 #include "constants.h"
 #include "math/math_funcs.h"
 #include <cmath>
@@ -15,14 +15,8 @@ private:
     Vector2f _game_x_Boundaries;
     Vector2f _game_y_Boundaries;
 
-    bool _is_focused;
-
 public:
     Camera();
-
-    bool getFocused() const;
-
-    void setFocused(bool is_focused);
 
     void move(const Vector2f &vector);
 

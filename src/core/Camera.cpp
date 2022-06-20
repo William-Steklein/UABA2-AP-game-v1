@@ -1,18 +1,11 @@
-#include "camera.h"
+#include "Camera.h"
 
 Camera::Camera()
         : _camera_x_Boundaries(constants::camera_view_x_min, constants::camera_view_x_max),
-          _camera_y_Boundaries(constants::camera_view_y_min, constants::camera_view_y_max),
-          _is_focused(true) {
+          _camera_y_Boundaries(constants::camera_view_y_min, constants::camera_view_y_max) {
     _position = {(_camera_x_Boundaries.y + _camera_x_Boundaries.x) / 2,
                  (_camera_y_Boundaries.y + _camera_y_Boundaries.x) / 2};
 }
-
-bool Camera::getFocused() const {
-    return _is_focused;
-}
-
-void Camera::setFocused(bool is_focused) { _is_focused = is_focused; }
 
 void Camera::move(const Vector2f &vector) {
     _camera_x_Boundaries += vector.x;
@@ -102,8 +95,7 @@ Vector2f Camera::projectCoordinateGameToCore(const Vector2f &point) const {
 }
 
 Vector2f
-Camera::projectCoordinateCustomToCore(const Vector2f &point, float x_min, float x_max, float y_min,
-                                      float y_max) const {
+Camera::projectCoordinateCustomToCore(const Vector2f &point, float x_min, float x_max, float y_min, float y_max) const {
     Vector2f new_point;
 
     float alpha_x{0};

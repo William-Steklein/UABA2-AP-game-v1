@@ -1,5 +1,5 @@
 file(GLOB_RECURSE GameLibFiles *.cpp)
-add_library(GameLib STATIC ${GameLibFiles})
+add_library(GameLib STATIC ${GameLibFiles} EntityView.cpp EntityView.h EntityViewCreator.cpp EntityViewCreator.h)
 
 # SFML
 if (WIN32)

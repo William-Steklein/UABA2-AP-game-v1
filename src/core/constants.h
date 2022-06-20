@@ -1,5 +1,5 @@
-#ifndef GAMEENGINE_CONSTANTS_H
-#define GAMEENGINE_CONSTANTS_H
+#ifndef GAMEENGINE_CORECONSTANTS_H
+#define GAMEENGINE_CORECONSTANTS_H
 
 #include <limits>
 
@@ -17,4 +17,4 @@ namespace constants {
 }
 
 
-#endif // GAMEENGINE_CONSTANTS_H
+#endif // GAMEENGINE_CORECONSTANTS_H
