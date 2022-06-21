@@ -38,7 +38,6 @@ void Game::draw() {
         _window->draw(entity_view->getSprite());
     }
 
-
     _window->display();
 }
 
@@ -47,8 +46,10 @@ void Game::handleEvents() {
 
     sf::Event event{};
     while (_window->pollEvent(event)) {
+        // text typing
         if (_world->getUserInputMap()->get_input_stream && event.type == sf::Event::TextEntered) {
             char c = event.text.unicode;
+
             if (c != 0x08 && _world->getUserInputMap()->input_stream.size() != 150)
                 _world->getUserInputMap()->input_stream += event.text.unicode;
             else if (c == 0x08 && !_world->getUserInputMap()->input_stream.empty()) {
@@ -56,6 +57,7 @@ void Game::handleEvents() {
             }
         }
 
+        // button presses
         switch (event.type) {
             case sf::Event::Closed:
                 _window->close();
@@ -92,6 +94,7 @@ void Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
     switch (event.key.code) {
         case sf::Keyboard::A:
             _world->getUserInputMap()->a = pressed;
+            // _world->
             break;
 
         case sf::Keyboard::B:

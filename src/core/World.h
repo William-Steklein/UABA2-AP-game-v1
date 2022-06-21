@@ -11,12 +11,11 @@
 
 class World {
 private:
-
     std::shared_ptr<Doodle> _player;
     //std::vector<std::shared_ptr<Platform>> _platforms;
     //std::vector<std::shared_ptr<BackgroundTile>> _background_tiles;
     //std::vector<std::shared_ptr<Bonus>> _bonuses;
-    //std::vector<std::shared_ptr<Monster>> _monsters;
+    //std::vector<std::shared_ptr<Enemies>> _enemies;
 
     std::shared_ptr<Camera> _camera;
     std::shared_ptr<IEntityViewCreator> _entity_view_creator;

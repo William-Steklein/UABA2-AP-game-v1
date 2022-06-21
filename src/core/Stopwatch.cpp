@@ -4,11 +4,6 @@
 
 #include <windows.h>
 
-#endif
-
-
-#ifdef WIN32
-
 void timerSleep(double seconds) {
     using namespace std::chrono;
 

@@ -59,7 +59,7 @@ void World::updateEntities(double t, float dt) {
 
     // bonuses
 
-    // monsters
+    // enemies
 
 }
 
