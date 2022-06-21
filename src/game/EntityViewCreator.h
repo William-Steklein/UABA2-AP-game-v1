@@ -7,11 +7,11 @@
 
 class EntityViewCreator : public IEntityViewCreator {
 private:
-    std::map<uint, std::vector<std::weak_ptr<EntityView>>> _entity_views;
+    std::map<unsigned int, std::vector<std::weak_ptr<EntityView>>> _entity_views;
 
 public:
     void createEntityView(std::shared_ptr<Entity> entity, std::vector<std::string> texture_files,
-                          AnimationStateMachine animation_state_machine, uint layer) override;
+                          AnimationStateMachine animation_state_machine, unsigned int layer) override;
 
     std::vector<std::shared_ptr<EntityView>> getEntityViews();
 };

@@ -17,7 +17,7 @@ private:
     sf::Sprite _sprite;
 
     std::vector<sf::Texture> _textures;
-    uint _current_texture;
+    unsigned int _current_texture;
     AnimationStateMachine _animation_state_machine;
 
 public:
@@ -30,9 +30,9 @@ public:
 
     void handleEvent(const std::string &event) override;
 
-    uint addTexture(const std::string &texture_file);
+    unsigned int addTexture(const std::string &texture_file);
 
-    void setTexture(uint texture_id);
+    void setTexture(unsigned int texture_id);
 
     sf::Sprite getSprite() const;
 };

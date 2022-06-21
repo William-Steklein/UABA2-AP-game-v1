@@ -7,7 +7,7 @@ World::World(std::shared_ptr<IEntityViewCreator> entity_view_creator, float x_mi
         : _entity_view_creator(std::move(entity_view_creator)), _user_input_map(new InputMap), _camera(new Camera) {
     _camera->setGameBoundaries(x_min, x_max, y_min, y_max);
 
-    std::shared_ptr<Doodle> player(new Doodle({0, 1}, _camera, {0.3, 0.3}));
+    _player = std::make_shared<Doodle>(Doodle({0, 0}, _camera, {0.3, 0.3}));
 
     std::vector<std::string> player_textures = {
             "data/sprites/doodle/doodle-left.png",
@@ -17,7 +17,7 @@ World::World(std::shared_ptr<IEntityViewCreator> entity_view_creator, float x_mi
     };
 
     AnimationStateMachine player_animation_state_machine = AnimationStateMachine();
-    _entity_view_creator->createEntityView(player, player_textures, player_animation_state_machine, 0);
+    _entity_view_creator->createEntityView(_player, player_textures, player_animation_state_machine, 0);
 }
 
 World::~World() = default;

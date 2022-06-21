@@ -1,7 +1,7 @@
 #include "EntityViewCreator.h"
 
 void EntityViewCreator::createEntityView(std::shared_ptr<Entity> entity, std::vector<std::string> texture_files,
-                                         AnimationStateMachine animation_state_machine, uint layer) {
+                                         AnimationStateMachine animation_state_machine, unsigned int layer) {
     std::shared_ptr<EntityView> new_entity_view(new EntityView(entity, texture_files, animation_state_machine));
     std::weak_ptr<EntityView> new_entity_view_weak = new_entity_view;
 
@@ -12,14 +12,10 @@ void EntityViewCreator::createEntityView(std::shared_ptr<Entity> entity, std::ve
     }
 
     entity->addObserver(new_entity_view);
-
-    if (true) {
-        std::cout << "Hello world!" << std::endl;
-    }
 }
 
 std::vector<std::shared_ptr<EntityView>> EntityViewCreator::getEntityViews() {
-    std::map<uint, std::vector<std::weak_ptr<EntityView>>> new_entity_views;
+    std::map<unsigned int, std::vector<std::weak_ptr<EntityView>>> new_entity_views;
     std::vector<std::shared_ptr<EntityView>> render_entity_views;
 
     for (const auto &[layer, layer_entity_views] : _entity_views) {

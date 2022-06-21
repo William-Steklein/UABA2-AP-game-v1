@@ -33,7 +33,7 @@ void EntityView::handleEvent(const std::string &event) {
 
 }
 
-uint EntityView::addTexture(const std::string &texture_file) {
+unsigned int EntityView::addTexture(const std::string &texture_file) {
     sf::Texture new_texture;
     if (!new_texture.loadFromFile(texture_file)) {
         std::cerr << "Couldn't load the texture!" << std::endl;
@@ -45,7 +45,7 @@ uint EntityView::addTexture(const std::string &texture_file) {
     return _textures.size() - 1;
 }
 
-void EntityView::setTexture(uint texture_id) {
+void EntityView::setTexture(unsigned int texture_id) {
     if (texture_id + 1 > _textures.size())
         return;
     _current_texture = texture_id;

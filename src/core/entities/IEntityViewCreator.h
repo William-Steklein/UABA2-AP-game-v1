@@ -10,7 +10,7 @@
 class IEntityViewCreator {
 public:
     virtual void createEntityView(std::shared_ptr<Entity> entity, std::vector<std::string> texture_files,
-                                  AnimationStateMachine animation_state_machine, uint layer) = 0;
+                                  AnimationStateMachine animation_state_machine, unsigned int layer) = 0;
 };
 
 
