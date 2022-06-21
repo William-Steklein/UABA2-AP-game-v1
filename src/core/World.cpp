@@ -7,17 +7,7 @@ World::World(std::shared_ptr<IEntityViewCreator> entity_view_creator, float x_mi
         : _entity_view_creator(std::move(entity_view_creator)), _user_input_map(new InputMap), _camera(new Camera) {
     _camera->setGameBoundaries(x_min, x_max, y_min, y_max);
 
-    _player = std::make_shared<Doodle>(Doodle({0, 0.5}, _camera, {0.3, 0.3}));
-
-    std::vector<std::string> player_textures = {
-            "data/sprites/doodle/doodle-left.png",
-            "data/sprites/doodle/doodle-right.png",
-            "data/sprites/doodle/doodle-jump-left.png",
-            "data/sprites/doodle/doodle-jump-right.png"
-    };
-
-    AnimationStateMachine player_animation_state_machine = AnimationStateMachine();
-    _entity_view_creator->createEntityView(_player, player_textures, player_animation_state_machine, 0);
+    initializeEntities();
 }
 
 World::~World() = default;
@@ -35,6 +25,24 @@ void World::update() {
          Stopwatch::getInstance().increasePhysicsTime();
          Stopwatch::getInstance().decreaseAccumulator();
     }
+}
+
+void World::initializeEntities() {
+    initializeDoodle();
+}
+
+void World::initializeDoodle() {
+    _player = std::make_shared<Doodle>(Doodle({0, 0.5}, _camera, {0.3, 0.3}));
+
+    std::vector<std::string> player_textures = {
+            "data/sprites/doodle/doodle-left.png",
+            "data/sprites/doodle/doodle-right.png",
+            "data/sprites/doodle/doodle-jump-left.png",
+            "data/sprites/doodle/doodle-jump-right.png"
+    };
+
+    AnimationStateMachine player_animation_state_machine = AnimationStateMachine();
+    _entity_view_creator->createEntityView(_player, player_textures, player_animation_state_machine, 0);
 }
 
 void World::update(double t, float dt) {

@@ -35,6 +35,10 @@ public:
     std::shared_ptr<InputMap> getUserInputMap();
 
 private:
+    void initializeEntities();
+
+    void initializeDoodle();
+
     void update(double t, float dt);
 
     void updateEntities(double t, float dt);
