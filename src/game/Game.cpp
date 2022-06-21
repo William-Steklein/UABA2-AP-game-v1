@@ -5,6 +5,7 @@ Game::Game()
           _running(true), _entity_view_creator(new EntityViewCreator) {
     _window = std::make_unique<sf::RenderWindow>(sf::VideoMode(_screen_width, _screen_height), "GameEngine");
 
+    // coreAPI initialize
     _world = std::make_unique<World>(_entity_view_creator, 0, _screen_width, _screen_height, 0);
 }
 
@@ -12,16 +13,16 @@ Game::~Game() = default;
 
 void Game::run() {
     while (_running) {
-        // sleep
-        Stopwatch::getInstance().sleep_frame();
+        // coreAPI sleep
+        _world->sleep();
 
-        // physics update
-        Stopwatch::getInstance().PhysicsUpdate(
-                std::bind(&World::update, _world.get(), std::placeholders::_1, std::placeholders::_2));
-
-        // sfml events
+        // sfml events (window & keyboard)
         handleEvents();
 
+        // coreAPI update
+        _world->update();
+
+        // sfml draw
         draw();
     }
 }
@@ -42,6 +43,8 @@ void Game::draw() {
 }
 
 void Game::handleEvents() {
+    // coreAPI handle events (add to eventmanager)
+
     sf::Event event{};
     while (_window->pollEvent(event)) {
         if (_world->getUserInputMap()->get_input_stream && event.type == sf::Event::TextEntered) {
@@ -209,6 +212,7 @@ void Game::handleMouseInput(const sf::Event &event, bool pressed) {
 }
 
 void Game::resizeWindow(unsigned int screen_width, unsigned int screen_height) {
+    // coreAPI resize window event
     sf::View view = _window->getDefaultView();
     view.setSize({static_cast<float>(screen_width), static_cast<float>(screen_height)});
 

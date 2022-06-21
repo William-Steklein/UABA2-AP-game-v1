@@ -28,11 +28,16 @@ public:
 
     ~World();
 
+    static void sleep();
+
+    void update();
+
+    std::shared_ptr<InputMap> getUserInputMap();
+
+private:
     void update(double t, float dt);
 
     void updateEntities(double t, float dt);
-
-    std::shared_ptr<InputMap> getUserInputMap();
 };
 
 #endif //GAMEENGINE_WORLD_H

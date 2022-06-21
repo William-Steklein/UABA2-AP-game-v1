@@ -69,7 +69,8 @@ void Stopwatch::sleep_frame() {
 #ifdef WIN32
         timerSleep(delta_us.count());
 #else
-        std::this_thread::sleep_for(std::chrono::microseconds(std::chrono::duration_cast<std::chrono::microseconds>(delta_us)));
+        std::this_thread::sleep_for(
+                std::chrono::microseconds(std::chrono::duration_cast<std::chrono::microseconds>(delta_us)));
 #endif
     }
 
@@ -97,19 +98,17 @@ void Stopwatch::setPhysicsDeltaTime(float dt) { _physics_delta_time = dt; }
 
 double Stopwatch::getPhysicsTime() const { return _physics_time; }
 
+void Stopwatch::increasePhysicsTime() { _physics_time += _physics_delta_time; }
+
 float Stopwatch::getPhysicsSpeed() const { return _physics_speed; }
 
 void Stopwatch::setPhysicsSpeed(float physics_speed) { _physics_speed = physics_speed; }
 
-void Stopwatch::PhysicsUpdate(const std::function<void(double, float)> &func) {
-    _accumulator += _delta_time * 1e-3f * _physics_speed;
-    while (_accumulator >= _physics_delta_time) {
-        func(_physics_time, _physics_delta_time);
+float Stopwatch::getAccumulator() const { return _accumulator; }
 
-        _physics_time += _physics_delta_time;
-        _accumulator -= _physics_delta_time;
-    }
-}
+void Stopwatch::increaseAccumulator() { _accumulator += _delta_time * 1e-3f * _physics_speed; }
+
+void Stopwatch::decreaseAccumulator() { _accumulator -= _physics_delta_time; }
 
 float Stopwatch::computeAlpha() const { return _accumulator / _physics_delta_time; }
 

@@ -22,6 +22,21 @@ World::World(std::shared_ptr<IEntityViewCreator> entity_view_creator, float x_mi
 
 World::~World() = default;
 
+void World::sleep() {
+    Stopwatch::getInstance().sleep_frame();
+}
+
+void World::update() {
+     Stopwatch::getInstance().increaseAccumulator();
+
+    while (Stopwatch::getInstance().getAccumulator() >= Stopwatch::getInstance().getPhysicsDeltaTime()) {
+        update(Stopwatch::getInstance().getPhysicsTime(), Stopwatch::getInstance().getPhysicsDeltaTime());
+
+         Stopwatch::getInstance().increasePhysicsTime();
+         Stopwatch::getInstance().decreaseAccumulator();
+    }
+}
+
 void World::update(double t, float dt) {
     updateEntities(t, dt);
 }

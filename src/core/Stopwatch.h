@@ -18,8 +18,8 @@ class Stopwatch {
     float _delta_time;
     float _physics_delta_time;
     double _physics_time;
-    float _accumulator;
     float _physics_speed;
+    float _accumulator;
 
     float _sample_duration;
     float _duration;
@@ -45,11 +45,17 @@ public:
 
     double getPhysicsTime() const;
 
+    void increasePhysicsTime();
+
     float getPhysicsSpeed() const;
 
     void setPhysicsSpeed(float physics_speed);
 
-    void PhysicsUpdate(const std::function<void(double, float)> &func);
+    float getAccumulator() const;
+
+    void increaseAccumulator();
+
+    void decreaseAccumulator();
 
     float computeAlpha() const;
 
