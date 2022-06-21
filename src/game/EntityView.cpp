@@ -17,6 +17,8 @@ void EntityView::handleEvent() {
         Vector2f new_position = entity_shared->getGamePosition();
         _sprite.setPosition(new_position.x, new_position.y);
 
+        _sprite.setRotation(to_degree(entity_shared->getRotation()));
+
         float x_scale_factor = entity_shared->getGameViewSize().x /
                                static_cast<float>(_textures[_current_texture].getSize().x) *
                                entity_shared->getScale().x;

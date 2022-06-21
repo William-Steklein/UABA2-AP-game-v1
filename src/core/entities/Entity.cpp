@@ -1,12 +1,11 @@
 #include "Entity.h"
 
 Entity::Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size)
-    : _position(position), _scale({1, 1}), _camera(std::move(camera)), _view_size(view_size) {
+    : _position(position), _scale({1, 1}), _rotation(0), _camera(std::move(camera)), _view_size(view_size) {
 
 }
 
-void Entity::update(float t, float dt) {
-
+void Entity::update(double t, float dt) {
     notifyObservers();
 }
 
@@ -36,4 +35,12 @@ Vector2f Entity::getScale() const {
 
 void Entity::setScale(const Vector2f &scale) {
     _scale = scale;
+}
+
+float Entity::getRotation() const {
+    return _rotation;
+}
+
+void Entity::setRotation(float rotation) {
+    _rotation = rotation;
 }

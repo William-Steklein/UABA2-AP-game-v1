@@ -5,7 +5,6 @@ Game::Game()
           _running(true), _entity_view_creator(new EntityViewCreator) {
     _window = std::make_unique<sf::RenderWindow>(sf::VideoMode(_screen_width, _screen_height), "GameEngine");
 
-
     _world = std::make_unique<World>(_entity_view_creator, 0, _screen_width, _screen_height, 0);
 }
 

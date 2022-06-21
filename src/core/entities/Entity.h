@@ -16,13 +16,14 @@ protected:
     // transform
     Vector2f _position;
     Vector2f _scale;
+    float _rotation;
 
     // physics
 
 public:
     Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size);
 
-    virtual void update(float t, float dt);
+    virtual void update(double t, float dt);
 
     virtual Vector2f getViewSize() const;
 
@@ -37,6 +38,10 @@ public:
     virtual Vector2f getScale() const;
 
     virtual void setScale(const Vector2f& scale);
+
+    virtual float getRotation() const;
+
+    virtual void setRotation(float rotation);
 };
 
 
