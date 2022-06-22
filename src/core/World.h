@@ -6,7 +6,7 @@
 #include "InputMap.h"
 #include "Camera.h"
 #include <memory>
-#include "entities/game/Doodle.h"
+#include "entities/physics/Doodle.h"
 #include "entities/IEntityViewCreator.h"
 #include "entities/ui/UIWidget.h"
 #include "animation/AnimationStateMachine.h"

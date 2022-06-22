@@ -19,8 +19,6 @@ protected:
     Vector2f _scale;
     float _rotation;
 
-    // physics
-
 public:
     Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size);
 
