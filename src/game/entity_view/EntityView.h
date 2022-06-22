@@ -20,10 +20,6 @@ public:
     explicit EntityView(std::weak_ptr<Entity> entity);
 
     ~EntityView() = default;
-
-//    virtual void handleEvent() = 0;
-//
-//    virtual void handleEvent(const std::string &event);
 };
 
 

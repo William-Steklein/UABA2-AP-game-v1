@@ -3,6 +3,7 @@
 
 
 #include <memory>
+#include <utility>
 #include "../math/Vector2f.h"
 #include "../Camera.h"
 #include "../observer_pattern_interface/ISubject.h"
