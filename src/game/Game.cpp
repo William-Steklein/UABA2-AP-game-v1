@@ -19,7 +19,7 @@ void Game::run() {
         // sfml events (window & keyboard)
         handleEvents();
 
-        // coreAPI update
+        // coreAPI updatePhysics
         _world->update();
 
         // sfml draw
@@ -30,12 +30,12 @@ void Game::run() {
 void Game::draw() {
     _window->clear(sf::Color(127, 128, 118));
 
-    // render fps counter
-    _window->setTitle(std::to_string(std::lround(Stopwatch::getInstance().getAverageFps())));
-
     // render entity views
-    for (const auto &entity_view : _entity_view_creator->getEntityViews()) {
-        _window->draw(entity_view->getSprite());
+    for (const auto &entity_sprite_view : _entity_view_creator->getEntitySpriteViews()) {
+        _window->draw(entity_sprite_view->getSprite());
+    }
+    for (const auto &entity_text_view : _entity_view_creator->getEntityTextViews()) {
+        _window->draw(entity_text_view->getText());
     }
 
     _window->display();

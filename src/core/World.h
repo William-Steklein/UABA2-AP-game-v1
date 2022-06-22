@@ -6,21 +6,27 @@
 #include "InputMap.h"
 #include "Camera.h"
 #include <memory>
-#include "entities/Doodle.h"
+#include "entities/game/Doodle.h"
+#include "entities/IEntityViewCreator.h"
+#include "entities/ui/UIWidget.h"
+#include "animation/AnimationStateMachine.h"
 #include "entities/IEntityViewCreator.h"
 
 class World {
 private:
+    std::vector<std::shared_ptr<UIWidget>> _ui_widget_entities;
+
     std::shared_ptr<Doodle> _player;
     //std::vector<std::shared_ptr<Platform>> _platforms;
     //std::vector<std::shared_ptr<BackgroundTile>> _background_tiles;
     //std::vector<std::shared_ptr<Bonus>> _bonuses;
-    //std::vector<std::shared_ptr<Enemies>> _enemies;
+    //std::vector<std::shared_ptr<Enemy>> _enemies;
 
     std::shared_ptr<Camera> _camera;
     std::shared_ptr<IEntityViewCreator> _entity_view_creator;
 
     std::shared_ptr<InputMap> _user_input_map;
+//    std::shared_ptr<EventManager> _event_manager;
 
 public:
     World(std::shared_ptr<IEntityViewCreator> entity_view_creator, float x_min, float x_max, float y_min, float y_max);
@@ -36,11 +42,15 @@ public:
 private:
     void initializeEntities();
 
+    void initializeUIWidget();
+
     void initializeDoodle();
 
-    void update(double t, float dt);
+    void updateUIEntities(double t, float dt);
 
-    void updateEntities(double t, float dt);
+    void updatePhysics(double t, float dt);
+
+    void updatePhysicsEntities(double t, float dt);
 };
 
 #endif //GAMEENGINE_WORLD_H

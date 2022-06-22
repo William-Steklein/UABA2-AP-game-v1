@@ -4,7 +4,7 @@
 
 #include "core/World.h"
 #include "constants.h"
-#include "EntityViewCreator.h"
+#include "game/entity_view/EntityViewCreator.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <memory>
