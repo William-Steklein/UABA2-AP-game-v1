@@ -42,7 +42,7 @@ public:
 private:
     void initializeEntities();
 
-    void initializeUIWidget();
+    void initializeUIWidgets();
 
     void initializeDoodle();
 

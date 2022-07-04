@@ -4,15 +4,19 @@
 
 #include <memory>
 #include <utility>
+#include <vector>
 #include "../math/Vector2f.h"
 #include "../Camera.h"
 #include "../observer_pattern_interface/ISubject.h"
+#include "../animation/AnimationStateMachine.h"
 
 class Entity : public ISubject {
 protected:
     // view
     std::shared_ptr<Camera> _camera;
     Vector2f _view_size;
+    std::vector<std::string> _textures;
+    std::shared_ptr<AnimationStateMachine> _animation_state_machine;
 
     // transform
     Vector2f _position;

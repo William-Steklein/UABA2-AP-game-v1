@@ -25,30 +25,42 @@ void World::update() {
     while (Stopwatch::getInstance().getAccumulator() >= Stopwatch::getInstance().getPhysicsDeltaTime()) {
         updatePhysics(Stopwatch::getInstance().getPhysicsTime(), Stopwatch::getInstance().getPhysicsDeltaTime());
 
-         Stopwatch::getInstance().increasePhysicsTime();
-         Stopwatch::getInstance().decreaseAccumulator();
+        Stopwatch::getInstance().increasePhysicsTime();
+        Stopwatch::getInstance().decreaseAccumulator();
     }
 }
 
 void World::initializeEntities() {
     initializeDoodle();
-    initializeUIWidget();
+    initializeUIWidgets();
 }
 
-void World::initializeUIWidget() {
-    std::shared_ptr<UIWidget> new_ui_widget = std::make_shared<UIWidget>(UIWidget({-1, 0}, _camera, {0.2, 0.2}));
+void World::initializeUIWidgets() {
+//    // menu
+    std::shared_ptr<UIWidget> menu_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {1, 1.5}));
 
     // view
-    std::vector<std::string> ui_widget_textures = {"data/ui/test1.png"};
+    std::vector<std::string> menu_widget_textures = {"data/ui/prototype/menu.png"};
+    AnimationStateMachine menu_widget_animation_state_machine = AnimationStateMachine();
+    _entity_view_creator->createEntitySpriteView(menu_widget, menu_widget_textures, menu_widget_animation_state_machine,
+                                                 10);
 
-    AnimationStateMachine ui_widget_animation_state_machine = AnimationStateMachine();
-    _entity_view_creator->createEntitySpriteView(new_ui_widget, ui_widget_textures, ui_widget_animation_state_machine, 10);
+    _ui_widget_entities.push_back(menu_widget);
 
-    _ui_widget_entities.push_back(new_ui_widget);
+    // button
+    std::shared_ptr<UIWidget> button_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {0.4, 0.15}));
+
+    // view
+    std::vector<std::string> button_widget_textures = {"data/ui/prototype/button.png"};
+    AnimationStateMachine button_widget_animation_state_machine = AnimationStateMachine();
+    _entity_view_creator->createEntitySpriteView(button_widget, button_widget_textures,
+                                                 button_widget_animation_state_machine, 11);
+
+    _ui_widget_entities.push_back(button_widget);
 }
 
 void World::initializeDoodle() {
-    _player = std::make_shared<Doodle>(Doodle({0, 0.5}, _camera, {0.3, 0.3}));
+    _player = std::make_shared<Doodle>(Doodle({1.5, 0.5}, _camera, {0.3, 0.3}));
 
     // view
     std::vector<std::string> player_textures = {
@@ -60,15 +72,10 @@ void World::initializeDoodle() {
 
     AnimationStateMachine player_animation_state_machine = AnimationStateMachine();
     _entity_view_creator->createEntitySpriteView(_player, player_textures, player_animation_state_machine, 0);
-
-    // actions
-//    _event_manager.addListener("ACTION_JUMP", pJumpFunc)
-//    _event_manager.addListener("ACTION_MOVE_LEFT", pJumpFunc)
-//    _event_manager.addListener("ACTION_MOVE_RIGHT", pJumpFunc)
 }
 
 void World::updateUIEntities(double t, float dt) {
-    for (const auto &ui_widget : _ui_widget_entities) {
+    for (const auto &ui_widget: _ui_widget_entities) {
         ui_widget->update(t, dt);
     }
 }

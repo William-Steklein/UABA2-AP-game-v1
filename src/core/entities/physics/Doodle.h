@@ -2,9 +2,9 @@
 #define GAMEENGINE_DOODLE_H
 
 
-#include "../Entity.h"
+#include "PhysicsEntity.h"
 
-class Doodle : public Entity {
+class Doodle : public PhysicsEntity {
 
 public:
     Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize);
