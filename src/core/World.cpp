@@ -36,7 +36,18 @@ void World::initializeEntities() {
 }
 
 void World::initializeUIWidgets() {
-//    // menu
+    // background
+    std::shared_ptr<UIWidget> background_widget = std::make_shared<UIWidget>(
+            UIWidget({0, 0}, _camera, {_camera->getCameraWidth(), _camera->getCameraHeight()}));
+    std::vector<std::string> background_widget_textures = {"data/kenney_prototypetextures/Dark/texture_01.png"};
+    AnimationStateMachine background_widget_animation_state_machine = AnimationStateMachine();
+    _entity_view_creator->createEntitySpriteView(background_widget, background_widget_textures,
+                                                 background_widget_animation_state_machine,
+                                                 1);
+
+    _ui_widget_entities.push_back(background_widget);
+
+    // menu
     std::shared_ptr<UIWidget> menu_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {1, 1.5}));
 
     // view
@@ -71,7 +82,7 @@ void World::initializeDoodle() {
     };
 
     AnimationStateMachine player_animation_state_machine = AnimationStateMachine();
-    _entity_view_creator->createEntitySpriteView(_player, player_textures, player_animation_state_machine, 0);
+    _entity_view_creator->createEntitySpriteView(_player, player_textures, player_animation_state_machine, 2);
 }
 
 void World::updateUIEntities(double t, float dt) {
