@@ -39,7 +39,7 @@ void World::initializeUIWidgets() {
     // background
     std::shared_ptr<UIWidget> background_widget = std::make_shared<UIWidget>(
             UIWidget({0, 0}, _camera, {_camera->getCameraWidth(), _camera->getCameraHeight()}));
-    std::vector<std::string> background_widget_textures = {"data/kenney_prototypetextures/Dark/texture_01.png"};
+    std::vector<std::string> background_widget_textures = {"data/prototype/tiles/Dark/texture_01.png"};
     AnimationStateMachine background_widget_animation_state_machine = AnimationStateMachine();
     _entity_view_creator->createEntitySpriteView(background_widget, background_widget_textures,
                                                  background_widget_animation_state_machine,
@@ -51,7 +51,7 @@ void World::initializeUIWidgets() {
     std::shared_ptr<UIWidget> menu_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {1, 1.5}));
 
     // view
-    std::vector<std::string> menu_widget_textures = {"data/ui/ui/menu.png"};
+    std::vector<std::string> menu_widget_textures = {"data/prototype/ui/menu.png"};
     AnimationStateMachine menu_widget_animation_state_machine = AnimationStateMachine();
     _entity_view_creator->createEntitySpriteView(menu_widget, menu_widget_textures, menu_widget_animation_state_machine,
                                                  10);
@@ -62,7 +62,7 @@ void World::initializeUIWidgets() {
     std::shared_ptr<UIWidget> button_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {0.4, 0.15}));
 
     // view
-    std::vector<std::string> button_widget_textures = {"data/ui/ui/button.png"};
+    std::vector<std::string> button_widget_textures = {"data/prototype/ui/button.png"};
     AnimationStateMachine button_widget_animation_state_machine = AnimationStateMachine();
     _entity_view_creator->createEntitySpriteView(button_widget, button_widget_textures,
                                                  button_widget_animation_state_machine, 11);
@@ -75,10 +75,10 @@ void World::initializeDoodle() {
 
     // view
     std::vector<std::string> player_textures = {
-            "data/sprites/doodle/doodle-left.png",
-            "data/sprites/doodle/doodle-right.png",
-            "data/sprites/doodle/doodle-jump-left.png",
-            "data/sprites/doodle/doodle-jump-right.png"
+            "data/sprites/characters/doodle/doodle-left.png",
+            "data/sprites/characters/doodle/doodle-right.png",
+            "data/sprites/characters/doodle/doodle-jump-left.png",
+            "data/sprites/characters/doodle/doodle-jump-right.png"
     };
 
     AnimationStateMachine player_animation_state_machine = AnimationStateMachine();
