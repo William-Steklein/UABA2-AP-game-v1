@@ -51,7 +51,7 @@ void World::initializeUIWidgets() {
     std::shared_ptr<UIWidget> menu_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {1, 1.5}));
 
     // view
-    std::vector<std::string> menu_widget_textures = {"data/ui/prototype/menu.png"};
+    std::vector<std::string> menu_widget_textures = {"data/ui/ui/menu.png"};
     AnimationStateMachine menu_widget_animation_state_machine = AnimationStateMachine();
     _entity_view_creator->createEntitySpriteView(menu_widget, menu_widget_textures, menu_widget_animation_state_machine,
                                                  10);
@@ -62,7 +62,7 @@ void World::initializeUIWidgets() {
     std::shared_ptr<UIWidget> button_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {0.4, 0.15}));
 
     // view
-    std::vector<std::string> button_widget_textures = {"data/ui/prototype/button.png"};
+    std::vector<std::string> button_widget_textures = {"data/ui/ui/button.png"};
     AnimationStateMachine button_widget_animation_state_machine = AnimationStateMachine();
     _entity_view_creator->createEntitySpriteView(button_widget, button_widget_textures,
                                                  button_widget_animation_state_machine, 11);
