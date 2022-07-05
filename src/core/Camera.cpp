@@ -1,8 +1,11 @@
 #include "Camera.h"
 
+// todo: complete rewrite
+
 Camera::Camera()
         : _camera_x_Boundaries(constants::camera_view_x_min, constants::camera_view_x_max),
-          _camera_y_Boundaries(constants::camera_view_y_min, constants::camera_view_y_max) {
+          _camera_y_Boundaries(constants::camera_view_y_min, constants::camera_view_y_max),
+          _resolution(500, 750) {
     _position = {(_camera_x_Boundaries.y + _camera_x_Boundaries.x) / 2,
                  (_camera_y_Boundaries.y + _camera_y_Boundaries.x) / 2};
 }
@@ -61,9 +64,28 @@ Vector2f Camera::projectCoordinateCoreToGame(const Vector2f &point) const {
     else
         alpha_y = 0;
 
+    Vector2f x_bounderies;
+    Vector2f y_bounderies;
+
     // linear interpolation of coordinate
-    new_point = {lerp(_game_x_Boundaries.x, _game_x_Boundaries.y, alpha_x),
-                 lerp(_game_y_Boundaries.x, _game_y_Boundaries.y, alpha_y)};
+    float screen_width = _game_x_Boundaries.y - _game_x_Boundaries.x;
+    if (screen_width <= _resolution.x) {
+        x_bounderies = _game_x_Boundaries;
+    } else {
+        float temp = (screen_width - _resolution.x) / 2;
+        x_bounderies = {_game_x_Boundaries.x + temp, _game_x_Boundaries.y - temp};
+    }
+
+    float screen_height = _game_y_Boundaries.y - _game_y_Boundaries.x;
+    if (getCameraWidth() <= _resolution.y) {
+        y_bounderies = _game_y_Boundaries;
+    } else {
+        float temp = (screen_height - _resolution.y) / 2;
+        x_bounderies = {_game_y_Boundaries.x + temp, _game_y_Boundaries.y - temp};
+    }
+
+    new_point = {lerp(x_bounderies.x, x_bounderies.y, alpha_x),
+                 lerp(y_bounderies.x, y_bounderies.y, alpha_y)};
 
     return new_point;
 }
@@ -122,11 +144,31 @@ Camera::projectCoordinateCustomToCore(const Vector2f &point, float x_min, float 
 Vector2f Camera::projectSize(const Vector2f &size) const {
     Vector2f new_size;
 
-    new_size.x = std::abs(((_game_x_Boundaries.y - _game_x_Boundaries.x) /
-                           (_camera_x_Boundaries.y - _camera_x_Boundaries.x))) * size.x;
+    Vector2f x_bounderies;
+    Vector2f y_bounderies;
 
-    new_size.y = std::abs(((_game_y_Boundaries.y - _game_y_Boundaries.x) /
-                           (_camera_y_Boundaries.y - _camera_y_Boundaries.x))) * size.y;
+    // linear interpolation of coordinate
+    float screen_width = _game_x_Boundaries.y - _game_x_Boundaries.x;
+    if (screen_width <= _resolution.x) {
+        x_bounderies = _game_x_Boundaries;
+    } else {
+        float temp = (screen_width - _resolution.x) / 2;
+        x_bounderies = {_game_x_Boundaries.x + temp, _game_x_Boundaries.y - temp};
+    }
+
+    float screen_height = _game_y_Boundaries.y - _game_y_Boundaries.x;
+    if (getCameraWidth() <= _resolution.y) {
+        y_bounderies = _game_y_Boundaries;
+    } else {
+        float temp = (screen_height - _resolution.y) / 2;
+        x_bounderies = {_game_y_Boundaries.x + temp, _game_y_Boundaries.y - temp};
+    }
+
+    new_size.x = std::abs((x_bounderies.y - x_bounderies.x) /
+                           getCameraWidth()) * size.x;
+
+    new_size.y = std::abs((y_bounderies.y - y_bounderies.x) /
+                           getCameraHeight()) * size.y;
 
     return new_size;
 }

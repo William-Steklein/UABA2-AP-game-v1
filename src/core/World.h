@@ -37,6 +37,8 @@ public:
 
     void update();
 
+    void updateScreenSize(float x_min, float x_max, float y_min, float y_max);
+
     std::shared_ptr<InputMap> getUserInputMap();
 
 private:

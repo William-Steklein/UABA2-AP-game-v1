@@ -10,6 +10,7 @@ class Camera {
 private:
     Vector2f _position;
 
+    Vector2f _resolution;
     Vector2f _camera_x_Boundaries;
     Vector2f _camera_y_Boundaries;
     Vector2f _game_x_Boundaries;

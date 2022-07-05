@@ -216,11 +216,13 @@ void Game::handleMouseInput(const sf::Event &event, bool pressed) {
 
 void Game::resizeWindow(unsigned int screen_width, unsigned int screen_height) {
     // coreAPI resize window event
-    sf::View view = _window->getDefaultView();
-    view.setSize({static_cast<float>(screen_width), static_cast<float>(screen_height)});
+//    sf::View view = _window->getDefaultView();
+//    view.setSize({static_cast<float>(screen_width), static_cast<float>(screen_height)});
 
     _screen_width = screen_width;
     _screen_height = screen_height;
 
-    _window->setView(view);
+    _world->updateScreenSize(0, static_cast<float>(_screen_width), static_cast<float>(_screen_height), 0);
+
+//    _window->setView(view);
 }

@@ -30,6 +30,10 @@ void World::update() {
     }
 }
 
+void World::updateScreenSize(float x_min, float x_max, float y_min, float y_max) {
+    _camera->setGameBoundaries(x_min, x_max, y_min, y_max);
+}
+
 void World::initializeEntities() {
     initializeDoodle();
     initializeUIWidgets();
