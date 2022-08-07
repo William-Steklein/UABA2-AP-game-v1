@@ -12,14 +12,5 @@ void Doodle::update(double t, float dt) {
                      std::sin(static_cast<float>(t)) + 1.5f,
              });
 
-//    if (jump_condition) {
-//        _position.y += 0.2;
-//    }
-
     Entity::update(t, dt);
-}
-
-void Doodle::jump() {
-    std::cout << "jumping" << std::endl;
-    _position.y += 0.2;
 }

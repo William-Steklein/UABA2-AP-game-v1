@@ -3,18 +3,19 @@
 
 
 #include "../Entity.h"
+#include <memory>
 
 class UIWidget : public Entity {
 private:
-    bool _static_view;
+    bool _static;
 
 public:
     UIWidget(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-             bool static_view=true);
+             bool static_view = true);
 
     ~UIWidget() = default;
 
-    void update(double t, float dt) override;
+    bool is_static() const;
 };
 
 

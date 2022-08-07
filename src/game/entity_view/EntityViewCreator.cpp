@@ -51,7 +51,7 @@ std::vector<std::shared_ptr<EntityTextView>> EntityViewCreator::getEntityTextVie
     std::vector<std::weak_ptr<EntityTextView>> new_entity_text_views;
     std::vector<std::shared_ptr<EntityTextView>> render_entity_text_views;
 
-    for (const auto &entity_text_view : _entity_text_views) {
+    for (const auto &entity_text_view: _entity_text_views) {
         if (!entity_text_view.expired()) {
             new_entity_text_views.push_back(entity_text_view);
 

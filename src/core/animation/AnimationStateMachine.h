@@ -12,10 +12,10 @@ private:
 public:
     AnimationStateMachine();
 
-    void addAnimation(const std::string& name, const std::vector<unsigned int> &frames, unsigned int framerate,
+    void addAnimation(const std::string &name, const std::vector<unsigned int> &frames, unsigned int framerate,
                       bool loop);
 
-    void removeAnimation(const std::string& name);
+    void removeAnimation(const std::string &name);
 };
 
 

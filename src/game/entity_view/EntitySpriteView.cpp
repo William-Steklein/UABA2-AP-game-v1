@@ -3,8 +3,8 @@
 
 EntitySpriteView::EntitySpriteView(std::weak_ptr<Entity> entity, const std::vector<std::string> &texture_files,
                                    AnimationStateMachine animation_state_machine)
-                                   : EntityView(std::move(entity)), _animation_state_machine(animation_state_machine),
-                                   _current_texture(0) {
+        : EntityView(std::move(entity)), _animation_state_machine(animation_state_machine),
+          _current_texture(0) {
     for (const auto &texture_file: texture_files) {
         addTexture(texture_file);
     }

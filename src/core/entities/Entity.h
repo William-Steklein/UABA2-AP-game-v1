@@ -32,7 +32,7 @@ public:
 
     virtual Vector2f getGameViewSize() const;
 
-    virtual void setViewSize(const Vector2f& view_size);
+    virtual void setViewSize(const Vector2f &view_size);
 
     virtual Vector2f getPosition() const;
 
@@ -40,7 +40,7 @@ public:
 
     virtual Vector2f getScale() const;
 
-    virtual void setScale(const Vector2f& scale);
+    virtual void setScale(const Vector2f &scale);
 
     virtual float getRotation() const;
 

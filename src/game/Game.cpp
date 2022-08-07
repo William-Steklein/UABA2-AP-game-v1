@@ -31,10 +31,10 @@ void Game::draw() {
     _window->clear(sf::Color(127, 128, 118));
 
     // render entity views
-    for (const auto &entity_sprite_view : _entity_view_creator->getEntitySpriteViews()) {
+    for (const auto &entity_sprite_view: _entity_view_creator->getEntitySpriteViews()) {
         _window->draw(entity_sprite_view->getSprite());
     }
-    for (const auto &entity_text_view : _entity_view_creator->getEntityTextViews()) {
+    for (const auto &entity_text_view: _entity_view_creator->getEntityTextViews()) {
         _window->draw(entity_text_view->getText());
     }
 
@@ -215,14 +215,12 @@ void Game::handleMouseInput(const sf::Event &event, bool pressed) {
 }
 
 void Game::resizeWindow(unsigned int screen_width, unsigned int screen_height) {
-    // coreAPI resize window event
-//    sf::View view = _window->getDefaultView();
-//    view.setSize({static_cast<float>(screen_width), static_cast<float>(screen_height)});
-
     _screen_width = screen_width;
     _screen_height = screen_height;
 
-    _world->updateScreenSize(0, static_cast<float>(_screen_width), static_cast<float>(_screen_height), 0);
+    // update the view to the new size of the window
+    sf::FloatRect visibleArea(0, 0, static_cast<float>(screen_width), static_cast<float>(screen_height));
+    _window->setView(sf::View(visibleArea));
 
-//    _window->setView(view);
+    _world->updateScreenResolution(0, static_cast<float>(screen_width), static_cast<float>(screen_height), 0);
 }
