@@ -9,7 +9,6 @@
 #include "entities/physics/Doodle.h"
 #include "entities/IEntityViewCreator.h"
 #include "entities/ui/UIWidget.h"
-#include "animation/AnimationStateMachine.h"
 #include "entities/IEntityViewCreator.h"
 
 class World {

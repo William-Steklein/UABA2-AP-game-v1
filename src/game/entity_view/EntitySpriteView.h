@@ -4,6 +4,7 @@
 
 #include "EntityView.h"
 #include <memory>
+#include <utility>
 
 class EntitySpriteView : public EntityView {
 private:
@@ -11,12 +12,9 @@ private:
 
     std::vector<sf::Texture> _textures;
     unsigned int _current_texture;
-    AnimationStateMachine _animation_state_machine;
 
 public:
-    EntitySpriteView(std::weak_ptr<Entity> entity,
-                     const std::vector<std::string> &texture_files,
-                     AnimationStateMachine animation_state_machine);
+    EntitySpriteView(std::weak_ptr<Entity> entity, const std::vector<std::string> &texture_files);
 
     void handleEvent() override;
 

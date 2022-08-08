@@ -8,7 +8,6 @@
 #include <vector>
 #include "core/observer_pattern_interface/IObserver.h"
 #include "core/entities/Entity.h"
-#include "core/animation/AnimationStateMachine.h"
 #include "core/math/math_funcs.h"
 #include <filesystem>
 

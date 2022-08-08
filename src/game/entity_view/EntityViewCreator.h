@@ -14,7 +14,7 @@ private:
 
 public:
     void createEntitySpriteView(std::shared_ptr<Entity> entity, std::vector<std::string> texture_files,
-                                AnimationStateMachine animation_state_machine, unsigned int layer) override;
+                                unsigned int layer) override;
 
     void createEntityTextView(std::shared_ptr<Entity> entity) override;
 

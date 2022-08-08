@@ -47,10 +47,7 @@ void World::initializeUIWidgets() {
             UIWidget({0, 0}, _camera, {_camera->getWidth(), _camera->getHeight()}));
 
     std::vector<std::string> background_widget_textures = {"data/prototype/tiles/Dark/texture_01.png"};
-    AnimationStateMachine background_widget_animation_state_machine = AnimationStateMachine();
-    _entity_view_creator->createEntitySpriteView(background_widget, background_widget_textures,
-                                                 background_widget_animation_state_machine,
-                                                 1);
+    _entity_view_creator->createEntitySpriteView(background_widget, background_widget_textures, 1);
 
     _ui_widget_entities.push_back(background_widget);
 
@@ -86,8 +83,7 @@ void World::initializeDoodle() {
             "data/sprites/characters/doodle/doodle-jump-right.png"
     };
 
-    AnimationStateMachine player_animation_state_machine = AnimationStateMachine();
-    _entity_view_creator->createEntitySpriteView(_player, player_textures, player_animation_state_machine, 2);
+    _entity_view_creator->createEntitySpriteView(_player, player_textures, 2);
 }
 
 void World::updateUIEntities(double t, float dt) {

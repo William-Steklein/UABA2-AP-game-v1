@@ -1,9 +1,9 @@
 #include "EntityViewCreator.h"
 
 void EntityViewCreator::createEntitySpriteView(std::shared_ptr<Entity> entity, std::vector<std::string> texture_files,
-                                               AnimationStateMachine animation_state_machine, unsigned int layer) {
+                                               unsigned int layer) {
     std::shared_ptr<EntitySpriteView> new_entity_sprite_view(
-            new EntitySpriteView(entity, texture_files, animation_state_machine));
+            new EntitySpriteView(entity, texture_files));
     std::weak_ptr<EntitySpriteView> new_entity_sprite_view_weak = new_entity_sprite_view;
 
     if (_entity_sprite_views.count(layer)) {

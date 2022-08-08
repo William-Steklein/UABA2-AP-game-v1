@@ -5,12 +5,11 @@
 #include <memory>
 #include <vector>
 #include "Entity.h"
-#include "../animation/AnimationStateMachine.h"
 
 class IEntityViewCreator {
 public:
     virtual void createEntitySpriteView(std::shared_ptr<Entity> entity, std::vector<std::string> texture_files,
-                                        AnimationStateMachine animation_state_machine, unsigned int layer) = 0;
+                                        unsigned int layer) = 0;
 
     virtual void createEntityTextView(std::shared_ptr<Entity> entity) = 0;
 };
