@@ -14,7 +14,7 @@ public:
 
     void handleEvent() override;
 
-    void handleEvent(const std::string &event) override;
+    void handleEvent(const std::string &event, const std::string &channel="") override;
 
     sf::Text getText() const;
 };

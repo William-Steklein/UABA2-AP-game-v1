@@ -94,7 +94,6 @@ void Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
     switch (event.key.code) {
         case sf::Keyboard::A:
             _world->getUserInputMap()->a = pressed;
-            // _world->
             break;
 
         case sf::Keyboard::B:

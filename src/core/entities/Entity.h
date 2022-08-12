@@ -14,7 +14,6 @@ protected:
     // view
     std::shared_ptr<Camera> _camera;
     Vector2f _view_size;
-    std::vector<std::string> _textures;
 
     // transform
     Vector2f _position;

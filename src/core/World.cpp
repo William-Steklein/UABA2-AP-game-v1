@@ -3,8 +3,8 @@
 World::World(std::shared_ptr<IEntityViewCreator> entity_view_creator, float x_min, float x_max, float y_min,
              float y_max)
         : _camera(new Camera(x_min, x_max, y_min, y_max)), _entity_view_creator(std::move(entity_view_creator)),
-          _force_update(true), _user_input_map(new InputMap) {
-
+          _force_static_update(true), _user_input_map(new InputMap) {
+    loadTexanis();
     initializeEntities();
 }
 
@@ -15,8 +15,6 @@ void World::sleep() {
 }
 
 void World::update() {
-    // dispatch events from event manager
-
     // update UI entities
     updateUIEntities(Stopwatch::getInstance().getPhysicsTime(), Stopwatch::getInstance().getAccumulator());
 
@@ -33,7 +31,34 @@ void World::update() {
 
 void World::updateScreenResolution(float x_min, float x_max, float y_min, float y_max) {
     _camera->setScreenBoundaries(x_min, x_max, y_min, y_max);
-    _force_update = true;
+    _force_static_update = true;
+}
+
+void World::loadTexanis() {
+    std::vector<std::string> player_textures = {
+            "data/sprites/characters/doodle/doodle-left.png",
+            "data/sprites/characters/doodle/doodle-right.png",
+            "data/sprites/characters/doodle/doodle-jump-left.png",
+            "data/sprites/characters/doodle/doodle-jump-right.png",
+            "data/sprites/vfx/circle_explosion/Circle_explosion1.png",
+            "data/sprites/vfx/circle_explosion/Circle_explosion2.png",
+            "data/sprites/vfx/circle_explosion/Circle_explosion3.png",
+            "data/sprites/vfx/circle_explosion/Circle_explosion4.png",
+            "data/sprites/vfx/circle_explosion/Circle_explosion5.png",
+            "data/sprites/vfx/circle_explosion/Circle_explosion6.png",
+            "data/sprites/vfx/circle_explosion/Circle_explosion7.png",
+            "data/sprites/vfx/circle_explosion/Circle_explosion8.png",
+            "data/sprites/vfx/circle_explosion/Circle_explosion9.png",
+            "data/sprites/vfx/circle_explosion/Circle_explosion10.png",
+    };
+
+    std::map<std::string, AnimationData> player_animations = {
+            {"idle_left", {{0}, 0, true}},
+            {"idle_right", {{1}, 0, true}},
+            {"explosion", {{4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 0.25f, false}},
+    };
+
+    _entity_view_creator->createEntityTexAni("player", player_textures, player_animations);
 }
 
 void World::initializeEntities() {
@@ -42,22 +67,20 @@ void World::initializeEntities() {
 }
 
 void World::initializeUIWidgets() {
-    // background
-    std::shared_ptr<UIWidget> background_widget = std::make_shared<UIWidget>(
-            UIWidget({0, 0}, _camera, {_camera->getWidth(), _camera->getHeight()}));
-
-    std::vector<std::string> background_widget_textures = {"data/prototype/tiles/Dark/texture_01.png"};
-    _entity_view_creator->createEntitySpriteView(background_widget, background_widget_textures, 1);
-
-    _ui_widget_entities.push_back(background_widget);
-
+//    // background
+//    std::shared_ptr<UIWidget> background_widget = std::make_shared<UIWidget>(
+//            UIWidget({0, 0}, _camera, {_camera->getWidth(), _camera->getHeight()}));
+//
+//    std::vector<std::string> background_widget_textures = {"data/prototype/tiles/Dark/texture_01.png"};
+//    _entity_view_creator->createEntitySpriteView(background_widget, background_widget_textures, 1);
+//
+//    _ui_widget_entities.push_back(background_widget);
+//
 //    // menu
 //    std::shared_ptr<UIWidget> menu_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {1, 1.5}));
 //
 //    std::vector<std::string> menu_widget_textures = {"data/prototype/ui/menu.png"};
-//    AnimationStateMachine menu_widget_animation_state_machine = AnimationStateMachine();
-//    _entity_view_creator->createEntitySpriteView(menu_widget, menu_widget_textures, menu_widget_animation_state_machine,
-//                                                 10);
+//    _entity_view_creator->createEntitySpriteView(menu_widget, menu_widget_textures, 10);
 //
 //    _ui_widget_entities.push_back(menu_widget);
 //
@@ -65,34 +88,24 @@ void World::initializeUIWidgets() {
 //    std::shared_ptr<UIWidget> button_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {0.4, 0.15}));
 //
 //    std::vector<std::string> button_widget_textures = {"data/prototype/ui/button.png"};
-//    AnimationStateMachine button_widget_animation_state_machine = AnimationStateMachine();
-//    _entity_view_creator->createEntitySpriteView(button_widget, button_widget_textures,
-//                                                 button_widget_animation_state_machine, 11);
+//    _entity_view_creator->createEntitySpriteView(button_widget, button_widget_textures, 11);
 //
 //    _ui_widget_entities.push_back(button_widget);
 }
 
 void World::initializeDoodle() {
-    _player = std::make_shared<Doodle>(Doodle({0, 0}, _camera, {0.3 * 2, 0.219 * 2}));
-
-    // view
-    std::vector<std::string> player_textures = {
-            "data/sprites/characters/doodle/doodle-left.png",
-            "data/sprites/characters/doodle/doodle-right.png",
-            "data/sprites/characters/doodle/doodle-jump-left.png",
-            "data/sprites/characters/doodle/doodle-jump-right.png"
-    };
-
-    _entity_view_creator->createEntitySpriteView(_player, player_textures, 2);
+    float scale_mul = 5.f;
+    _player = std::make_shared<Doodle>(Doodle({0, 0}, _camera, {0.3f * scale_mul, 0.219f * scale_mul}));
+    _entity_view_creator->createEntitySpriteView(_player, "player", 100);
 }
 
 void World::updateUIEntities(double t, float dt) {
     for (const auto &ui_widget: _ui_widget_entities) {
-        if (!ui_widget->is_static() || _force_update) {
+        if (!ui_widget->is_static() || _force_static_update) {
             ui_widget->update(t, dt);
-            if (_force_update) _force_update = false;
         }
     }
+    if (_force_static_update) _force_static_update = false;
 }
 
 void World::updatePhysics(double t, float dt) {

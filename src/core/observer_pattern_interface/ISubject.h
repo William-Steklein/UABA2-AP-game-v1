@@ -16,7 +16,7 @@ public:
 
     virtual void notifyObservers();
 
-    virtual void notifyObservers(const std::string &event);
+    virtual void notifyObservers(const std::string &event, const std::string& channel="");
 };
 
 #endif // GAMEENGINE_ISUBJECT_H

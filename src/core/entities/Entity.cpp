@@ -6,7 +6,7 @@ Entity::Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const V
 }
 
 void Entity::update(double t, float dt) {
-    notifyObservers("update");
+    notifyObservers();
 }
 
 Vector2f Entity::getViewSize() const {

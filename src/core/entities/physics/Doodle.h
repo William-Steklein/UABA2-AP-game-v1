@@ -5,6 +5,9 @@
 #include "PhysicsEntity.h"
 
 class Doodle : public PhysicsEntity {
+private:
+    double _prev_t;
+    bool _facing_left;
 
 public:
     Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize);

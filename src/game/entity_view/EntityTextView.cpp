@@ -8,7 +8,7 @@ void EntityTextView::handleEvent() {
 
 }
 
-void EntityTextView::handleEvent(const std::string &event) {
+void EntityTextView::handleEvent(const std::string &event, const std::string &channel) {
 
 }
 
