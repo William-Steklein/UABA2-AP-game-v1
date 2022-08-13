@@ -36,21 +36,26 @@ void World::updateScreenResolution(float x_min, float x_max, float y_min, float 
 
 void World::loadTextureGroups() {
     std::vector<std::string> player_textures = {
-            "data/sprites/characters/doodle/doodle-left.png",
-            "data/sprites/characters/doodle/doodle-right.png",
-            "data/sprites/characters/doodle/doodle-jump-left.png",
-            "data/sprites/characters/doodle/doodle-jump-right.png",
-            "data/sprites/vfx/circle_explosion/Circle_explosion1.png",
-            "data/sprites/vfx/circle_explosion/Circle_explosion2.png",
-            "data/sprites/vfx/circle_explosion/Circle_explosion3.png",
-            "data/sprites/vfx/circle_explosion/Circle_explosion4.png",
-            "data/sprites/vfx/circle_explosion/Circle_explosion5.png",
-            "data/sprites/vfx/circle_explosion/Circle_explosion6.png",
-            "data/sprites/vfx/circle_explosion/Circle_explosion7.png",
-            "data/sprites/vfx/circle_explosion/Circle_explosion8.png",
-            "data/sprites/vfx/circle_explosion/Circle_explosion9.png",
-            "data/sprites/vfx/circle_explosion/Circle_explosion10.png",
+            "data/sprites/doodle/doodle-left.png",
+            "data/sprites/doodle/doodle-right.png",
+            "data/sprites/doodle/doodle-jump-left.png",
+            "data/sprites/doodle/doodle-jump-right.png",
+            "data/sprites/circle_explosion/Circle_explosion1.png",
+            "data/sprites/circle_explosion/Circle_explosion2.png",
+            "data/sprites/circle_explosion/Circle_explosion3.png",
+            "data/sprites/circle_explosion/Circle_explosion4.png",
+            "data/sprites/circle_explosion/Circle_explosion5.png",
+            "data/sprites/circle_explosion/Circle_explosion6.png",
+            "data/sprites/circle_explosion/Circle_explosion7.png",
+            "data/sprites/circle_explosion/Circle_explosion8.png",
+            "data/sprites/circle_explosion/Circle_explosion9.png",
+            "data/sprites/circle_explosion/Circle_explosion10.png",
     };
+
+    std::vector<std::string> background_widget_textures = {"data/textures/prototype/Dark/texture_07.png"};
+
+    _entity_view_creator->loadTextureGroup("player", player_textures);
+    _entity_view_creator->loadTextureGroup("background", background_widget_textures);
 
     std::map<std::string, AnimationData> player_animations = {
             {"idle_standing_left", {{0}, 0, true}},
@@ -59,8 +64,6 @@ void World::loadTextureGroups() {
             {"idle_jumping_right", {{3}, 0, true}},
             {"explosion", {{4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 0.25f, false}},
     };
-
-    _entity_view_creator->loadTextureGroup("player", player_textures);
 }
 
 void World::initializeEntities() {
@@ -69,14 +72,13 @@ void World::initializeEntities() {
 }
 
 void World::initializeUIWidgets() {
-//    // background
-//    std::shared_ptr<UIWidget> background_widget = std::make_shared<UIWidget>(
-//            UIWidget({0, 0}, _camera, {_camera->getWidth(), _camera->getHeight()}));
-//
-//    std::vector<std::string> background_widget_textures = {"data/prototype/tiles/Dark/texture_01.png"};
-//    _entity_view_creator->createEntitySpriteView(background_widget, background_widget_textures, 1);
-//
-//    _ui_widget_entities.push_back(background_widget);
+    // background
+    std::shared_ptr<UIWidget> background_widget = std::make_shared<UIWidget>(
+            UIWidget({0, 0}, _camera, {_camera->getWidth(), _camera->getHeight()}));
+
+    _entity_view_creator->createEntitySpriteView(background_widget, "background", 1);
+    _ui_widget_entities.push_back(background_widget);
+
 //
 //    // menu
 //    std::shared_ptr<UIWidget> menu_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {1, 1.5}));
