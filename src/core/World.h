@@ -42,7 +42,7 @@ public:
     std::shared_ptr<InputMap> getUserInputMap();
 
 private:
-    void loadTexanis();
+    void loadTextureGroups();
 
     void initializeEntities();
 

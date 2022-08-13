@@ -3,7 +3,6 @@
 
 
 #include "EntityView.h"
-#include "EntityTexAni.h"
 #include <memory>
 #include <utility>
 
@@ -11,14 +10,11 @@ class EntitySpriteView : public EntityView {
 private:
     sf::Sprite _sprite;
 
-    std::shared_ptr<EntityTexAni> _entity_texani;
+    std::shared_ptr<std::vector<sf::Texture>> _texture_group;
     unsigned int _current_texture;
-    std::string _current_animation;
-    unsigned int _current_animation_frame;
-    float _current_animation_time;
 
 public:
-    EntitySpriteView(std::weak_ptr<Entity> entity, std::shared_ptr<EntityTexAni> entity_texani);
+    EntitySpriteView(std::weak_ptr<Entity> entity, std::shared_ptr<std::vector<sf::Texture>> texture_group);
 
     void handleEvent() override;
 
@@ -29,10 +25,6 @@ public:
     sf::Sprite getSprite() const;
 
     void updateSprite();
-
-    void startAnimation(const std::string &animation);
-
-    void advanceAnimation();
 };
 
 

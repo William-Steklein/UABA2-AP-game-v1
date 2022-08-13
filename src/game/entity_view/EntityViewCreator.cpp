@@ -1,9 +1,8 @@
 #include "EntityViewCreator.h"
 
-void EntityViewCreator::createEntityTexAni(const std::string &texani_name,
-                                           const std::vector<std::string> &texture_filenames,
-                                           const std::map<std::string, AnimationData> &animations) {
-    std::vector<sf::Texture> new_textures;
+void EntityViewCreator::loadTextureGroup(const std::string &texture_group_name,
+                                         const std::vector<std::string> &texture_filenames) {
+    std::shared_ptr<std::vector<sf::Texture>> texture_group = std::make_shared<std::vector<sf::Texture>>();
 
     for (const auto &texture_filename: texture_filenames) {
         sf::Texture new_texture;
@@ -12,16 +11,16 @@ void EntityViewCreator::createEntityTexAni(const std::string &texani_name,
             std::cerr << "Couldn't load the texture \"" + texture_filename + "\"" << std::endl;
         }
 
-        new_textures.push_back(new_texture);
+        texture_group->push_back(new_texture);
     }
 
-    _entity_texanis[texani_name] = std::make_shared<EntityTexAni>(EntityTexAni(new_textures, animations));
+    _texture_groups[texture_group_name] = texture_group;
 }
 
-void EntityViewCreator::createEntitySpriteView(std::shared_ptr<Entity> entity, const std::string &texani_name,
+void EntityViewCreator::createEntitySpriteView(std::shared_ptr<Entity> entity, const std::string &texture_group_name,
                                                unsigned int layer) {
     std::shared_ptr<EntitySpriteView> new_entity_sprite_view(
-            new EntitySpriteView(entity, _entity_texanis[texani_name]));
+            new EntitySpriteView(entity, _texture_groups[texture_group_name]));
     std::weak_ptr<EntitySpriteView> new_entity_sprite_view_weak = new_entity_sprite_view;
 
     if (_entity_sprite_views.count(layer)) {

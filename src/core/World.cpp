@@ -4,7 +4,7 @@ World::World(std::shared_ptr<IEntityViewCreator> entity_view_creator, float x_mi
              float y_max)
         : _camera(new Camera(x_min, x_max, y_min, y_max)), _entity_view_creator(std::move(entity_view_creator)),
           _force_static_update(true), _user_input_map(new InputMap) {
-    loadTexanis();
+    loadTextureGroups();
     initializeEntities();
 }
 
@@ -34,7 +34,7 @@ void World::updateScreenResolution(float x_min, float x_max, float y_min, float 
     _force_static_update = true;
 }
 
-void World::loadTexanis() {
+void World::loadTextureGroups() {
     std::vector<std::string> player_textures = {
             "data/sprites/characters/doodle/doodle-left.png",
             "data/sprites/characters/doodle/doodle-right.png",
@@ -58,7 +58,7 @@ void World::loadTexanis() {
             {"explosion", {{4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 0.25f, false}},
     };
 
-    _entity_view_creator->createEntityTexAni("player", player_textures, player_animations);
+    _entity_view_creator->loadTextureGroup("player", player_textures);
 }
 
 void World::initializeEntities() {
