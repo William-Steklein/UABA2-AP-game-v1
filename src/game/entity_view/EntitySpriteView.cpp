@@ -2,8 +2,9 @@
 
 EntitySpriteView::EntitySpriteView(std::weak_ptr<Entity> entity,
                                    std::shared_ptr<std::vector<sf::Texture>> texture_group)
-        : EntityView(std::move(entity)), _texture_group(std::move(texture_group)), _current_texture_index(0) {
-    setTexture(0);
+        : EntityView(std::move(entity)), _h_mirror(false), _texture_group(std::move(texture_group)), _current_texture_index(0) {
+    std::shared_ptr<Entity> shared_entity = _entity.lock();
+    setTexture(shared_entity->getCurrentTextureIndex(), shared_entity->isMirrored());
     updateSprite();
 }
 
@@ -15,9 +16,13 @@ void EntitySpriteView::handleEvent(const unsigned int &event, const unsigned int
     if (channel == 0) {
         setTexture(event);
     }
+    if (channel == 1) {
+        setTexture(event, true);
+    }
 }
 
-void EntitySpriteView::setTexture(unsigned int texture_index) {
+void EntitySpriteView::setTexture(unsigned int texture_index, bool h_mirror) {
+    _h_mirror = h_mirror;
     _current_texture_index = texture_index;
 
     _sprite.setTexture(_texture_group->at(_current_texture_index), true);
@@ -47,7 +52,7 @@ void EntitySpriteView::updateSprite() {
                                static_cast<float>(texture_size.y) *
                                entity_size.y;
 
-        _sprite.setScale(x_scale_factor, y_scale_factor);
+        _sprite.setScale(_h_mirror ? -x_scale_factor : x_scale_factor, y_scale_factor);
 
         _sprite.setRotation(to_degree(entity_shared->getRotation()));
     }

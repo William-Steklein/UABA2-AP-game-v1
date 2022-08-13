@@ -1,61 +1,47 @@
 #include "Doodle.h"
 #include <utility>
 
-Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize)
-        : PhysicsEntity(position, std::move(camera), viewSize), _current_animation_frame(0),
-          _current_animation_name(""), _prev_t(0), _facing_left(true) {
-    _animations = {
-            {"idle_standing_left",  {{0},                                0,     true}},
-            {"idle_standing_right", {{1},                                0,     true}},
-            {"idle_jumping_left",   {{2},                                0,     true}},
-            {"idle_jumping_right",  {{3},                                0,     true}},
-            {"explosion",           {{4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 0.25f, false}},
-    };
+Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
+               std::shared_ptr<std::map<std::string, Animation>> animation_group)
+        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group)), _prev_t(0),
+          _facing_left(true), _current_animation(1) {
+
+    startAnimation("crouch", _facing_left);
+    std::cout << 0 << std::endl;
 }
 
 void Doodle::update(double t, float dt) {
-//    setScale({
-//                     std::sin(static_cast<float>(t)) + 1.5f,
-//                     std::sin(static_cast<float>(t)) + 1.5f,
-//             });
-
-    float wait_duration = 64 * dt * 4;
-//    float wait_duration = 1;
+//    float wait_duration = 64 * dt * 4;
+    float wait_duration = 3;
 
     if (t - _prev_t >= (wait_duration)) {
         _prev_t = t;
 
-        if (_facing_left) {
-            _facing_left = false;
-            startAnimation("explosion");
-        } else {
-            _facing_left = true;
-            startAnimation("idle_standing_left");
+        std::cout << _current_animation << std::endl;
+
+        switch (_current_animation) {
+            case 0:
+                startAnimation("crouch", _facing_left);
+                break;
+            case 1:
+                startAnimation("fall", _facing_left);
+                break;
+            case 2:
+                startAnimation("idle", _facing_left);
+                break;
+            case 3:
+                startAnimation("jump", _facing_left);
+                break;
+            case 4:
+                startAnimation("run", _facing_left);
+                _current_animation = -1;
+                break;
+            default:
+                _current_animation = -1;
+                break;
         }
+        _current_animation++;
     }
 
-    advanceAnimation();
     Entity::update(t, dt);
-}
-
-void Doodle::startAnimation(const std::string &animation_name) {
-    _current_animation_name = animation_name;
-    _current_animation_frame = -1;
-    _current_animation_time = -(_animations.at(_current_animation_name).getFramerate());
-}
-
-void Doodle::advanceAnimation() {
-    if (_current_animation_name.empty()) {
-        return;
-    }
-
-    std::vector<unsigned int> texture_frames = _animations.at(_current_animation_name).getTextureFrames();
-    float framerate = _animations.at(_current_animation_name).getFramerate();
-    _current_animation_time += framerate;
-
-    if (_current_animation_frame + 1 < texture_frames.size() && (_current_animation_time >= 1 || framerate == 0)) {
-        notifyObservers(texture_frames[_current_animation_frame + 1], 0);
-        _current_animation_frame += 1;
-        _current_animation_time -= 1;
-    }
 }

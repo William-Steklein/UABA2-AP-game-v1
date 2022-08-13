@@ -4,26 +4,19 @@
 
 #include "PhysicsEntity.h"
 #include <map>
-#include "../../animation/AnimationData.h"
+#include "../../animation/Animation.h"
 
 class Doodle : public PhysicsEntity {
 private:
-    std::map<std::string, AnimationData> _animations;
-    std::string _current_animation_name;
-    unsigned int _current_animation_frame;
-    float _current_animation_time;
-
     double _prev_t;
+    unsigned int _current_animation;
     bool _facing_left;
 
 public:
-    Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize);
+    Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
+           std::shared_ptr<std::map<std::string, Animation>> animation_group);
 
     void update(double t, float dt) override;
-
-    void startAnimation(const std::string &animation_name);
-
-    void advanceAnimation();
 };
 
 

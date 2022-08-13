@@ -4,7 +4,7 @@ World::World(std::shared_ptr<IEntityViewCreator> entity_view_creator, float x_mi
              float y_max)
         : _camera(new Camera(x_min, x_max, y_min, y_max)), _entity_view_creator(std::move(entity_view_creator)),
           _force_static_update(true), _user_input_map(new InputMap) {
-    loadTextureGroups();
+    loadAnimations();
     initializeEntities();
 }
 
@@ -34,36 +34,34 @@ void World::updateScreenResolution(float x_min, float x_max, float y_min, float 
     _force_static_update = true;
 }
 
-void World::loadTextureGroups() {
-    std::vector<std::string> player_textures = {
-            "data/sprites/doodle/doodle-left.png",
-            "data/sprites/doodle/doodle-right.png",
-            "data/sprites/doodle/doodle-jump-left.png",
-            "data/sprites/doodle/doodle-jump-right.png",
-            "data/sprites/circle_explosion/Circle_explosion1.png",
-            "data/sprites/circle_explosion/Circle_explosion2.png",
-            "data/sprites/circle_explosion/Circle_explosion3.png",
-            "data/sprites/circle_explosion/Circle_explosion4.png",
-            "data/sprites/circle_explosion/Circle_explosion5.png",
-            "data/sprites/circle_explosion/Circle_explosion6.png",
-            "data/sprites/circle_explosion/Circle_explosion7.png",
-            "data/sprites/circle_explosion/Circle_explosion8.png",
-            "data/sprites/circle_explosion/Circle_explosion9.png",
-            "data/sprites/circle_explosion/Circle_explosion10.png",
-    };
+void World::loadAnimations() {
+    for (const auto &animation_data_group: animation_data_groups) {
+        std::vector<std::string> texture_filenames;
+        std::shared_ptr<std::map<std::string, Animation>> animation_group =
+                std::make_shared<std::map<std::string, Animation>>();
 
-    std::vector<std::string> background_widget_textures = {"data/textures/prototype/Dark/texture_07.png"};
+        unsigned int current_texture_index = 0;
 
-    _entity_view_creator->loadTextureGroup("player", player_textures);
-    _entity_view_creator->loadTextureGroup("background", background_widget_textures);
+        for (const auto &animation_data_pair: animation_data_group.second) {
+            AnimationData animation_data = animation_data_pair.second;
 
-    std::map<std::string, AnimationData> player_animations = {
-            {"idle_standing_left", {{0}, 0, true}},
-            {"idle_standing_right", {{1}, 0, true}},
-            {"idle_jumping_left", {{2}, 0, true}},
-            {"idle_jumping_right", {{3}, 0, true}},
-            {"explosion", {{4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 0.25f, false}},
-    };
+            Animation animation;
+            animation.framerate = animation_data.framerate;
+            animation.loop = animation_data.loop;
+
+            for (const auto &texture_filename: animation_data.texture_filenames) {
+                texture_filenames.push_back(texture_filename);
+
+                animation.texture_indeces.push_back(current_texture_index);
+                current_texture_index++;
+            }
+
+            animation_group->insert({animation_data_pair.first, animation});
+        }
+
+        _animation_groups[animation_data_group.first] = animation_group;
+        _entity_view_creator->loadTextureGroup(animation_data_group.first, texture_filenames);
+    }
 }
 
 void World::initializeEntities() {
@@ -74,33 +72,17 @@ void World::initializeEntities() {
 void World::initializeUIWidgets() {
     // background
     std::shared_ptr<UIWidget> background_widget = std::make_shared<UIWidget>(
-            UIWidget({0, 0}, _camera, {_camera->getWidth(), _camera->getHeight()}));
+            UIWidget({0, 0}, _camera, {_camera->getWidth(), _camera->getHeight()}, _animation_groups["background"]));
 
     _entity_view_creator->createEntitySpriteView(background_widget, "background", 1);
     _ui_widget_entities.push_back(background_widget);
-
-//
-//    // menu
-//    std::shared_ptr<UIWidget> menu_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {1, 1.5}));
-//
-//    std::vector<std::string> menu_widget_textures = {"data/prototype/ui/menu.png"};
-//    _entity_view_creator->createEntitySpriteView(menu_widget, menu_widget_textures, 10);
-//
-//    _ui_widget_entities.push_back(menu_widget);
-//
-//    // button
-//    std::shared_ptr<UIWidget> button_widget = std::make_shared<UIWidget>(UIWidget({0, 0}, _camera, {0.4, 0.15}));
-//
-//    std::vector<std::string> button_widget_textures = {"data/prototype/ui/button.png"};
-//    _entity_view_creator->createEntitySpriteView(button_widget, button_widget_textures, 11);
-//
-//    _ui_widget_entities.push_back(button_widget);
 }
 
 void World::initializeDoodle() {
     float scale_mul = 5.f;
-    _player = std::make_shared<Doodle>(Doodle({0, 0}, _camera, {0.3f * scale_mul, 0.219f * scale_mul}));
-    _entity_view_creator->createEntitySpriteView(_player, "player", 100);
+    _player = std::make_shared<Doodle>(
+            Doodle({0, 0}, _camera, {0.3f * scale_mul, 0.219f * scale_mul}, _animation_groups["adventurer"]));
+    _entity_view_creator->createEntitySpriteView(_player, "adventurer", 100);
 }
 
 void World::updateUIEntities(double t, float dt) {

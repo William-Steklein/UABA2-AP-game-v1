@@ -2,7 +2,7 @@
 #define GAMEENGINE_CORECONSTANTS_H
 
 #include <limits>
-#include "math/Vector2f.h"
+#include "../math/Vector2f.h"
 
 namespace constants {
     // camera

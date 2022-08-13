@@ -10,12 +10,14 @@
 #include "entities/IEntityViewCreator.h"
 #include "entities/ui/UIWidget.h"
 #include "entities/IEntityViewCreator.h"
-#include "animation/AnimationData.h"
+#include "animation/Animation.h"
+#include "constants/animation_data.h"
 
 class World {
 private:
     std::shared_ptr<Camera> _camera;
     std::shared_ptr<IEntityViewCreator> _entity_view_creator;
+    std::map<std::string, std::shared_ptr<std::map<std::string, Animation>>> _animation_groups;
     bool _force_static_update;
 
     std::vector<std::shared_ptr<UIWidget>> _ui_widget_entities;
@@ -42,7 +44,7 @@ public:
     std::shared_ptr<InputMap> getUserInputMap();
 
 private:
-    void loadTextureGroups();
+    void loadAnimations();
 
     void initializeEntities();
 

@@ -9,6 +9,7 @@
 class EntitySpriteView : public EntityView {
 private:
     sf::Sprite _sprite;
+    bool _h_mirror;
 
     std::shared_ptr<std::vector<sf::Texture>> _texture_group;
     unsigned int _current_texture_index;
@@ -20,7 +21,7 @@ public:
 
     void handleEvent(const unsigned int &event, const unsigned int &channel) override;
 
-    void setTexture(unsigned int texture_index);
+    void setTexture(unsigned int texture_index, bool h_mirror=false);
 
     sf::Sprite getSprite() const;
 

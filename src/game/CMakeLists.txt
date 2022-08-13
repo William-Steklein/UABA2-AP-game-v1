@@ -5,7 +5,7 @@ add_library(GameLib STATIC ${GameLibFiles})
 if (WIN32)
     set(SFML_STATIC_LIBRARIES TRUE)
 endif ()
-find_package(SFML 2.4 COMPONENTS graphics audio REQUIRED)
+find_package(SFML COMPONENTS graphics audio REQUIRED)
 
 target_link_libraries(GameLib CoreLib sfml-graphics sfml-audio)
 

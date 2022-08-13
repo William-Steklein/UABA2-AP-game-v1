@@ -4,7 +4,7 @@
 #include <cmath>
 #include "math/Vector2f.h"
 #include "math/math_funcs.h"
-#include "constants.h"
+#include "constants/constants.h"
 
 class Camera {
 private:

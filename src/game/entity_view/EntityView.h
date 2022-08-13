@@ -6,7 +6,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <vector>
-#include "core/observer_pattern_interface/IObserver.h"
+#include "core/observer-pattern-interface/IObserver.h"
 #include "core/entities/Entity.h"
 #include "core/math/math_funcs.h"
 #include <filesystem>

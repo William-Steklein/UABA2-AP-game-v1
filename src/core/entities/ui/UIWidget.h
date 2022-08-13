@@ -4,6 +4,7 @@
 
 #include "../Entity.h"
 #include <memory>
+#include <utility>
 
 class UIWidget : public Entity {
 private:
@@ -11,6 +12,7 @@ private:
 
 public:
     UIWidget(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
+             std::shared_ptr<std::map<std::string, Animation>> animation_group,
              bool static_view = true);
 
     ~UIWidget() = default;

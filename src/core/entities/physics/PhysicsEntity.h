@@ -9,7 +9,8 @@ private:
     // physics
 
 public:
-    PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize);
+    PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
+                  std::shared_ptr<std::map<std::string, Animation>> animation_group);
 
     ~PhysicsEntity() = default;
 };

@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 #include "Entity.h"
-#include "../animation/AnimationData.h"
+#include "../animation/Animation.h"
 
 class IEntityViewCreator {
 public:
