@@ -4,7 +4,7 @@ Entity::Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const V
                std::shared_ptr<std::map<std::string, Animation>> animation_group)
         : _position(position), _scale({1, 1}), _rotation(0), _camera(std::move(camera)), _view_size(view_size),
           _animation_group(std::move(animation_group)), _current_animation_name(""), _h_mirror(false),
-          _current_animation_frame(0), _current_animation_time(0) {
+          _current_animation_frame(0), _current_animation_time(0), _hitbox(std::make_shared<Hitbox>()) {
 
 }
 
@@ -13,24 +13,21 @@ void Entity::update(double t, float dt) {
     notifyObservers();
 }
 
-Vector2f Entity::getViewSize() const {
-    return _view_size;
-}
-
-Vector2f Entity::getGameViewSize() const {
-    return _camera->projectSizeCoreToGame(_view_size);
-}
-
-void Entity::setViewSize(const Vector2f &view_size) {
-    _view_size = view_size;
-}
-
 Vector2f Entity::getPosition() const {
     return _position;
 }
 
-Vector2f Entity::getGamePosition() const {
+Vector2f Entity::getScreenPosition() const {
     return _camera->projectCoordCoreToGame(_position);
+}
+
+void Entity::setPosition(const Vector2f &position) {
+    _position = position;
+}
+
+void Entity::move(const Vector2f &vector) {
+    _position += vector;
+    _hitbox->setPosition(_position + _hitbox_offset);
 }
 
 Vector2f Entity::getScale() const {
@@ -47,6 +44,18 @@ float Entity::getRotation() const {
 
 void Entity::setRotation(float rotation) {
     _rotation = rotation;
+}
+
+Vector2f Entity::getViewSize() const {
+    return _view_size;
+}
+
+Vector2f Entity::getScreenViewSize() const {
+    return _camera->projectSizeCoreToGame(_view_size);
+}
+
+void Entity::setViewSize(const Vector2f &view_size) {
+    _view_size = view_size;
 }
 
 unsigned int Entity::getCurrentTextureIndex() const {
@@ -94,4 +103,29 @@ void Entity::advanceAnimation() {
             updateAnimationFrame();
         }
     }
+}
+
+std::shared_ptr<Hitbox> Entity::getHitbox() {
+    return _hitbox;
+}
+
+Hitbox Entity::getScreenHitbox() {
+    return {_camera->projectCoordCoreToGame(_hitbox->getPosition()),
+            _camera->projectSizeCoreToGame(_hitbox->getSize())};
+}
+
+void Entity::setHitbox(const Vector2f &position, const Vector2f &size) {
+    _hitbox = std::make_shared<Hitbox>(position, size);
+}
+
+void Entity::setHitbox(const Hitbox &hitbox) {
+    _hitbox = std::make_shared<Hitbox>(hitbox);
+}
+
+void Entity::setHitbox(const std::shared_ptr<Hitbox> &hitbox) {
+    _hitbox = hitbox;
+}
+
+void Entity::setHitboxOffset(const Vector2f &hitbox_offset) {
+    _hitbox_offset = hitbox_offset;
 }

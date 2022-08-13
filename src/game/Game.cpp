@@ -33,6 +33,7 @@ void Game::draw() {
     // render entity views
     for (const auto &entity_sprite_view: _entity_view_creator->getEntitySpriteViews()) {
         _window->draw(entity_sprite_view->getSprite());
+        _window->draw(entity_sprite_view->getHitbox());
     }
     for (const auto &entity_text_view: _entity_view_creator->getEntityTextViews()) {
         _window->draw(entity_text_view->getText());

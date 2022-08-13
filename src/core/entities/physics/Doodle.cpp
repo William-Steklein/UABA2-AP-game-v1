@@ -2,22 +2,34 @@
 #include <utility>
 
 Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-               std::shared_ptr<std::map<std::string, Animation>> animation_group)
+               std::shared_ptr<std::map<std::string, Animation>> animation_group, float mass, bool is_static)
         : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group)), _prev_t(0),
           _facing_left(true), _current_animation(1) {
+    _hitbox->setSize({_view_size.x / 3.f, _view_size.y / 1.25f});
+    _hitbox_offset = {0, -0.072f * _view_size.y};
 
+    float jump_dt = 0.6;
+    float jump_height = 1;
+
+    _gravitational_acceleration = -2 * jump_height / (jump_dt * jump_dt);
+    _initial_jump_velocity = 2 * jump_height / jump_dt;
+
+    _horizontal_movement_force = 200;
+    _drag = 0.015;
+    _friction = 0.3;
+
+    _mass = 20;
+    _max_velocity = {1.4, _initial_jump_velocity * 1.5f};
+
+//    startAnimation("idle", _facing_left);
     startAnimation("crouch", _facing_left);
-    std::cout << 0 << std::endl;
 }
 
 void Doodle::update(double t, float dt) {
-//    float wait_duration = 64 * dt * 4;
     float wait_duration = 3;
 
     if (t - _prev_t >= (wait_duration)) {
         _prev_t = t;
-
-        std::cout << _current_animation << std::endl;
 
         switch (_current_animation) {
             case 0:
@@ -43,5 +55,32 @@ void Doodle::update(double t, float dt) {
         _current_animation++;
     }
 
-    Entity::update(t, dt);
+    // ground collision
+    if (_hitbox->getPosition().y - (_hitbox->getSize().y / 2) < 0) {
+        setPosition({_position.x, _hitbox->getSize().y / 2 - _hitbox_offset.y});
+        _standing = true;
+        _velocity.y = 0;
+    }
+
+    // gravity
+    if (!_standing) {
+        _acceleration.y += _gravitational_acceleration;
+    }
+
+    // friction & drag
+//    Vector2f friction_force = _velocity * _friction;
+//    if (_velocity.length() < 0.1) {
+//        friction_force *= 3;
+//    }
+//    Vector2f drag_force = _velocity * _velocity.length() * _drag;
+//    _acceleration -= friction_force + drag_force;
+
+    // side scrolling
+    if (_position.x <= constants::world_x_min) {
+        setPosition({constants::world_x_max, _position.y});
+    } else if (_position.x >= constants::world_x_max) {
+        setPosition({constants::world_x_min, _position.y});
+    }
+
+    PhysicsEntity::update(t, dt);
 }

@@ -10,6 +10,18 @@ struct AnimationData {
     std::vector<std::string> texture_filenames;
     float framerate;
     bool loop;
+
+    AnimationData(const std::string &texture_filename) {
+        texture_filenames = {texture_filename};
+        framerate = 0.f;
+        loop = true;
+    };
+
+    AnimationData(const std::vector<std::string> &_texture_filenames, float _framerate, bool _loop) {
+        texture_filenames = _texture_filenames;
+        framerate = _framerate;
+        loop = _loop;
+    };
 };
 
 struct Animation {

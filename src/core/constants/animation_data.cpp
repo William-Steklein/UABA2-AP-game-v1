@@ -3,9 +3,7 @@
 const std::map<std::string, std::map<std::string, AnimationData>> animation_data_groups =
         {
                 {"background", {
-                        {"", {{
-                                          "data/textures/prototype/Dark/texture_07.png",
-                                    }, 0.f, true}},
+                        {"", {"data/textures/prototype/Dark/texture_07.png"}},
                 }},
                 {"doodle", {
                         {"standing", {{

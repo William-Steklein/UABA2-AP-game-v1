@@ -39,4 +39,5 @@ private:
     void resizeWindow(unsigned int screen_width, unsigned int screen_height);
 };
 
+
 #endif //GAMEENGINE_GAME_H

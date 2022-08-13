@@ -10,6 +10,7 @@
 #include "core/entities/Entity.h"
 #include "core/math/math_funcs.h"
 #include <filesystem>
+#include <SFML/Graphics/VertexArray.hpp>
 
 class EntityView : public IObserver {
 protected:
@@ -19,6 +20,8 @@ public:
     explicit EntityView(std::weak_ptr<Entity> entity);
 
     ~EntityView() = default;
+
+    virtual sf::VertexArray getHitbox() const;
 };
 
 

@@ -38,17 +38,17 @@ void EntitySpriteView::updateSprite() {
     std::shared_ptr<Entity> entity_shared = _entity.lock();
     if (entity_shared) {
         // transform
-        Vector2f new_position = entity_shared->getGamePosition();
+        Vector2f new_position = entity_shared->getScreenPosition();
         _sprite.setPosition(new_position.x, new_position.y);
 
         auto texture_size = _sprite.getTexture()->getSize();
         Vector2f entity_size = entity_shared->getScale();
 
-        float x_scale_factor = entity_shared->getGameViewSize().x /
+        float x_scale_factor = entity_shared->getScreenViewSize().x /
                                static_cast<float>(texture_size.x) *
                                entity_size.x;
 
-        float y_scale_factor = entity_shared->getGameViewSize().y /
+        float y_scale_factor = entity_shared->getScreenViewSize().y /
                                static_cast<float>(texture_size.y) *
                                entity_size.y;
 

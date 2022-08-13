@@ -72,7 +72,7 @@ void World::initializeEntities() {
 void World::initializeUIWidgets() {
     // background
     std::shared_ptr<UIWidget> background_widget = std::make_shared<UIWidget>(
-            UIWidget({0, 0}, _camera, {_camera->getWidth(), _camera->getHeight()}, _animation_groups["background"]));
+            UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()}, _animation_groups["background"]));
 
     _entity_view_creator->createEntitySpriteView(background_widget, "background", 1);
     _ui_widget_entities.push_back(background_widget);
@@ -81,7 +81,7 @@ void World::initializeUIWidgets() {
 void World::initializeDoodle() {
     float scale_mul = 5.f;
     _player = std::make_shared<Doodle>(
-            Doodle({0, 0}, _camera, {0.3f * scale_mul, 0.219f * scale_mul}, _animation_groups["adventurer"]));
+            Doodle({0, 1.5f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _animation_groups["adventurer"]));
     _entity_view_creator->createEntitySpriteView(_player, "adventurer", 100);
 }
 
