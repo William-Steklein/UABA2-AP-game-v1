@@ -10,7 +10,7 @@ void ISubject::notifyObservers() {
     }
 }
 
-void ISubject::notifyObservers(const std::string &event, const std::string& channel) {
+void ISubject::notifyObservers(const unsigned int &event, const unsigned int &channel) {
     for (const auto &observer: _observers) {
         observer->handleEvent(event, channel);
     }

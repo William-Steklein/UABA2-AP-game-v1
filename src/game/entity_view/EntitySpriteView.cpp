@@ -2,7 +2,7 @@
 
 EntitySpriteView::EntitySpriteView(std::weak_ptr<Entity> entity,
                                    std::shared_ptr<std::vector<sf::Texture>> texture_group)
-        : EntityView(std::move(entity)), _texture_group(std::move(texture_group)), _current_texture(0) {
+        : EntityView(std::move(entity)), _texture_group(std::move(texture_group)), _current_texture_index(0) {
     setTexture(0);
     updateSprite();
 }
@@ -11,14 +11,16 @@ void EntitySpriteView::handleEvent() {
     updateSprite();
 }
 
-void EntitySpriteView::handleEvent(const std::string &event, const std::string &channel) {
-
+void EntitySpriteView::handleEvent(const unsigned int &event, const unsigned int &channel) {
+    if (channel == 0) {
+        setTexture(event);
+    }
 }
 
-void EntitySpriteView::setTexture(unsigned int texture_id) {
-    _current_texture = texture_id;
+void EntitySpriteView::setTexture(unsigned int texture_index) {
+    _current_texture_index = texture_index;
 
-    _sprite.setTexture(_texture_group->at(_current_texture), true);
+    _sprite.setTexture(_texture_group->at(_current_texture_index), true);
     _sprite.setOrigin(static_cast<float>(_sprite.getTextureRect().width) / 2,
                       static_cast<float>(_sprite.getTextureRect().height) / 2);
 }

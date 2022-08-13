@@ -53,8 +53,10 @@ void World::loadTextureGroups() {
     };
 
     std::map<std::string, AnimationData> player_animations = {
-            {"idle_left", {{0}, 0, true}},
-            {"idle_right", {{1}, 0, true}},
+            {"idle_standing_left", {{0}, 0, true}},
+            {"idle_standing_right", {{1}, 0, true}},
+            {"idle_jumping_left", {{2}, 0, true}},
+            {"idle_jumping_right", {{3}, 0, true}},
             {"explosion", {{4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 0.25f, false}},
     };
 

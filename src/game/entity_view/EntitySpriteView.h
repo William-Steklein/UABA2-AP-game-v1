@@ -11,16 +11,16 @@ private:
     sf::Sprite _sprite;
 
     std::shared_ptr<std::vector<sf::Texture>> _texture_group;
-    unsigned int _current_texture;
+    unsigned int _current_texture_index;
 
 public:
     EntitySpriteView(std::weak_ptr<Entity> entity, std::shared_ptr<std::vector<sf::Texture>> texture_group);
 
     void handleEvent() override;
 
-    void handleEvent(const std::string &event, const std::string &channel="") override;
+    void handleEvent(const unsigned int &event, const unsigned int &channel) override;
 
-    void setTexture(unsigned int texture_id);
+    void setTexture(unsigned int texture_index);
 
     sf::Sprite getSprite() const;
 
