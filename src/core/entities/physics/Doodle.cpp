@@ -1,12 +1,12 @@
 #include "Doodle.h"
-#include <utility>
 
 Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-               std::shared_ptr<std::map<std::string, Animation>> animation_group, float mass, bool is_static)
-        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group)), _prev_t(0),
-          _facing_left(true), _current_animation(1) {
+               std::shared_ptr<std::map<std::string, Animation>> animation_group,
+               const std::shared_ptr<InputMap> &input_map, float mass, bool is_static)
+        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group), mass, is_static), _prev_t(0),
+          _facing_left(true), _current_animation(1), _input_map(input_map) {
     _hitbox->setSize({_view_size.x / 3.f, _view_size.y / 1.25f});
-    _hitbox_offset = {0, -0.072f * _view_size.y};
+    setHitboxOffset({0, -0.072f * _view_size.y});
 
     float jump_dt = 0.6;
     float jump_height = 1;
@@ -21,38 +21,69 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
     _mass = 20;
     _max_velocity = {1.4, _initial_jump_velocity * 1.5f};
 
-//    startAnimation("idle", _facing_left);
-    startAnimation("crouch", _facing_left);
+    startAnimation("idle", _facing_left);
+//    startAnimation("crouch", _facing_left);
 }
 
 void Doodle::update(double t, float dt) {
     float wait_duration = 3;
 
-    if (t - _prev_t >= (wait_duration)) {
-        _prev_t = t;
+//    if (t - _prev_t >= (wait_duration)) {
+//        _prev_t = t;
+//
+//        switch (_current_animation) {
+//            case 0:
+//                startAnimation("crouch", _facing_left);
+//                break;
+//            case 1:
+//                startAnimation("fall", _facing_left);
+//                break;
+//            case 2:
+//                startAnimation("idle", _facing_left);
+//                break;
+//            case 3:
+//                startAnimation("jump", _facing_left);
+//                break;
+//            case 4:
+//                startAnimation("run", _facing_left);
+//                _current_animation = -1;
+//                break;
+//            default:
+//                _current_animation = -1;
+//                break;
+//        }
+//        _current_animation++;
+//    }
 
-        switch (_current_animation) {
-            case 0:
-                startAnimation("crouch", _facing_left);
-                break;
-            case 1:
-                startAnimation("fall", _facing_left);
-                break;
-            case 2:
-                startAnimation("idle", _facing_left);
-                break;
-            case 3:
-                startAnimation("jump", _facing_left);
-                break;
-            case 4:
-                startAnimation("run", _facing_left);
-                _current_animation = -1;
-                break;
-            default:
-                _current_animation = -1;
-                break;
+    _velocity.clear();
+
+    float movement_speed = 0.01f;
+
+    // player controller
+    if (_input_map->a) {
+        move({-movement_speed, 0});
+        _velocity += {-movement_speed, 0};
+    }
+    if (_input_map->d) {
+        move({movement_speed, 0});
+        _velocity += {movement_speed, 0};
+    }
+    if (_input_map->w) {
+        move({0, movement_speed});
+        _velocity += {0, movement_speed};
+    }
+    if (_input_map->s) {
+        move({0, -movement_speed});
+        _velocity += {0, -movement_speed};
+    }
+
+    // crouching
+    if (_input_map->c) {
+        if (_current_animation_name != "crouch") {
+            startAnimation("crouch", _facing_left);
         }
-        _current_animation++;
+    } else if (_current_animation_name != "idle") {
+        startAnimation("idle", _facing_left);
     }
 
     // ground collision

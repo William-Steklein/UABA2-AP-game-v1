@@ -5,6 +5,9 @@ const std::map<std::string, std::map<std::string, AnimationData>> animation_data
                 {"background", {
                         {"", {"data/textures/prototype/Dark/texture_07.png"}},
                 }},
+                {"wall", {
+                                       {"", {"data/textures/cobble_stone.png"}},
+                               }},
                 {"doodle", {
                         {"standing", {{
                                           "data/sprites/doodle/doodle-left.png",

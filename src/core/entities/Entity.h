@@ -40,6 +40,8 @@ public:
 
     virtual void update(double t, float dt);
 
+    virtual void updateView();
+
     virtual Vector2f getPosition() const;
 
     virtual Vector2f getScreenPosition() const;

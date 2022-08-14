@@ -6,13 +6,17 @@
 
 class PhysicsEntity : public Entity {
 protected:
+    bool _is_static;
+
     // physics
     float _mass;
     Vector2f _force;
     Vector2f _velocity;
     Vector2f _acceleration;
 
-    bool _is_static;
+    // collision resolution
+    Vector2f _previous_hitbox_position;
+    Vector2f _previous_velocity;
 
 public:
     PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
@@ -21,6 +25,32 @@ public:
     ~PhysicsEntity() = default;
 
     virtual void update(double t, float dt);
+
+    bool isIsStatic() const;
+
+    void setIsStatic(bool isStatic);
+
+    float getMass() const;
+
+    void setMass(float mass);
+
+    const Vector2f &getForce() const;
+
+    void setForce(const Vector2f &force);
+
+    const Vector2f &getVelocity() const;
+
+    void setVelocity(const Vector2f &velocity);
+
+    const Vector2f &getAcceleration() const;
+
+    void setAcceleration(const Vector2f &acceleration);
+
+    const Vector2f &getPreviousPosition() const;
+
+    const Vector2f &getPreviousVelocity() const;
+
+    virtual void resolveCollision(const PhysicsEntity &other);
 };
 
 

@@ -10,6 +10,7 @@
 #include "entities/IEntityViewCreator.h"
 #include "entities/ui/UIWidget.h"
 #include "entities/IEntityViewCreator.h"
+#include "entities/physics/Wall.h"
 #include "animation/Animation.h"
 #include "constants/animation_data.h"
 
@@ -23,6 +24,7 @@ private:
     std::vector<std::shared_ptr<UIWidget>> _ui_widget_entities;
 
     std::shared_ptr<Doodle> _player;
+    std::vector<std::shared_ptr<Wall>> _walls;
     //std::vector<std::shared_ptr<Platform>> _platforms;
     //std::vector<std::shared_ptr<BackgroundTile>> _background_tiles;
     //std::vector<std::shared_ptr<Bonus>> _bonuses;
@@ -57,6 +59,9 @@ private:
     void updatePhysics(double t, float dt);
 
     void updatePhysicsEntities(double t, float dt);
+
+    bool handleCollision(const std::shared_ptr<PhysicsEntity> &entity1, const std::shared_ptr<PhysicsEntity> &entity2,
+                         bool resolve = true);
 };
 
 

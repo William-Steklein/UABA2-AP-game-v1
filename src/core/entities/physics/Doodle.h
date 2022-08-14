@@ -3,8 +3,8 @@
 
 
 #include "PhysicsEntity.h"
-#include <map>
-#include "../../animation/Animation.h"
+#include "../../InputMap.h"
+#include <utility>
 
 class Doodle : public PhysicsEntity {
 private:
@@ -23,9 +23,11 @@ private:
     unsigned int _current_animation;
     bool _facing_left;
 
+    std::shared_ptr<InputMap> _input_map;
+
 public:
     Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-           std::shared_ptr<std::map<std::string, Animation>> animation_group, float mass=1, bool is_static=false);
+           std::shared_ptr<std::map<std::string, Animation>> animation_group, const std::shared_ptr<InputMap> &input_map, float mass=1, bool is_static=false);
 
     void update(double t, float dt) override;
 };

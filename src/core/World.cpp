@@ -65,8 +65,13 @@ void World::loadAnimations() {
 }
 
 void World::initializeEntities() {
-    initializeDoodle();
     initializeUIWidgets();
+    initializeDoodle();
+
+    std::shared_ptr<Wall> new_wall = std::make_shared<Wall>(
+            Wall({-0.3f, 1.f}, _camera, {0.4f, 0.4f}, _animation_groups["wall"]));
+    _entity_view_creator->createEntitySpriteView(new_wall, "wall", 3);
+    _walls.push_back(new_wall);
 }
 
 void World::initializeUIWidgets() {
@@ -79,10 +84,11 @@ void World::initializeUIWidgets() {
 }
 
 void World::initializeDoodle() {
-    float scale_mul = 5.f;
+    float scale_mul = 2.5f;
     _player = std::make_shared<Doodle>(
-            Doodle({0, 1.5f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _animation_groups["adventurer"]));
-    _entity_view_creator->createEntitySpriteView(_player, "adventurer", 100);
+            Doodle({0.f, 1.f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _animation_groups["adventurer"],
+                   _user_input_map, 1, true));
+    _entity_view_creator->createEntitySpriteView(_player, "adventurer", 2);
 }
 
 void World::updateUIEntities(double t, float dt) {
@@ -96,11 +102,21 @@ void World::updateUIEntities(double t, float dt) {
 
 void World::updatePhysics(double t, float dt) {
     updatePhysicsEntities(t, dt);
+
+    // collisions
+    for (const auto &wall: _walls) {
+        handleCollision(_player, wall, true);
+    }
 }
 
 void World::updatePhysicsEntities(double t, float dt) {
     // player
     _player->update(t, dt);
+
+    // walls
+    for (const auto &wall: _walls) {
+        wall->update(t, dt);
+    }
 
     // platforms
 
@@ -114,4 +130,22 @@ void World::updatePhysicsEntities(double t, float dt) {
 
 std::shared_ptr<InputMap> World::getUserInputMap() {
     return _user_input_map;
+}
+
+bool World::handleCollision(const std::shared_ptr<PhysicsEntity> &entity1,
+                            const std::shared_ptr<PhysicsEntity> &entity2,
+                            bool resolve) {
+    if (entity1->getHitbox()->empty() || entity2->getHitbox()->empty()) {
+        return false;
+    }
+
+//    std::cout << entity1->getHitbox()->getDisplacementToCollision(*entity2->getHitbox()) << std::endl;
+
+    bool collided = entity1->getHitbox()->collides(*entity2->getHitbox());
+
+    if (collided && resolve) {
+        entity1->resolveCollision(*entity2);
+    }
+
+    return collided;
 }

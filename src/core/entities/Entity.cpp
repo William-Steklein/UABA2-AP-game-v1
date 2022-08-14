@@ -10,6 +10,10 @@ Entity::Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const V
 
 void Entity::update(double t, float dt) {
     advanceAnimation();
+    updateView();
+}
+
+void Entity::updateView() {
     notifyObservers();
 }
 
@@ -23,11 +27,11 @@ Vector2f Entity::getScreenPosition() const {
 
 void Entity::setPosition(const Vector2f &position) {
     _position = position;
+    _hitbox->setPosition(_position + _hitbox_offset);
 }
 
 void Entity::move(const Vector2f &vector) {
-    _position += vector;
-    _hitbox->setPosition(_position + _hitbox_offset);
+    setPosition(_position + vector);
 }
 
 Vector2f Entity::getScale() const {
@@ -128,4 +132,5 @@ void Entity::setHitbox(const std::shared_ptr<Hitbox> &hitbox) {
 
 void Entity::setHitboxOffset(const Vector2f &hitbox_offset) {
     _hitbox_offset = hitbox_offset;
+    _hitbox->setPosition(_position + _hitbox_offset);
 }

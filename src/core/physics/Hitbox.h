@@ -22,7 +22,11 @@ public:
 
     void setSize(const Vector2f &size);
 
+    bool empty() const;
+
     bool collides(const Hitbox &other) const;
+
+    Vector2f getDisplacementToCollision(const Hitbox &other) const;
 };
 
 
