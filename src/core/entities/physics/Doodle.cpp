@@ -3,8 +3,8 @@
 Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
                std::shared_ptr<std::map<std::string, Animation>> animation_group,
                const std::shared_ptr<InputMap> &input_map, float mass, bool is_static)
-        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group), mass, is_static), _prev_t(0),
-          _facing_left(true), _current_animation(1), _input_map(input_map) {
+        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group), mass, is_static),
+          _input_map(input_map) {
     _hitbox->setSize({_view_size.x / 3.f, _view_size.y / 1.25f});
     setHitboxOffset({0, -0.072f * _view_size.y});
 
@@ -21,40 +21,23 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
     _mass = 20;
     _max_velocity = {1.4, _initial_jump_velocity * 1.5f};
 
-    startAnimation("idle", _facing_left);
-//    startAnimation("crouch", _facing_left);
+    startAnimation("idle");
 }
 
 void Doodle::update(double t, float dt) {
-    float wait_duration = 3;
+    adventurerController();
 
-//    if (t - _prev_t >= (wait_duration)) {
-//        _prev_t = t;
-//
-//        switch (_current_animation) {
-//            case 0:
-//                startAnimation("crouch", _facing_left);
-//                break;
-//            case 1:
-//                startAnimation("fall", _facing_left);
-//                break;
-//            case 2:
-//                startAnimation("idle", _facing_left);
-//                break;
-//            case 3:
-//                startAnimation("jump", _facing_left);
-//                break;
-//            case 4:
-//                startAnimation("run", _facing_left);
-//                _current_animation = -1;
-//                break;
-//            default:
-//                _current_animation = -1;
-//                break;
-//        }
-//        _current_animation++;
-//    }
+    // side scrolling
+    if (_position.x <= constants::world_x_min) {
+        setPosition({constants::world_x_max, _position.y});
+    } else if (_position.x >= constants::world_x_max) {
+        setPosition({constants::world_x_min, _position.y});
+    }
 
+    PhysicsEntity::update(t, dt);
+}
+
+void Doodle::testController() {
     _velocity.clear();
 
     float movement_speed = 0.01f;
@@ -76,14 +59,29 @@ void Doodle::update(double t, float dt) {
         move({0, -movement_speed});
         _velocity += {0, -movement_speed};
     }
+}
+
+void Doodle::adventurerController() {
+    // reset player
+    if (_input_map->r) {
+        setPosition({0, 1});
+        _standing = false;
+    }
+
+    // jumping
+    if (_standing && _input_map->w) {
+        _velocity.y = _initial_jump_velocity;
+        _standing = false;
+        startAnimation("jump");
+    }
 
     // crouching
     if (_input_map->c) {
         if (_current_animation_name != "crouch") {
-            startAnimation("crouch", _facing_left);
+            startAnimation("crouch", _h_mirror);
         }
     } else if (_current_animation_name != "idle") {
-        startAnimation("idle", _facing_left);
+        startAnimation("idle", _h_mirror);
     }
 
     // ground collision
@@ -93,25 +91,26 @@ void Doodle::update(double t, float dt) {
         _velocity.y = 0;
     }
 
+    // left / right movement
+    if (_input_map->d) {
+        _force.x += _horizontal_movement_force;
+        _h_mirror = false;
+    }
+    if (_input_map->a) {
+        _force.x -= _horizontal_movement_force;
+        _h_mirror = true;
+    }
+
     // gravity
     if (!_standing) {
         _acceleration.y += _gravitational_acceleration;
     }
 
     // friction & drag
-//    Vector2f friction_force = _velocity * _friction;
-//    if (_velocity.length() < 0.1) {
-//        friction_force *= 3;
-//    }
-//    Vector2f drag_force = _velocity * _velocity.length() * _drag;
-//    _acceleration -= friction_force + drag_force;
-
-    // side scrolling
-    if (_position.x <= constants::world_x_min) {
-        setPosition({constants::world_x_max, _position.y});
-    } else if (_position.x >= constants::world_x_max) {
-        setPosition({constants::world_x_min, _position.y});
+    Vector2f friction_force = _velocity * _friction;
+    if (_velocity.length() < 0.1) {
+        friction_force *= 3;
     }
-
-    PhysicsEntity::update(t, dt);
+    Vector2f drag_force = _velocity * _velocity.length() * _drag;
+    _acceleration -= friction_force + drag_force;
 }

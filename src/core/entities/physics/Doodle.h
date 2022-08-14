@@ -19,10 +19,6 @@ private:
     float _friction;
     Vector2f _max_velocity;
 
-    double _prev_t;
-    unsigned int _current_animation;
-    bool _facing_left;
-
     std::shared_ptr<InputMap> _input_map;
 
 public:
@@ -30,6 +26,10 @@ public:
            std::shared_ptr<std::map<std::string, Animation>> animation_group, const std::shared_ptr<InputMap> &input_map, float mass=1, bool is_static=false);
 
     void update(double t, float dt) override;
+
+    void testController();
+
+    void adventurerController();
 };
 
 

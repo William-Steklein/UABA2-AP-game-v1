@@ -69,7 +69,7 @@ void World::initializeEntities() {
     initializeDoodle();
 
     std::shared_ptr<Wall> new_wall = std::make_shared<Wall>(
-            Wall({-0.3f, 1.f}, _camera, {0.4f, 0.4f}, _animation_groups["wall"]));
+            Wall({-0.5f, 0.5f}, _camera, {0.4f, 0.4f}, _animation_groups["wall"]));
     _entity_view_creator->createEntitySpriteView(new_wall, "wall", 3);
     _walls.push_back(new_wall);
 }
@@ -86,8 +86,8 @@ void World::initializeUIWidgets() {
 void World::initializeDoodle() {
     float scale_mul = 2.5f;
     _player = std::make_shared<Doodle>(
-            Doodle({0.f, 1.f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _animation_groups["adventurer"],
-                   _user_input_map, 1, true));
+            Doodle({0.f, 2.f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _animation_groups["adventurer"],
+                   _user_input_map, 1, false));
     _entity_view_creator->createEntitySpriteView(_player, "adventurer", 2);
 }
 
