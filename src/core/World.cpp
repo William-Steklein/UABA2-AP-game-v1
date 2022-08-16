@@ -16,8 +16,15 @@ void World::sleep() {
 }
 
 void World::update() {
+    if (_input_map->z) {
+        Stopwatch::getInstance().setPhysicsSpeed(1);
+    }
+    if (_input_map->x) {
+        Stopwatch::getInstance().setPhysicsSpeed(1.f / 60);
+    }
+
     // update UI entities
-    updateUIEntities(Stopwatch::getInstance().getPhysicsTime(), Stopwatch::getInstance().getAccumulator());
+    updateUIEntities(Stopwatch::getInstance().getPhysicsTime(), Stopwatch::getInstance().getDeltaTime());
 
     // update physics entities
     Stopwatch::getInstance().increaseAccumulator();
@@ -94,8 +101,6 @@ void World::initializePhysicsEntities() {
                    _input_map, 1, false));
     _entity_view_creator->createEntitySpriteView(_player, "adventurer", 5);
 
-    std::vector<std::shared_ptr<Ray>> banana = _player->getRays();
-
 //    // walls
 //    _walls.push_back(std::make_shared<Wall>(
 //            Wall({-0.5f, 0.5f}, _camera, {0.4f, 0.4f}, _animation_groups["wall"])));
@@ -106,7 +111,6 @@ void World::initializePhysicsEntities() {
             std::make_shared<PortalRadio>(PortalRadio({0.5f, 2}, _camera, {0.2f, 0.2f}, _animation_groups["portal_radio"])));
     _entity_view_creator->createEntitySpriteView(_portal_radios.back(), "portal_radio", 4);
 
-    // physics test scene
     // walls
 
     _walls.push_back(std::make_shared<Wall>(
@@ -118,7 +122,7 @@ void World::initializePhysicsEntities() {
     _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 3);
 
     _walls.push_back(std::make_shared<Wall>(
-            Wall({0.5f, 1.5f}, _camera, {0.5f, 0.5f}, _animation_groups["wall"], 1, false)));
+            Wall({0.5f, 0.75f}, _camera, {0.5f, 0.5f}, _animation_groups["wall"], 1, false)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 2);
 }
 
@@ -138,6 +142,10 @@ void World::updatePhysics(double t, float dt) {
     if (_player) {
         for (const auto &wall: _walls) {
             handleCollision(_player, wall, true);
+
+            for (const auto &ray: _player->getRays()) {
+                handleCollision(ray, wall);
+            }
         }
     }
 
@@ -188,4 +196,12 @@ bool World::handleCollision(const std::shared_ptr<PhysicsEntity> &entity1,
     }
 
     return collided;
+}
+
+bool World::handleCollision(const std::shared_ptr<Ray> &ray, const std::shared_ptr<PhysicsEntity> &entity) {
+    if (entity->getHitbox()->empty()) {
+        return false;
+    }
+
+    return ray->collides(*entity->getHitbox());
 }

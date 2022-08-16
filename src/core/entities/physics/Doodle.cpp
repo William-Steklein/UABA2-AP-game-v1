@@ -7,13 +7,13 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
                std::shared_ptr<InputMap> input_map, float mass, bool is_static)
         : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group), mass, is_static),
           _input_map(std::move(input_map)) {
-    _hitbox->setSize({_view_size.x / 3.f, _view_size.y / 1.25f});
+    _hitbox->setSize({_view_size.x / 3.5f, _view_size.y / 1.25f});
     _hitbox->setOffset({0, -0.072f * _view_size.y});
 
     // standing rays
-    Vector2f r1(_hitbox->getPosition().x - _hitbox->getSize().x / 2, _hitbox->getPosition().y);
-    Vector2f r2(r1.x + _hitbox->getSize().x, r1.y);
-    float ray_length = 0.1;
+    Vector2f r1(_hitbox->getPosition().x - _hitbox->getSize().x / 2.1, _hitbox->getPosition().y - _hitbox->getSize().y / 2);
+    Vector2f r2(_hitbox->getPosition().x + _hitbox->getSize().x / 2.1, r1.y);
+    float ray_length = 0.05;
 
     _rays.push_back(std::make_shared<Ray>(Ray(r1, {r1.x, r1.y - ray_length})));
     _rays.push_back(std::make_shared<Ray>(Ray(r2, {r2.x, r2.y - ray_length})));
@@ -108,10 +108,11 @@ void Doodle::testController2() {
 }
 
 void Doodle::adventurerController() {
+    _standing = false;
+
     // reset player
     if (_input_map->r) {
-        setPosition({0, 1});
-        _standing = false;
+        setPosition({0, 2.5f});
         _velocity.clear();
         for (const auto& standing_ray: _rays) {
             standing_ray->reset();
@@ -140,13 +141,6 @@ void Doodle::adventurerController() {
         }
     } else if (_current_animation_name != "idle" && (_current_animation_name != "jump" || _standing)) {
         startAnimation("idle", _h_mirror);
-    }
-
-    // ground collision
-    if (_hitbox->getPosition().y - (_hitbox->getSize().y / 2) < 0) {
-        setPosition({_position.x, _hitbox->getSize().y / 2 - _hitbox->getOffset().y});
-        _standing = true;
-        _velocity.y = 0;
     }
 
     // left / right movement

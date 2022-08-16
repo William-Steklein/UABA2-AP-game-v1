@@ -26,6 +26,7 @@ private:
 
     // entities
     std::shared_ptr<IEntityViewCreator> _entity_view_creator;
+//    _entities;
     bool _force_static_update;
     std::shared_ptr<Doodle> _player;
     std::vector<std::shared_ptr<Wall>> _walls;
@@ -65,6 +66,8 @@ private:
 
     bool handleCollision(const std::shared_ptr<PhysicsEntity> &entity1, const std::shared_ptr<PhysicsEntity> &entity2,
                          bool resolve = true);
+
+    bool handleCollision(const std::shared_ptr<Ray> &ray, const std::shared_ptr<PhysicsEntity> &entity);
 };
 
 

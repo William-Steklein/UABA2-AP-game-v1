@@ -2,11 +2,8 @@
 
 Hitbox::Hitbox(const Vector2f &position, const Vector2f &size, const Vector2f &offset) : _position(position),
                                                                                          _original_position(position),
-                                                                                         _scale({1.f, 1.f}),
                                                                                          _size(size),
-                                                                                         _original_size(size),
-                                                                                         _offset(offset),
-                                                                                         _original_offset(offset) {
+                                                                                         _offset(offset) {
 
 }
 
@@ -19,26 +16,14 @@ void Hitbox::setPosition(const Vector2f &position) {
     _position = _original_position + _offset;
 }
 
-const Vector2f &Hitbox::getScale() const {
-    return _scale;
-}
-
-void Hitbox::setScale(const Vector2f &scale) {
-    _scale = scale;
-
-    setSize(_original_size);
-
-    setOffset(_original_offset);
-    setPosition(_original_position);
-}
-
 const Vector2f &Hitbox::getSize() const {
     return _size;
 }
 
 void Hitbox::setSize(const Vector2f &size) {
-    _original_size = size;
-    _size = {_original_size.x * _scale.x, _original_size.y * _scale.y};
+    _size = size;
+//    _original_size = size;
+//    _size = {_original_size.x * _scale.x, _original_size.y * _scale.y};
 }
 
 const Vector2f &Hitbox::getOffset() const {
@@ -46,8 +31,16 @@ const Vector2f &Hitbox::getOffset() const {
 }
 
 void Hitbox::setOffset(const Vector2f &offset) {
-    _original_offset = offset;
-    _offset = {_original_offset.x * _scale.x, _original_offset.y * _scale.y};
+    _offset = offset;
+//    _original_offset = offset;
+//    _offset = {_original_offset.x * _scale.x, _original_offset.y * _scale.y};
+}
+
+void Hitbox::scale(const Vector2f &scale) {
+    _offset = {_offset.x * scale.x, _offset.y * scale.y};
+    _size = {_size.x * scale.x, _size.y * scale.y};
+
+    setPosition(_original_position);
 }
 
 bool Hitbox::empty() const {
@@ -62,9 +55,19 @@ bool Hitbox::collides(const Hitbox &other) const {
 }
 
 Vector2f Hitbox::getDisplacementToCollision(const Hitbox &other) const {
-    if (_position < other._position) {
-        return other._position - (other._size / 2) - (_position + (_size / 2));
+    Vector2f displacement;
+
+    if (_position.x < other._position.x) {
+        displacement.x = other._position.x - (other._size.x / 2) - (_position.x + (_size.x / 2));
     } else {
-        return other._position + (other._size / 2) - (_position - (_size / 2));
+        displacement.x = other._position.x + (other._size.x / 2) - (_position.x - (_size.x / 2));
     }
+
+    if (_position.y < other._position.y) {
+        displacement.y = other._position.y - (other._size.y / 2) - (_position.y + (_size.y / 2));
+    } else {
+        displacement.y = other._position.y + (other._size.y / 2) - (_position.y - (_size.y / 2));
+    }
+
+    return displacement;
 }

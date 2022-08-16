@@ -26,8 +26,13 @@ Vector2f Entity::getScreenPosition() const {
 }
 
 void Entity::setPosition(const Vector2f &position) {
+    _hitbox->setPosition(position);
+
+    for (const auto& ray: _rays) {
+        ray->move(position - _position);
+    }
+
     _position = position;
-    _hitbox->setPosition(_position);
 }
 
 void Entity::move(const Vector2f &vector) {
@@ -39,8 +44,16 @@ Vector2f Entity::getScale() const {
 }
 
 void Entity::setScale(const Vector2f &scale) {
+    if (!(_scale.x == 0 || _scale.y == 0)) {
+        Vector2f scale_mult(scale.x / _scale.x, scale.y / _scale.y);
+
+        _hitbox->scale(scale_mult);
+
+        for (const auto& ray: _rays) {
+            ray->scale(scale_mult, _position);
+        }
+    }
     _scale = scale;
-    _hitbox->setScale(scale);
 }
 
 void Entity::scale(const Vector2f &scale) {

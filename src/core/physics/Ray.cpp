@@ -27,6 +27,20 @@ void Ray::setEndPoint(const Vector2f &endPoint) {
     _end_point = endPoint;
 }
 
+void Ray::move(const Vector2f &vector) {
+    _origin_point += vector;
+    _end_point += vector;
+    _collision_point += vector;
+}
+
+void Ray::scale(const Vector2f &scale, const Vector2f &origin) {
+    _origin_point = {(_origin_point.x + origin.x * scale.x) - origin.x,
+                     (_origin_point.y + origin.y * scale.y) - origin.y};
+    _end_point = {(_end_point.x + origin.x * scale.x) - origin.x, (_end_point.y + origin.y * scale.y) - origin.y};
+    _collision_point = {(_collision_point.x + origin.x * scale.x) - origin.x,
+                        (_collision_point.y + origin.y * scale.y) - origin.y};
+}
+
 bool Ray::isCollided() const {
     return _collided;
 }
@@ -56,7 +70,7 @@ bool Ray::collides(const Vector2f &other_origin_point, const Vector2f &other_end
     bool collision = linesegmentIntersection(_origin_point, _end_point, other_origin_point, other_end_point,
                                              intersection1, intersection2, is_collinear);
 
-    if (set_collision_point) {
+    if (collision && set_collision_point) {
         Vector2f closest_intersection;
         if (is_collinear) {
             // check the closest intersection of 1 & 2
