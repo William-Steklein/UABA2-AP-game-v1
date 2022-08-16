@@ -12,7 +12,7 @@ private:
 
 public:
     UIWidget(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-             std::shared_ptr<std::map<std::string, Animation>> animation_group,
+             std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group,
              bool static_view = true);
 
     ~UIWidget() = default;

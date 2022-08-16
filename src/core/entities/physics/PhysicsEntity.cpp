@@ -1,19 +1,15 @@
 #include "PhysicsEntity.h"
 
 PhysicsEntity::PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-                             std::shared_ptr<std::map<std::string, Animation>> animation_group, float mass,
+                             std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group, float mass,
                              bool is_static) : Entity(position, std::move(camera), viewSize,
-                                                      std::move(animation_group)), _is_static(is_static),
-                                               _previous_hitbox_position(_position), _mass(mass) {
+                                                      std::move(animation_group)), _is_static(is_static), _mass(mass),
+                                               _gravitational_acceleration(0) {
     _hitbox = std::make_shared<Hitbox>(_position, _view_size);
 
 }
 
 void PhysicsEntity::update(double t, float dt) {
-    // store old pos and vel for collision resolution
-    _previous_hitbox_position = _hitbox->getPosition();
-    _previous_velocity = _velocity;
-
     if (_is_static) {
         Entity::update(t, dt);
         return;
@@ -22,11 +18,9 @@ void PhysicsEntity::update(double t, float dt) {
     // force acceleration
     _acceleration += _force / _mass;
 
-    // position: position + timestep * (velocity + timestep * acceleration / 2)
-    Vector2f move_velocity = _velocity + dt * _acceleration / 2;
-    move(dt * move_velocity);
-
-    _velocity += dt * _acceleration;
+    // verlet integration t(position): position + velocity * timestep + (acceleration * timestep^2) / 2
+    move(_velocity * dt + _acceleration * dt * dt / 2);
+    _velocity += _acceleration * dt;
 
     // todo: make min_value a constant
     float min_value = 1.e-4f;
@@ -83,45 +77,19 @@ void PhysicsEntity::setAcceleration(const Vector2f &acceleration) {
     _acceleration = acceleration;
 }
 
-const Vector2f &PhysicsEntity::getPreviousPosition() const {
-    return _previous_hitbox_position;
-}
-
-const Vector2f &PhysicsEntity::getPreviousVelocity() const {
-    return _previous_velocity;
-}
-
 void PhysicsEntity::resolveCollision(const PhysicsEntity &other) {
-    // case 1: other is static
-    Vector2f displacement = Hitbox(_previous_hitbox_position, _hitbox->getSize()).getDisplacementToCollision(
-            {other._previous_hitbox_position, other._hitbox->getSize()});
+    Vector2f displacement = _hitbox->getDisplacementToCollision(*other._hitbox);
 
-    Vector2f collision_time = {_previous_velocity.x != 0 ? std::abs(displacement.x / _previous_velocity.x) : 0,
-                               _previous_velocity.y != 0 ? std::abs(displacement.y / _previous_velocity.y) : 0};
-
-    Vector2f move_vector;
-
-    if (_previous_velocity.x != 0 && _previous_velocity.y == 0) {
-        move_vector.x = _previous_velocity.x * collision_time.x;
-    } else if (_previous_velocity.x == 0 && _previous_velocity.y != 0) {
-        move_vector.y = _previous_velocity.y * collision_time.y;
+    if (std::abs(displacement.x) == std::abs(displacement.y)) {
+        move({displacement.x, displacement.y});
+        _velocity.x = 0;
+    } else if (std::abs(displacement.x) < std::abs(displacement.y)) {
+        move({displacement.x, 0});
+        _velocity.x = 0;
     } else {
-//        move_vector = _previous_velocity * std::min(collision_time.x, collision_time.y);
-        if (collision_time.x < collision_time.y) {
-            move_vector.x = _previous_velocity.x * collision_time.x;
-        } else {
-            move_vector.y = _previous_velocity.y * collision_time.y;
-        }
+        move({0, displacement.y});
+        _velocity.y = 0;
     }
 
-    std::cout << _previous_velocity << std::endl;
-    std::cout << -1 * (move_vector) << std::endl;
-    std::cout << "********************" << std::endl;
-
-    setPosition(_previous_hitbox_position - _hitbox_offset - move_vector * 1.001);
     updateView();
-
-    // case 2: this is static
-
-    // case 3: both are dynamic
 }

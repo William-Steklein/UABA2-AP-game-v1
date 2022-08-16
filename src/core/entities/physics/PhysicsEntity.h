@@ -13,14 +13,11 @@ protected:
     Vector2f _force;
     Vector2f _velocity;
     Vector2f _acceleration;
-
-    // collision resolution
-    Vector2f _previous_hitbox_position;
-    Vector2f _previous_velocity;
+    float _gravitational_acceleration;
 
 public:
     PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-                  std::shared_ptr<std::map<std::string, Animation>> animation_group, float mass=1, bool is_static=false);
+                  std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group, float mass=1, bool is_static=false);
 
     ~PhysicsEntity() = default;
 
@@ -45,10 +42,6 @@ public:
     const Vector2f &getAcceleration() const;
 
     void setAcceleration(const Vector2f &acceleration);
-
-    const Vector2f &getPreviousPosition() const;
-
-    const Vector2f &getPreviousVelocity() const;
 
     virtual void resolveCollision(const PhysicsEntity &other);
 };

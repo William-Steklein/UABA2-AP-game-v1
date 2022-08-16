@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "game/entity_view/EntityViewCreator.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <memory>
 

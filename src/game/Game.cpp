@@ -12,6 +12,19 @@ Game::Game()
 Game::~Game() = default;
 
 void Game::run() {
+//    sf::SoundBuffer buffer;
+//    if (!buffer.loadFromFile("data/audio/wilhelm_scream.wav"))
+//        return;
+
+//    sf::Sound sound;
+//    sound.setBuffer(buffer);
+//
+//    std::cout << sound.getStatus() << std::endl;
+//
+//    sound.play();
+//
+//    std::cout << sound.getStatus() << std::endl;
+
     while (_running) {
         // coreAPI sleep
         _world->sleep();
@@ -24,6 +37,10 @@ void Game::run() {
 
         // sfml draw
         draw();
+
+//        if (sound.getStatus() == 0) {
+//            sound.play();
+//        }
     }
 }
 

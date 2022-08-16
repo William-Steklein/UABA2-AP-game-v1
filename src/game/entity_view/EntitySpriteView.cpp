@@ -2,7 +2,8 @@
 
 EntitySpriteView::EntitySpriteView(std::weak_ptr<Entity> entity,
                                    std::shared_ptr<std::vector<sf::Texture>> texture_group)
-        : EntityView(std::move(entity)), _h_mirror(false), _texture_group(std::move(texture_group)), _current_texture_index(0) {
+        : EntityView(std::move(entity)), _h_mirror(false), _texture_group(std::move(texture_group)),
+          _current_texture_index(0) {
     std::shared_ptr<Entity> shared_entity = _entity.lock();
     setTexture(shared_entity->getCurrentTextureIndex(), shared_entity->isMirrored());
     updateSprite();
@@ -15,8 +16,7 @@ void EntitySpriteView::handleEvent() {
 void EntitySpriteView::handleEvent(const unsigned int &event, const unsigned int &channel) {
     if (channel == 0) {
         setTexture(event);
-    }
-    if (channel == 1) {
+    } else if (channel == 1) {
         setTexture(event, true);
     }
 }

@@ -1,7 +1,7 @@
 #include "Entity.h"
 
 Entity::Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size,
-               std::shared_ptr<std::map<std::string, Animation>> animation_group)
+               std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group)
         : _position(position), _scale({1, 1}), _rotation(0), _camera(std::move(camera)), _view_size(view_size),
           _animation_group(std::move(animation_group)), _current_animation_name(""), _h_mirror(false),
           _current_animation_frame(0), _current_animation_time(0), _hitbox(std::make_shared<Hitbox>()) {

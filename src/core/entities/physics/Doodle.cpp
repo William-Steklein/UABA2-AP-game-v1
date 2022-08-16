@@ -1,10 +1,12 @@
 #include "Doodle.h"
 
+#include <utility>
+
 Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-               std::shared_ptr<std::map<std::string, Animation>> animation_group,
-               const std::shared_ptr<InputMap> &input_map, float mass, bool is_static)
+               std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group,
+               std::shared_ptr<InputMap> input_map, float mass, bool is_static)
         : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group), mass, is_static),
-          _input_map(input_map) {
+          _input_map(std::move(input_map)) {
     _hitbox->setSize({_view_size.x / 3.f, _view_size.y / 1.25f});
     setHitboxOffset({0, -0.072f * _view_size.y});
 
@@ -16,7 +18,7 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
 
     _horizontal_movement_force = 200;
     _drag = 0.015;
-    _friction = 0.3;
+    _friction = 0.7;
 
     _mass = 20;
     _max_velocity = {1.4, _initial_jump_velocity * 1.5f};
@@ -26,6 +28,8 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
 
 void Doodle::update(double t, float dt) {
     adventurerController();
+//    testController();
+//    testController2();
 
     // side scrolling
     if (_position.x <= constants::world_x_min) {
@@ -61,6 +65,39 @@ void Doodle::testController() {
     }
 }
 
+void Doodle::testController2() {
+    float movement_force = 15.f;
+
+    // reset player
+    if (_input_map->r) {
+        setPosition({0, 2.5f});
+        setVelocity({0, 0});
+        _standing = false;
+    }
+
+    // player controller
+    if (_input_map->a) {
+        _force += {-movement_force, 0};
+    }
+    if (_input_map->d) {
+        _force += {movement_force, 0};
+    }
+    if (_input_map->w) {
+        _force += {0, movement_force};
+    }
+    if (_input_map->s) {
+        _force += {0, -movement_force};
+    }
+
+    // friction & drag
+    Vector2f friction_force = _velocity * _friction;
+    if (_velocity.length() < 0.1) {
+        friction_force *= 3;
+    }
+    Vector2f drag_force = _velocity * _velocity.length() * _drag;
+    _acceleration -= friction_force + drag_force;
+}
+
 void Doodle::adventurerController() {
     // reset player
     if (_input_map->r) {
@@ -76,11 +113,11 @@ void Doodle::adventurerController() {
     }
 
     // crouching
-    if (_input_map->c) {
+    if (_input_map->s) {
         if (_current_animation_name != "crouch") {
             startAnimation("crouch", _h_mirror);
         }
-    } else if (_current_animation_name != "idle") {
+    } else if (_current_animation_name != "idle" && (_current_animation_name != "jump" || _standing)) {
         startAnimation("idle", _h_mirror);
     }
 

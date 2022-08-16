@@ -9,7 +9,7 @@
 #include "../math/Vector2f.h"
 #include "../Camera.h"
 #include "../observer-pattern-interface/ISubject.h"
-#include "../animation/Animation.h"
+#include "../animation/AnimationPlayer.h"
 #include "../physics/Hitbox.h"
 
 class Entity : public ISubject {
@@ -23,12 +23,14 @@ protected:
     std::shared_ptr<Camera> _camera;
     Vector2f _view_size;
 
-    // animation
-    std::shared_ptr<std::map<std::string, Animation>> _animation_group;
+    // animation player
+    std::shared_ptr<std::map<std::string, AnimationPlayer>> _animation_group;
     std::string _current_animation_name;
     bool _h_mirror;
     unsigned int _current_animation_frame;
     float _current_animation_time;
+
+    // audio player
 
     // physics hitbox
     std::shared_ptr<Hitbox> _hitbox;
@@ -36,7 +38,7 @@ protected:
 
 public:
     Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size,
-           std::shared_ptr<std::map<std::string, Animation>> animation_group);
+           std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group);
 
     virtual void update(double t, float dt);
 
