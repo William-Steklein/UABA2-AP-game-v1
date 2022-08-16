@@ -32,9 +32,8 @@ protected:
 
     // audio player
 
-    // physics hitbox
+    // hitbox
     std::shared_ptr<Hitbox> _hitbox;
-    Vector2f _hitbox_offset;
 
 public:
     Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size,
@@ -56,9 +55,13 @@ public:
 
     virtual void setScale(const Vector2f &scale);
 
+    virtual void scale(const Vector2f &scale);
+
     virtual float getRotation() const;
 
     virtual void setRotation(float rotation);
+
+    virtual void rotate(float rotation);
 
     virtual Vector2f getViewSize() const;
 
@@ -85,8 +88,6 @@ public:
     void setHitbox(const Hitbox &hitbox);
 
     void setHitbox(const std::shared_ptr<Hitbox> &hitbox);
-
-    void setHitboxOffset(const Vector2f &hitbox_offset);
 };
 
 

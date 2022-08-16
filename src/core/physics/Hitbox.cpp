@@ -1,6 +1,12 @@
 #include "Hitbox.h"
 
-Hitbox::Hitbox(const Vector2f &position, const Vector2f &size) : _position(position), _size(size) {
+Hitbox::Hitbox(const Vector2f &position, const Vector2f &size, const Vector2f &offset) : _position(position),
+                                                                                         _original_position(position),
+                                                                                         _scale({1.f, 1.f}),
+                                                                                         _size(size),
+                                                                                         _original_size(size),
+                                                                                         _offset(offset),
+                                                                                         _original_offset(offset) {
 
 }
 
@@ -9,7 +15,21 @@ const Vector2f &Hitbox::getPosition() const {
 }
 
 void Hitbox::setPosition(const Vector2f &position) {
-    _position = position;
+    _original_position = position;
+    _position = _original_position + _offset;
+}
+
+const Vector2f &Hitbox::getScale() const {
+    return _scale;
+}
+
+void Hitbox::setScale(const Vector2f &scale) {
+    _scale = scale;
+
+    setSize(_original_size);
+
+    setOffset(_original_offset);
+    setPosition(_original_position);
 }
 
 const Vector2f &Hitbox::getSize() const {
@@ -17,7 +37,17 @@ const Vector2f &Hitbox::getSize() const {
 }
 
 void Hitbox::setSize(const Vector2f &size) {
-    _size = size;
+    _original_size = size;
+    _size = {_original_size.x * _scale.x, _original_size.y * _scale.y};
+}
+
+const Vector2f &Hitbox::getOffset() const {
+    return _offset;
+}
+
+void Hitbox::setOffset(const Vector2f &offset) {
+    _original_offset = offset;
+    _offset = {_original_offset.x * _scale.x, _original_offset.y * _scale.y};
 }
 
 bool Hitbox::empty() const {
@@ -32,65 +62,9 @@ bool Hitbox::collides(const Hitbox &other) const {
 }
 
 Vector2f Hitbox::getDisplacementToCollision(const Hitbox &other) const {
-//    if (this->_position < other._position + other._size / 2) {
-//        return (other._position - other._size / 2) - (this->_position + this->_size / 2);
-//    } else {
-//        return (other._position + other._size / 2) - (this->_position - this->_size / 2);
-//    }
-
-    Vector2f displacement;
-
-//    if (this->_position.x < other._position.x + other._size.x / 2) {
-//        displacement.x = (other._position.x - other._size.x / 2) - (this->_position.x + this->_size.x / 2);
-//    } else {
-//        displacement.x = (other._position.x + other._size.x / 2) - (this->_position.x - this->_size.x / 2);
-//    }
-//
-//    if (this->_position.y < other._position.y + other._size.y / 2) {
-//        displacement.y = (other._position.y - other._size.y / 2) - (this->_position.y + this->_size.y / 2);
-//    } else {
-//        displacement.y = (other._position.y + other._size.y / 2) - (this->_position.y - this->_size.y / 2);
-//    }
-//
-//    if (_position.x < other._position.x) {
-//        displacement.x = other._position.x - (_position.x + _size.x);
-//    } else {
-//        displacement.x = _position.x - (other._position.x + other._size.x);
-//    }
-//
-//    if (_position.y < other._position.y) {
-//        displacement.y = other._position.y - (_position.y + _size.y);
-//    } else {
-//        displacement.y = _position.y - (other._position.y + other._size.y);
-//    }
-
-//    Vector2f this_corner = _position - (_size / 2);
-//    Vector2f other_corner = other._position - (other._size / 2);
-
-//    if (this_corner.x < other_corner.x) {
-//        displacement.x = other_corner.x - (this_corner.x + _size.x);
-//    } else {
-//        displacement.x = this_corner.x - (other_corner.x + other._size.x);
-//    }
-//
-//    if (this_corner.y < other_corner.y) {
-//        displacement.y = other_corner.y - (this_corner.y + _size.y);
-//    } else {
-//        displacement.y = this_corner.y - (other_corner.y + other._size.y);
-//    }
-
-    if (_position.x < other._position.x) {
-        displacement.x = other._position.x - (other._size.x / 2) - (_position.x + (_size.x / 2));
+    if (_position < other._position) {
+        return other._position - (other._size / 2) - (_position + (_size / 2));
     } else {
-        displacement.x = other._position.x + (other._size.x / 2) - (_position.x - (_size.x / 2));
+        return other._position + (other._size / 2) - (_position - (_size / 2));
     }
-
-    if (_position.y < other._position.y) {
-        displacement.y = other._position.y - (other._size.y / 2) - (_position.y + (_size.y / 2));
-    } else {
-        displacement.y = other._position.y + (other._size.y / 2) - (_position.y - (_size.y / 2));
-    }
-
-
-    return displacement;
 }

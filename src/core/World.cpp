@@ -138,8 +138,6 @@ void World::updatePhysics(double t, float dt) {
             handleCollision(_player, wall, true);
         }
     }
-
-    handleCollision(_walls.front(), _walls.back());
 }
 
 void World::updatePhysicsEntities(double t, float dt) {
@@ -175,8 +173,6 @@ bool World::handleCollision(const std::shared_ptr<PhysicsEntity> &entity1,
         return false;
     }
 
-//    std::cout << entity1->getHitbox()->getDisplacementToCollision(*entity2->getHitbox()) << std::endl;
-
     bool collided = entity1->getHitbox()->collides(*entity2->getHitbox());
 
     if (collided && resolve) {
@@ -184,5 +180,4 @@ bool World::handleCollision(const std::shared_ptr<PhysicsEntity> &entity1,
     }
 
     return collided;
-    return false;
 }

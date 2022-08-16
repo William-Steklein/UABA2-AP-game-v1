@@ -83,7 +83,8 @@ void PhysicsEntity::resolveCollision(const PhysicsEntity &other) {
     if (std::abs(displacement.x) == std::abs(displacement.y)) {
         move({displacement.x, displacement.y});
         _velocity.x = 0;
-    } else if (std::abs(displacement.x) < std::abs(displacement.y)) {
+    } else
+        if (std::abs(displacement.x) < std::abs(displacement.y)) {
         move({displacement.x, 0});
         _velocity.x = 0;
     } else {

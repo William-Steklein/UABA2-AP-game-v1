@@ -27,7 +27,7 @@ Vector2f Entity::getScreenPosition() const {
 
 void Entity::setPosition(const Vector2f &position) {
     _position = position;
-    _hitbox->setPosition(_position + _hitbox_offset);
+    _hitbox->setPosition(_position);
 }
 
 void Entity::move(const Vector2f &vector) {
@@ -40,6 +40,11 @@ Vector2f Entity::getScale() const {
 
 void Entity::setScale(const Vector2f &scale) {
     _scale = scale;
+    _hitbox->setScale(scale);
+}
+
+void Entity::scale(const Vector2f &scale) {
+    setScale({_scale.x * scale.x, _scale.y * scale.y});
 }
 
 float Entity::getRotation() const {
@@ -48,6 +53,10 @@ float Entity::getRotation() const {
 
 void Entity::setRotation(float rotation) {
     _rotation = rotation;
+}
+
+void Entity::rotate(float rotation) {
+    setRotation(_rotation + rotation);
 }
 
 Vector2f Entity::getViewSize() const {
@@ -128,9 +137,4 @@ void Entity::setHitbox(const Hitbox &hitbox) {
 
 void Entity::setHitbox(const std::shared_ptr<Hitbox> &hitbox) {
     _hitbox = hitbox;
-}
-
-void Entity::setHitboxOffset(const Vector2f &hitbox_offset) {
-    _hitbox_offset = hitbox_offset;
-    _hitbox->setPosition(_position + _hitbox_offset);
 }

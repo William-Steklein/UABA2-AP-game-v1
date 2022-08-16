@@ -8,7 +8,7 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
         : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group), mass, is_static),
           _input_map(std::move(input_map)) {
     _hitbox->setSize({_view_size.x / 3.f, _view_size.y / 1.25f});
-    setHitboxOffset({0, -0.072f * _view_size.y});
+    _hitbox->setOffset({0, -0.072f * _view_size.y});
 
     float jump_dt = 0.6;
     float jump_height = 1;
@@ -123,7 +123,7 @@ void Doodle::adventurerController() {
 
     // ground collision
     if (_hitbox->getPosition().y - (_hitbox->getSize().y / 2) < 0) {
-        setPosition({_position.x, _hitbox->getSize().y / 2 - _hitbox_offset.y});
+        setPosition({_position.x, _hitbox->getSize().y / 2 - _hitbox->getOffset().y});
         _standing = true;
         _velocity.y = 0;
     }

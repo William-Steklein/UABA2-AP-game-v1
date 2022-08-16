@@ -14,6 +14,7 @@
 #include "animation/AnimationPlayer.h"
 #include "constants/resources.h"
 #include "entities/physics/PortalRadio.h"
+#include "physics/Ray.h"
 
 class World {
 private:

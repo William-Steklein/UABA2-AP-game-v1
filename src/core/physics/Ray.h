@@ -4,13 +4,14 @@
 
 #include "../math/Vector2f.h"
 #include "Hitbox.h"
+#include "../math/math_funcs.h"
 
 class Ray {
 private:
     Vector2f _origin_point;
     Vector2f _end_point;
 
-    bool _activated;
+    bool _collided;
     Vector2f _collision_point;
 
 public:
@@ -26,19 +27,21 @@ public:
 
     void setEndPoint(const Vector2f &endPoint);
 
-    bool isActivated() const;
+    bool isCollided() const;
 
-    void setActivated(bool activated);
+    void setCollided(bool collided);
 
     const Vector2f &getCollisionPoint() const;
 
     void setCollisionPoint(const Vector2f &collisionPoint);
 
-    bool collides(const Vector2f &other_origin_point, const Vector2f &other_end_point) const;
+    void reset();
 
-    bool collides(const Ray &other);
+    bool collides(const Vector2f &other_origin_point, const Vector2f &other_end_point, bool set_collision_point = true);
 
-    bool collides(const Hitbox &other);
+    bool collides(const Ray &other, bool set_collision_point = true);
+
+    bool collides(const Hitbox &other, bool set_collision_point = true);
 };
 
 
