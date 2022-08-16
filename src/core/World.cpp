@@ -94,15 +94,17 @@ void World::initializePhysicsEntities() {
                    _input_map, 1, false));
     _entity_view_creator->createEntitySpriteView(_player, "adventurer", 5);
 
+    std::vector<std::shared_ptr<Ray>> banana = _player->getRays();
+
 //    // walls
 //    _walls.push_back(std::make_shared<Wall>(
 //            Wall({-0.5f, 0.5f}, _camera, {0.4f, 0.4f}, _animation_groups["wall"])));
 //    _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 3);
 //
-//    // portal radio music object
-//    _portal_radios.push_back(
-//            std::make_shared<PortalRadio>(PortalRadio({0.5f, 2}, _camera, {0.2f, 0.2f}, _animation_groups["portal_radio"])));
-//    _entity_view_creator->createEntitySpriteView(_portal_radios.back(), "portal_radio", 4);
+    // portal radio music object
+    _portal_radios.push_back(
+            std::make_shared<PortalRadio>(PortalRadio({0.5f, 2}, _camera, {0.2f, 0.2f}, _animation_groups["portal_radio"])));
+    _entity_view_creator->createEntitySpriteView(_portal_radios.back(), "portal_radio", 4);
 
     // physics test scene
     // walls
@@ -136,6 +138,12 @@ void World::updatePhysics(double t, float dt) {
     if (_player) {
         for (const auto &wall: _walls) {
             handleCollision(_player, wall, true);
+        }
+    }
+
+    for (const auto &portal_radio: _portal_radios) {
+        for (const auto &wall: _walls) {
+            handleCollision(portal_radio, wall, true);
         }
     }
 }

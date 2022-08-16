@@ -11,6 +11,7 @@
 #include "../observer-pattern-interface/ISubject.h"
 #include "../animation/AnimationPlayer.h"
 #include "../physics/Hitbox.h"
+#include "../physics/Ray.h"
 
 class Entity : public ISubject {
 protected:
@@ -34,6 +35,9 @@ protected:
 
     // hitbox
     std::shared_ptr<Hitbox> _hitbox;
+
+    // rays
+    std::vector<std::shared_ptr<Ray>> _rays;
 
 public:
     Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size,
@@ -79,15 +83,21 @@ public:
 
     void advanceAnimation();
 
-    std::shared_ptr<Hitbox> getHitbox();
+    const std::shared_ptr<Hitbox>& getHitbox();
 
-    Hitbox getScreenHitbox();
+    std::shared_ptr<Hitbox> getScreenHitbox();
 
     void setHitbox(const Vector2f &position, const Vector2f &size);
 
     void setHitbox(const Hitbox &hitbox);
 
     void setHitbox(const std::shared_ptr<Hitbox> &hitbox);
+
+    const std::vector<std::shared_ptr<Ray>> &getRays() const;
+
+    std::vector<std::shared_ptr<Ray>> getScreenRays() const;
+
+    void setRays(const std::vector<std::shared_ptr<Ray>> &rays);
 };
 
 

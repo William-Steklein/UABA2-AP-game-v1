@@ -10,6 +10,15 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
     _hitbox->setSize({_view_size.x / 3.f, _view_size.y / 1.25f});
     _hitbox->setOffset({0, -0.072f * _view_size.y});
 
+    // standing rays
+    Vector2f r1(_hitbox->getPosition().x - _hitbox->getSize().x / 2, _hitbox->getPosition().y);
+    Vector2f r2(r1.x + _hitbox->getSize().x, r1.y);
+    float ray_length = 0.1;
+
+    _rays.push_back(std::make_shared<Ray>(Ray(r1, {r1.x, r1.y - ray_length})));
+    _rays.push_back(std::make_shared<Ray>(Ray(r2, {r2.x, r2.y - ray_length})));
+
+    // movement / jump physics
     float jump_dt = 0.6;
     float jump_height = 1;
 
@@ -103,6 +112,18 @@ void Doodle::adventurerController() {
     if (_input_map->r) {
         setPosition({0, 1});
         _standing = false;
+        _velocity.clear();
+        for (const auto& standing_ray: _rays) {
+            standing_ray->reset();
+        }
+    }
+
+    // check if standing
+    for (const auto& standing_ray: _rays) {
+        if (standing_ray->isCollided()) {
+            _standing = true;
+            standing_ray->reset();
+        }
     }
 
     // jumping

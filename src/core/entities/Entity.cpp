@@ -118,13 +118,13 @@ void Entity::advanceAnimation() {
     }
 }
 
-std::shared_ptr<Hitbox> Entity::getHitbox() {
+const std::shared_ptr<Hitbox>& Entity::getHitbox() {
     return _hitbox;
 }
 
-Hitbox Entity::getScreenHitbox() {
-    return {_camera->projectCoordCoreToGame(_hitbox->getPosition()),
-            _camera->projectSizeCoreToGame(_hitbox->getSize())};
+std::shared_ptr<Hitbox> Entity::getScreenHitbox() {
+    return std::make_shared<Hitbox>(Hitbox(_camera->projectCoordCoreToGame(_hitbox->getPosition()),
+                                           _camera->projectSizeCoreToGame(_hitbox->getSize())));
 }
 
 void Entity::setHitbox(const Vector2f &position, const Vector2f &size) {
@@ -137,4 +137,23 @@ void Entity::setHitbox(const Hitbox &hitbox) {
 
 void Entity::setHitbox(const std::shared_ptr<Hitbox> &hitbox) {
     _hitbox = hitbox;
+}
+
+const std::vector<std::shared_ptr<Ray>> &Entity::getRays() const {
+    return _rays;
+}
+
+std::vector<std::shared_ptr<Ray>> Entity::getScreenRays() const {
+    std::vector<std::shared_ptr<Ray>> new_rays;
+
+    for (const auto &ray: _rays) {
+        new_rays.push_back(std::make_shared<Ray>(Ray(_camera->projectCoordCoreToGame(ray->getOriginPoint()),
+                                                     _camera->projectCoordCoreToGame(ray->getEndPoint()))));
+    }
+
+    return new_rays;
+}
+
+void Entity::setRays(const std::vector<std::shared_ptr<Ray>> &rays) {
+    _rays = rays;
 }

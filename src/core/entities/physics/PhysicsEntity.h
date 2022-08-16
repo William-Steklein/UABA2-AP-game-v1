@@ -3,6 +3,7 @@
 
 
 #include "../Entity.h"
+#include "../../physics/Ray.h"
 
 class PhysicsEntity : public Entity {
 protected:

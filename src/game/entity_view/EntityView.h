@@ -22,6 +22,8 @@ public:
     ~EntityView() = default;
 
     virtual sf::VertexArray getHitbox() const;
+
+    virtual sf::VertexArray getRays() const;
 };
 
 
