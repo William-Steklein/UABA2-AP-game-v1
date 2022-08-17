@@ -18,8 +18,9 @@ void PhysicsEntity::update(double t, float dt) {
     // force acceleration
     _acceleration += _force / _mass;
 
-    // verlet integration t(position): position + velocity * timestep + (acceleration * timestep^2) / 2
-    move(_velocity * dt + _acceleration * dt * dt / 2);
+    // position(t): position + velocity * timestep + (acceleration / 2 * timestep^2)
+    move(_velocity * dt + _acceleration / 2 * dt * dt);
+    // verlet integration
     _velocity += _acceleration * dt;
 
     // todo: make min_value a constant

@@ -22,8 +22,6 @@ const Vector2f &Hitbox::getSize() const {
 
 void Hitbox::setSize(const Vector2f &size) {
     _size = size;
-//    _original_size = size;
-//    _size = {_original_size.x * _scale.x, _original_size.y * _scale.y};
 }
 
 const Vector2f &Hitbox::getOffset() const {
@@ -32,8 +30,6 @@ const Vector2f &Hitbox::getOffset() const {
 
 void Hitbox::setOffset(const Vector2f &offset) {
     _offset = offset;
-//    _original_offset = offset;
-//    _offset = {_original_offset.x * _scale.x, _original_offset.y * _scale.y};
 }
 
 void Hitbox::scale(const Vector2f &scale) {

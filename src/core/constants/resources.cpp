@@ -5,6 +5,9 @@ const std::map<std::string, std::map<std::string, AnimationResource>> animation_
                 {"background", {
                         {"", {"data/textures/prototype/Dark/texture_07.png"}},
                 }},
+                {"sidescreen_background", {
+                                       {"", {"data/textures/cobble_stone.png"}},
+                               }},
                 {"wall", {
                                        {"", {"data/textures/cobble_stone.png"}},
                                }},
@@ -38,7 +41,7 @@ const std::map<std::string, std::map<std::string, AnimationResource>> animation_
                                           "data/sprites/adventurer/adventurer-jump-01.png",
                                           "data/sprites/adventurer/adventurer-jump-02.png",
                                           "data/sprites/adventurer/adventurer-jump-03.png",
-                                  }, 0.20f, false}},
+                                  }, 0.15f, false}},
                         {"run", {{
                                          "data/sprites/adventurer/adventurer-run-00.png",
                                          "data/sprites/adventurer/adventurer-run-01.png",

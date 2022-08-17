@@ -40,6 +40,20 @@ void World::update() {
 void World::updateScreenResolution(float x_min, float x_max, float y_min, float y_max) {
     _camera->setScreenBoundaries(x_min, x_max, y_min, y_max);
     _force_static_update = true;
+
+    Vector2f bottom_left = _camera->projectCoordGameToCore({_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().x});
+
+    Vector2f bottom_right = {_camera->getXBounderies().x, _camera->getYBounderies().x};
+
+    Vector2f top_right = {_camera->getXBounderies().x, _camera->getYBounderies().y};
+
+    Vector2f top_left = _camera->projectCoordGameToCore({_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().y});
+
+//    std::cout << bottom_left << std::endl;
+//    std::cout << bottom_right << std::endl;
+//    std::cout << top_right << std::endl;
+//    std::cout << top_left << std::endl;
+
 }
 
 std::shared_ptr<InputMap> World::getUserInputMap() {
@@ -87,6 +101,21 @@ void World::loadAudio() {
 
 void World::initializeUIWidgets() {
     // background
+//    Vector2f bottom_left = _camera->projectCoordGameToCore({_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().x});
+//    Vector2f bottom_right = {_camera->getXBounderies().x, _camera->getYBounderies().x};
+//
+//    std::cout << bottom_right << std::endl;
+
+    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
+            UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
+                     _animation_groups["background"])));
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), "sidescreen_background", 1);
+
+    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
+            UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
+                     _animation_groups["background"])));
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), "sidescreen_background", 1);
+
     _ui_widget_entities.push_back(std::make_shared<UIWidget>(
             UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
                      _animation_groups["background"])));
@@ -95,7 +124,7 @@ void World::initializeUIWidgets() {
 
 void World::initializePhysicsEntities() {
     // player
-    float scale_mul = 2.5f;
+    float scale_mul = 2.f;
     _player = std::make_shared<Doodle>(
             Doodle({0.f, 2.5f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _animation_groups["adventurer"],
                    _input_map, 1, false));
@@ -121,9 +150,9 @@ void World::initializePhysicsEntities() {
             Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_groups["wall"], 1, false)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 3);
 
-    _walls.push_back(std::make_shared<Wall>(
-            Wall({0.5f, 0.75f}, _camera, {0.5f, 0.5f}, _animation_groups["wall"], 1, false)));
-    _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 2);
+//    _walls.push_back(std::make_shared<Wall>(
+//            Wall({0.5f, 0.75f}, _camera, {0.5f, 0.5f}, _animation_groups["wall"], 1, false)));
+//    _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 2);
 }
 
 void World::updateUIEntities(double t, float dt) {

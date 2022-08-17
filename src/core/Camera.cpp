@@ -56,9 +56,9 @@ float Camera::getWidth() const { return _camera_x_boundaries.y - _camera_x_bound
 
 float Camera::getHeight() const { return _camera_y_boundaries.y - _camera_y_boundaries.x; }
 
-float Camera::getScreenWidth() const { return std::abs(_screen_x_boundaries.y - _screen_x_boundaries.x); }
+float Camera::getScreenWidth() const { return _screen_x_boundaries.y - _screen_x_boundaries.x; }
 
-float Camera::getScreenHeight() const { return std::abs(_screen_y_boundaries.y - _screen_y_boundaries.x); }
+float Camera::getScreenHeight() const { return _screen_y_boundaries.y - _screen_y_boundaries.x; }
 
 float Camera::getSubscreenWidth() const {
     return std::abs(_subscreen_x_boundaries.y - _subscreen_x_boundaries.x);
@@ -71,11 +71,13 @@ float Camera::getSubscreenHeight() const {
 void Camera::updateSubscreenResolution() {
     Vector2f new_subscreen_resolution;
 
-    float r_s = getScreenWidth() / getScreenHeight();
+    // resolution screen
+    float r_s = std::abs(getScreenWidth()) / std::abs(getScreenHeight());
+    // resolution image (subscreen)
     float r_i = _aspect_ratio.x / _aspect_ratio.y;
 
     if (r_s > r_i) {
-        new_subscreen_resolution = {getScreenHeight() * r_i, getScreenHeight()};
+        new_subscreen_resolution = {std::abs(getScreenHeight()) * r_i, std::abs(getScreenHeight())};
 
         if (_screen_x_boundaries.x < _screen_x_boundaries.y) {
             float middle_point = (_screen_x_boundaries.y - _screen_x_boundaries.x) / 2;
@@ -113,8 +115,8 @@ Vector2f Camera::projectCoordCoreToGame(const Vector2f &point) const {
 }
 
 Vector2f Camera::projectCoordGameToCore(const Vector2f &point) const {
-    float alpha_x = (point.x - _screen_x_boundaries.x) / getScreenWidth();
-    float alpha_y = (point.y - _screen_y_boundaries.x) / getScreenHeight();
+    float alpha_x = (point.x - _subscreen_x_boundaries.x) / getScreenWidth();
+    float alpha_y = (point.y - _subscreen_y_boundaries.x) / getScreenHeight();
 
     return {lerp(_camera_x_boundaries.x, _camera_x_boundaries.y, alpha_x),
             lerp(_camera_y_boundaries.x, _camera_y_boundaries.y, alpha_y)};
@@ -122,4 +124,13 @@ Vector2f Camera::projectCoordGameToCore(const Vector2f &point) const {
 
 Vector2f Camera::projectSizeCoreToGame(const Vector2f &size) const {
     return {getSubscreenWidth() / getWidth() * size.x, getSubscreenHeight() / getHeight() * size.y};
+}
+
+bool Camera::isSidescreenHorizontal() const {
+    // resolution screen
+    float r_s = std::abs(getScreenWidth()) / std::abs(getScreenHeight());
+    // resolution image (subscreen)
+    float r_i = _aspect_ratio.x / _aspect_ratio.y;
+
+    return r_s > r_i;
 }

@@ -60,6 +60,8 @@ public:
 
     void updateSubscreenResolution();
 
+    bool isSidescreenHorizontal() const;
+
     Vector2f projectCoordCoreToGame(const Vector2f &point) const;
 
     Vector2f projectCoordGameToCore(const Vector2f &point) const;

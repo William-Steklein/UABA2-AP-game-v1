@@ -27,11 +27,11 @@ public:
 
     void update(double t, float dt) override;
 
+    void reset();
+
+    void playerController(float dt);
+
     void testController();
-
-    void testController2();
-
-    void adventurerController();
 };
 
 
