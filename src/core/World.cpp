@@ -127,7 +127,7 @@ void World::initializePhysicsEntities() {
     float scale_mul = 2.f;
     _player = std::make_shared<Doodle>(
             Doodle({0.f, 2.5f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _animation_groups["adventurer"],
-                   _input_map, 1, false));
+                   _input_map, false));
     _entity_view_creator->createEntitySpriteView(_player, "adventurer", 5);
 
 //    // walls
@@ -137,17 +137,17 @@ void World::initializePhysicsEntities() {
 //
     // portal radio music object
     _portal_radios.push_back(
-            std::make_shared<PortalRadio>(PortalRadio({0.5f, 2}, _camera, {0.2f, 0.2f}, _animation_groups["portal_radio"])));
+            std::make_shared<PortalRadio>(PortalRadio({0.5f, 2.5f}, _camera, {0.2f, 0.2f}, _animation_groups["portal_radio"])));
     _entity_view_creator->createEntitySpriteView(_portal_radios.back(), "portal_radio", 4);
 
     // walls
 
     _walls.push_back(std::make_shared<Wall>(
-            Wall({-0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_groups["wall"], 1, true)));
+            Wall({-0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_groups["wall"], true)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 3);
 
     _walls.push_back(std::make_shared<Wall>(
-            Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_groups["wall"], 1, true)));
+            Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_groups["wall"], true)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 3);
 
 //    _walls.push_back(std::make_shared<Wall>(

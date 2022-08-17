@@ -14,14 +14,20 @@ protected:
     Vector2f _force;
     Vector2f _velocity;
     Vector2f _acceleration;
-    float _gravitational_acceleration;
+
+    Vector2f _gravitational_acceleration;
+    Vector2f _max_velocity;
+    Vector2f _drag;
+    Vector2f _friction;
 
 public:
     PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-                  std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group, float mass = 1,
+                  std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group,
                   bool is_static = false);
 
     ~PhysicsEntity() = default;
+
+    void setupPlayerPhysics(float jump_dt, float jump_height);
 
     virtual void update(double t, float dt);
 
@@ -44,6 +50,12 @@ public:
     const Vector2f &getAcceleration() const;
 
     void setAcceleration(const Vector2f &acceleration);
+
+    void applyGravity();
+
+    void applyFrictionAndDrag();
+
+    void applySideScrolling();
 
     virtual void resolveCollision(PhysicsEntity &other);
 };

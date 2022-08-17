@@ -4,8 +4,8 @@
 
 Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
                std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group,
-               std::shared_ptr<InputMap> input_map, float mass, bool is_static)
-        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group), mass, is_static),
+               std::shared_ptr<InputMap> input_map, bool is_static)
+        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group), is_static),
           _input_map(std::move(input_map)) {
     _hitbox->setSize({_view_size.x / 3.75f, _view_size.y / 1.25f});
     _hitbox->setOffset({0, -0.072f * _view_size.y});
@@ -23,15 +23,11 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
     float jump_dt = 0.6;
     float jump_height = 1;
 
-    _gravitational_acceleration = -2 * jump_height / (jump_dt * jump_dt);
-    _initial_jump_velocity = 2 * jump_height / jump_dt;
-
-    _horizontal_movement_force = 200;
-    _drag = 0.15f;
-    _friction = 5.f;
-
     _mass = 20;
-    _max_velocity = {1.5f, _initial_jump_velocity * 1.5f};
+    _initial_jump_velocity = 2 * jump_height / jump_dt;
+    _horizontal_movement_force = 200;
+
+    setupPlayerPhysics(jump_dt, jump_height);
 
     startAnimation("idle");
 }
@@ -40,19 +36,16 @@ void Doodle::update(double t, float dt) {
     playerController(dt);
 //    testController();
 
-    // side scrolling
-    if (_position.x <= constants::world_x_min) {
-        setPosition({constants::world_x_max, _position.y});
-    } else if (_position.x >= constants::world_x_max) {
-        setPosition({constants::world_x_min, _position.y});
-    }
+    applySideScrolling();
 
     PhysicsEntity::update(t, dt);
 }
 
 void Doodle::reset() {
     setPosition({0, 2.5f});
+
     _velocity.clear();
+
     for (const auto &standing_ray: _rays) {
         standing_ray->reset();
     }
@@ -104,20 +97,10 @@ void Doodle::playerController(float dt) {
 
     // gravity
     if (!_standing) {
-        _acceleration.y += _gravitational_acceleration;
+        applyGravity();
     }
 
-    // friction & drag
-    float friction_force = _velocity.x * _friction;
-    if (std::abs(_velocity.x) < 0.1) {
-        friction_force *= 3;
-    }
-    float drag_force = _velocity.x * _velocity.x * _drag;
-    _acceleration.x -= friction_force + drag_force;
-
-    // max velocity
-    _velocity = {std::clamp(_velocity.x, -_max_velocity.x, _max_velocity.x),
-                 std::clamp(_velocity.y, -_max_velocity.y, _max_velocity.y)};
+    applyFrictionAndDrag();
 }
 
 void Doodle::testController() {
@@ -142,11 +125,5 @@ void Doodle::testController() {
         _force += {0, -movement_force};
     }
 
-    // friction & drag
-    Vector2f friction_force = _velocity * _friction;
-    if (std::abs(_velocity.x) < 0.1) {
-        friction_force *= 3;
-    }
-    Vector2f drag_force = _velocity * _velocity.length() * _drag;
-    _acceleration -= friction_force + drag_force;
+    applyFrictionAndDrag();
 }

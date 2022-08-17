@@ -14,16 +14,12 @@ private:
     float _initial_jump_velocity;
     float _horizontal_movement_force;
 
-    float _drag;
-    float _friction;
-    Vector2f _max_velocity;
-
     std::shared_ptr<InputMap> _input_map;
 
 public:
     Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
            std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group, std::shared_ptr<InputMap> input_map,
-           float mass = 1, bool is_static = false);
+           bool is_static = false);
 
     void update(double t, float dt) override;
 

@@ -1,12 +1,19 @@
 #include "PhysicsEntity.h"
 
 PhysicsEntity::PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-                             std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group, float mass,
+                             std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group,
                              bool is_static) : Entity(position, std::move(camera), viewSize,
-                                                      std::move(animation_group)), _is_static(is_static), _mass(mass),
-                                               _gravitational_acceleration(0) {
+                                                      std::move(animation_group)), _is_static(is_static), _mass(1),
+                                               _gravitational_acceleration({0, 0}) {
     _hitbox = std::make_shared<Hitbox>(_position, _view_size);
 
+}
+
+void PhysicsEntity::setupPlayerPhysics(float jump_dt, float jump_height) {
+    _gravitational_acceleration = {0, -2 * jump_height / (jump_dt * jump_dt)};
+    _max_velocity = {1.5f, 2 * jump_height / jump_dt * 1.5f};
+    _drag = {0.15f, 0};
+    _friction = {5.f, 0};
 }
 
 void PhysicsEntity::update(double t, float dt) {
@@ -14,6 +21,9 @@ void PhysicsEntity::update(double t, float dt) {
         Entity::update(t, dt);
         return;
     }
+    // max velocity
+    _velocity = {std::clamp(_velocity.x, -_max_velocity.x, _max_velocity.x),
+                 std::clamp(_velocity.y, -_max_velocity.y, _max_velocity.y)};
 
     // force acceleration
     _acceleration += _force / _mass;
@@ -78,6 +88,27 @@ void PhysicsEntity::setAcceleration(const Vector2f &acceleration) {
     _acceleration = acceleration;
 }
 
+void PhysicsEntity::applyGravity() {
+    _acceleration += _gravitational_acceleration;
+}
+
+void PhysicsEntity::applyFrictionAndDrag() {
+    Vector2f friction_force = {_velocity.x * _friction.x, _velocity.y * _friction.y};
+    if (_velocity.length() < 0.1) {
+        friction_force *= 3;
+    }
+    Vector2f drag_force = _velocity.x * _velocity.x * _drag;
+    _acceleration -= friction_force + drag_force;
+}
+
+void PhysicsEntity::applySideScrolling() {
+    if (_position.x <= constants::world_x_min) {
+        setPosition({constants::world_x_max, _position.y});
+    } else if (_position.x >= constants::world_x_max) {
+        setPosition({constants::world_x_min, _position.y});
+    }
+}
+
 void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
 
 
@@ -116,18 +147,30 @@ void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
         other.updateView();
 
     } else if (!_is_static && !other._is_static) {
-        // if both are dynamic
-        float alpha = other._mass / _mass;
+        // both are dynamic
+        float alpha;
+
+        if (other._mass < _mass) {
+            alpha = other._mass / _mass;
+        } else {
+            alpha = 1 - (_mass / other._mass);
+        }
 
         move(lerp({0, 0}, move_vector, alpha));
         other.move(lerp({0, 0}, move_vector * -1, 1 - alpha));
 
-        _velocity = new_velocity_this;
-        other._velocity = new_velocity_other;
+        Vector2f new_velocity;
+
+        if (_velocity.length() + other._velocity.length() < (_velocity + other._velocity).length()) {
+            new_velocity = _velocity + other._velocity;
+        } else {
+            new_velocity = _velocity.length() > other._velocity.length() ? _velocity : other._velocity;
+        }
+
+        _velocity = new_velocity;
+        other._velocity = new_velocity;
 
         updateView();
         other.updateView();
     }
-
-
 }
