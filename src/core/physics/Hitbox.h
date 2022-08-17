@@ -3,6 +3,7 @@
 
 
 #include "../math/Vector2f.h"
+#include <memory>
 
 class Hitbox {
 private:

@@ -143,11 +143,11 @@ void World::initializePhysicsEntities() {
     // walls
 
     _walls.push_back(std::make_shared<Wall>(
-            Wall({-0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_groups["wall"], 1, false)));
+            Wall({-0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_groups["wall"], 1, true)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 3);
 
     _walls.push_back(std::make_shared<Wall>(
-            Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_groups["wall"], 1, false)));
+            Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_groups["wall"], 1, true)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 3);
 
 //    _walls.push_back(std::make_shared<Wall>(
@@ -174,6 +174,14 @@ void World::updatePhysics(double t, float dt) {
 
             for (const auto &ray: _player->getRays()) {
                 handleCollision(ray, wall);
+            }
+        }
+
+        for (const auto &portal_radio: _portal_radios) {
+            handleCollision(_player, portal_radio);
+
+            for (const auto &ray: _player->getRays()) {
+                handleCollision(ray, portal_radio);
             }
         }
     }

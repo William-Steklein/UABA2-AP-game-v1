@@ -78,20 +78,56 @@ void PhysicsEntity::setAcceleration(const Vector2f &acceleration) {
     _acceleration = acceleration;
 }
 
-void PhysicsEntity::resolveCollision(const PhysicsEntity &other) {
+void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
+
+
     Vector2f displacement = _hitbox->getDisplacementToCollision(*other._hitbox);
+    Vector2f move_vector;
+
+    Vector2f new_velocity_this = _velocity;
+    Vector2f new_velocity_other = other._velocity;
 
     if (std::abs(displacement.x) == std::abs(displacement.y)) {
-        move({displacement.x, displacement.y});
-        _velocity.x = 0;
-    } else
-        if (std::abs(displacement.x) < std::abs(displacement.y)) {
-        move({displacement.x, 0});
-        _velocity.x = 0;
+        move_vector = {displacement.x, displacement.y};
+    } else if (std::abs(displacement.x) < std::abs(displacement.y)) {
+        move_vector = {displacement.x, 0};
+
+        new_velocity_this.x = 0;
+        new_velocity_other.x = 0;
     } else {
-        move({0, displacement.y});
-        _velocity.y = 0;
+        move_vector = {0, displacement.y};
+
+        new_velocity_this.y = 0;
+        new_velocity_other.y = 0;
     }
 
-    updateView();
+    if (!_is_static && other._is_static) {
+        // this is dynamic
+        move(move_vector);
+        _velocity = new_velocity_this;
+
+        updateView();
+
+    } else if (_is_static && !other._is_static) {
+        // other is dynamic
+        other.move(move_vector * -1);
+        other._velocity = new_velocity_other;
+
+        other.updateView();
+
+    } else if (!_is_static && !other._is_static) {
+        // if both are dynamic
+        float alpha = other._mass / _mass;
+
+        move(lerp({0, 0}, move_vector, alpha));
+        other.move(lerp({0, 0}, move_vector * -1, 1 - alpha));
+
+        _velocity = new_velocity_this;
+        other._velocity = new_velocity_other;
+
+        updateView();
+        other.updateView();
+    }
+
+
 }

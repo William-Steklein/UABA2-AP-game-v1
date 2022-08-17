@@ -19,13 +19,14 @@ PortalRadio::PortalRadio(const Vector2f &position, std::shared_ptr<Camera> camer
 void PortalRadio::update(double t, float dt) {
     // spatial audio test
 
-    _acceleration.y += _gravitational_acceleration;
-
-    // ground collision
-    if (_hitbox->getPosition().y - (_hitbox->getSize().y / 2) < 0) {
-        setPosition({_position.x, _hitbox->getSize().y / 2 - _hitbox->getOffset().y});
-        _velocity.y = 0;
+    // side scrolling
+    if (_position.x <= constants::world_x_min) {
+        setPosition({constants::world_x_max, _position.y});
+    } else if (_position.x >= constants::world_x_max) {
+        setPosition({constants::world_x_min, _position.y});
     }
+
+    _acceleration.y += _gravitational_acceleration;
 
     PhysicsEntity::update(t, dt);
 }

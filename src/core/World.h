@@ -26,7 +26,6 @@ private:
 
     // entities
     std::shared_ptr<IEntityViewCreator> _entity_view_creator;
-//    _entities;
     bool _force_static_update;
     std::shared_ptr<Doodle> _player;
     std::vector<std::shared_ptr<Wall>> _walls;
