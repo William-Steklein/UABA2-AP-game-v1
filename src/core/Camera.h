@@ -64,7 +64,9 @@ public:
 
     Vector2f projectCoordCoreToGame(const Vector2f &point) const;
 
-    Vector2f projectCoordGameToCore(const Vector2f &point) const;
+    Vector2f projectCoordScreenToCore(const Vector2f &point) const;
+
+    Vector2f projectCoordSubscreenToCore(const Vector2f &point) const;
 
     Vector2f projectSizeCoreToGame(const Vector2f &size) const;
 };

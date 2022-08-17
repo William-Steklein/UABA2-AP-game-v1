@@ -39,21 +39,9 @@ void World::update() {
 
 void World::updateScreenResolution(float x_min, float x_max, float y_min, float y_max) {
     _camera->setScreenBoundaries(x_min, x_max, y_min, y_max);
+    updateSidebars();
+
     _force_static_update = true;
-
-    Vector2f bottom_left = _camera->projectCoordGameToCore({_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().x});
-
-    Vector2f bottom_right = {_camera->getXBounderies().x, _camera->getYBounderies().x};
-
-    Vector2f top_right = {_camera->getXBounderies().x, _camera->getYBounderies().y};
-
-    Vector2f top_left = _camera->projectCoordGameToCore({_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().y});
-
-//    std::cout << bottom_left << std::endl;
-//    std::cout << bottom_right << std::endl;
-//    std::cout << top_right << std::endl;
-//    std::cout << top_left << std::endl;
-
 }
 
 std::shared_ptr<InputMap> World::getUserInputMap() {
@@ -101,25 +89,67 @@ void World::loadAudio() {
 
 void World::initializeUIWidgets() {
     // background
-//    Vector2f bottom_left = _camera->projectCoordGameToCore({_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().x});
+//    Vector2f bottom_left = _camera->projectCoordScreenToCore({_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().x});
 //    Vector2f bottom_right = {_camera->getXBounderies().x, _camera->getYBounderies().x};
-//
-//    std::cout << bottom_right << std::endl;
+////
+////    std::cout << bottom_right << std::endl;
 
     _ui_widget_entities.push_back(std::make_shared<UIWidget>(
-            UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
-                     _animation_groups["background"])));
-    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), "sidescreen_background", 1);
+            UIWidget({0, 0}, _camera, {1, 1},
+                     _animation_groups["sidescreen_background"], false)));
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), "sidescreen_background", 200);
+    _side_bars.push_back(_ui_widget_entities.back());
 
     _ui_widget_entities.push_back(std::make_shared<UIWidget>(
-            UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
-                     _animation_groups["background"])));
-    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), "sidescreen_background", 1);
+            UIWidget({0, 0}, _camera, {1, 1},
+                     _animation_groups["sidescreen_background"], false)));
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), "sidescreen_background", 200);
+    _side_bars.push_back(_ui_widget_entities.back());
 
     _ui_widget_entities.push_back(std::make_shared<UIWidget>(
             UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
                      _animation_groups["background"])));
     _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), "background", 1);
+}
+
+void World::updateSidebars() {
+    if (_camera->isSidescreenHorizontal()) {
+        // left and right
+        Vector2f left_bottom_left = _camera->projectCoordSubscreenToCore(
+                {_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().x});
+        Vector2f left_bottom_right = {_camera->getXBounderies().x, _camera->getYBounderies().x};
+        Vector2f left_top_left = _camera->projectCoordSubscreenToCore(
+                {_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().y});
+
+        Vector2f right_bottom_left = {_camera->getXBounderies().y, _camera->getYBounderies().x};
+        Vector2f right_bottom_right = _camera->projectCoordSubscreenToCore(
+                {_camera->getScreenXBoundaries().y, _camera->getScreenYBoundaries().x});
+        Vector2f right_top_left = {_camera->getXBounderies().y, _camera->getYBounderies().y};
+
+        _side_bars.front()->setPosition({(left_bottom_left.x + left_bottom_right.x) / 2, (left_bottom_left.y + left_top_left.y) / 2});
+        _side_bars.front()->setScale({left_bottom_right.x - left_bottom_left.x, left_top_left.y - left_bottom_left.y});
+
+        _side_bars.back()->setPosition({(right_bottom_left.x + right_bottom_right.x) / 2, (right_bottom_left.y + right_top_left.y) / 2});
+        _side_bars.back()->setScale({right_bottom_right.x - right_bottom_left.x, right_top_left.y - right_bottom_left.y});
+
+    } else {
+        Vector2f bottom_bottom_left = _camera->projectCoordSubscreenToCore(
+                {_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().x});
+        Vector2f bottom_bottom_right = _camera->projectCoordSubscreenToCore(
+                {_camera->getScreenXBoundaries().y, _camera->getScreenYBoundaries().x});
+        Vector2f bottom_top_left = {_camera->getXBounderies().x, _camera->getYBounderies().x};
+
+        Vector2f top_bottom_left = {_camera->getXBounderies().x, _camera->getYBounderies().y};
+        Vector2f top_bottom_right = {_camera->getXBounderies().y, _camera->getYBounderies().y};
+        Vector2f top_top_left = _camera->projectCoordSubscreenToCore(
+                {_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().y});
+
+        _side_bars.front()->setPosition({(bottom_bottom_left.x + bottom_bottom_right.x) / 2, (bottom_bottom_left.y + bottom_top_left.y) / 2});
+        _side_bars.front()->setScale({bottom_bottom_right.x - bottom_bottom_left.x, bottom_top_left.y - bottom_bottom_left.y});
+
+        _side_bars.back()->setPosition({(top_bottom_left.x + top_bottom_right.x) / 2, (top_bottom_left.y + top_top_left.y) / 2});
+        _side_bars.back()->setScale({top_bottom_right.x - top_bottom_left.x, top_top_left.y - top_bottom_left.y});
+    }
 }
 
 void World::initializePhysicsEntities() {
@@ -137,7 +167,8 @@ void World::initializePhysicsEntities() {
 //
     // portal radio music object
     _portal_radios.push_back(
-            std::make_shared<PortalRadio>(PortalRadio({0.5f, 2.5f}, _camera, {0.2f, 0.2f}, _animation_groups["portal_radio"])));
+            std::make_shared<PortalRadio>(
+                    PortalRadio({0.5f, 2.5f}, _camera, {0.2f, 0.2f}, _animation_groups["portal_radio"])));
     _entity_view_creator->createEntitySpriteView(_portal_radios.back(), "portal_radio", 4);
 
     // walls

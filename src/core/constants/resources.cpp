@@ -6,7 +6,7 @@ const std::map<std::string, std::map<std::string, AnimationResource>> animation_
                         {"", {"data/textures/prototype/Dark/texture_07.png"}},
                 }},
                 {"sidescreen_background", {
-                                       {"", {"data/textures/cobble_stone.png"}},
+                                       {"", {"data/textures/missing_texture.png"}},
                                }},
                 {"wall", {
                                        {"", {"data/textures/cobble_stone.png"}},

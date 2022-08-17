@@ -32,6 +32,7 @@ private:
     std::vector<std::shared_ptr<PortalRadio>> _portal_radios;
 
     std::vector<std::shared_ptr<UIWidget>> _ui_widget_entities;
+    std::vector<std::shared_ptr<UIWidget>> _side_bars;
 
 public:
     World(std::shared_ptr<IEntityViewCreator> entity_view_creator, float x_min, float x_max, float y_min, float y_max);
@@ -54,6 +55,8 @@ private:
     void loadAudio();
 
     void initializeUIWidgets();
+
+    void updateSidebars();
 
     void initializePhysicsEntities();
 
