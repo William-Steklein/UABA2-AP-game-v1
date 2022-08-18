@@ -10,6 +10,7 @@ sf::VertexArray EntityView::getHitbox() const {
     std::shared_ptr<Entity> shared_entity = _entity.lock();
     if (shared_entity) {
         std::shared_ptr<Hitbox> hitbox = shared_entity->getScreenHitbox();
+        if (!hitbox) return sf::VertexArray(sf::LineStrip, 0);
 
         Vector2f half_size = hitbox->getSize() / 2;
         Vector2f origin_point = hitbox->getPosition();

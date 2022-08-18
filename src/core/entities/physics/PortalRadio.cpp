@@ -3,8 +3,9 @@
 #include <utility>
 
 PortalRadio::PortalRadio(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-                         std::shared_ptr<std::map<std::string, AnimationPlayer>> animationGroup, bool isStatic)
-        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animationGroup), isStatic) {
+                         AnimationPlayer animation_player, AudioPlayer audio_player, bool is_static)
+        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player),
+                        is_static) {
     _hitbox->setSize({_view_size.x / 1.25f, _view_size.y / 1.75f});
     _hitbox->setOffset({0, _view_size.y * -0.2f});
 
@@ -22,7 +23,8 @@ void PortalRadio::update(double t, float dt) {
 
     applySideScrolling();
     applyGravity();
-    applyFrictionAndDrag();
+    applyFriction();
+    applyDrag();
 
     PhysicsEntity::update(t, dt);
 }

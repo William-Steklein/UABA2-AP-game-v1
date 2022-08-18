@@ -2,32 +2,45 @@
 #define GAMEENGINE_ANIMATIONPLAYER_H
 
 
-#include <vector>
-#include <utility>
 #include <string>
+#include <map>
+#include <memory>
+#include <utility>
+#include "Animation.h"
 
-struct AnimationResource {
-    std::vector<std::string> texture_filenames;
-    float framerate;
-    bool loop;
+class AnimationPlayer {
+private:
+    std::string _name;
+    std::shared_ptr<std::map<std::string, Animation>> _animations;
+    bool _horizontal_mirror;
 
-    AnimationResource(const std::string &texture_filename) {
-        texture_filenames = {texture_filename};
-        framerate = 0.f;
-        loop = true;
-    };
+    std::string _current_animation_name;
+    unsigned int _current_animation_frame;
+    float _current_animation_time;
 
-    AnimationResource(const std::vector<std::string> &_texture_filenames, float _framerate, bool _loop) {
-        texture_filenames = _texture_filenames;
-        framerate = _framerate;
-        loop = _loop;
-    };
-};
+public:
+    AnimationPlayer(std::string name = "",
+                    std::shared_ptr<std::map<std::string, Animation>> animations = std::make_shared<std::map<std::string, Animation>>());
 
-struct AnimationPlayer {
-    std::vector<unsigned int> texture_indeces;
-    float framerate;
-    bool loop;
+    const std::string &getName() const;
+
+    const std::shared_ptr<std::map<std::string, Animation>> &getAnimations() const;
+
+    void setAnimations(const std::shared_ptr<std::map<std::string, Animation>> &animations);
+
+    void addAnimation(const std::string &animation_name, const Animation &animation);
+
+    bool isHorizontalMirror() const;
+
+    void setHorizontalMirror(bool horizontal_mirror);
+
+    const std::string &getCurrentAnimationName() const;
+
+    unsigned int getCurrentTextureIndex() const;
+
+    void startAnimation(const std::string &animation_name);
+
+    bool advanceAnimation();
 };
 
 

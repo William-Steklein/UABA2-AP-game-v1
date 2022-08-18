@@ -8,16 +8,15 @@
 
 class UIWidget : public Entity {
 private:
-    bool _static;
+    bool _static_view;
 
 public:
-    UIWidget(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-             std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group,
-             bool static_view = true);
+    UIWidget(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size,
+             AnimationPlayer animation_player = {}, AudioPlayer audio_player = {}, bool static_view = true);
 
     ~UIWidget() = default;
 
-    bool is_static() const;
+    bool is_static_view() const;
 };
 
 

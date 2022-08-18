@@ -1,10 +1,9 @@
 #include "PhysicsEntity.h"
 
 PhysicsEntity::PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-                             std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group,
-                             bool is_static) : Entity(position, std::move(camera), viewSize,
-                                                      std::move(animation_group)), _is_static(is_static), _mass(1),
-                                               _gravitational_acceleration({0, 0}) {
+                             AnimationPlayer animation_player, AudioPlayer audio_player, bool is_static) :
+        Entity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player)),
+        _is_static(is_static), _mass(1), _gravitational_acceleration({0, 0}) {
     _hitbox = std::make_shared<Hitbox>(_position, _view_size);
 
 }
@@ -92,13 +91,17 @@ void PhysicsEntity::applyGravity() {
     _acceleration += _gravitational_acceleration;
 }
 
-void PhysicsEntity::applyFrictionAndDrag() {
+void PhysicsEntity::applyFriction() {
     Vector2f friction_force = {_velocity.x * _friction.x, _velocity.y * _friction.y};
     if (_velocity.length() < 0.1) {
         friction_force *= 3;
     }
+    _acceleration -= friction_force;
+}
+
+void PhysicsEntity::applyDrag() {
     Vector2f drag_force = _velocity.x * _velocity.x * _drag;
-    _acceleration -= friction_force + drag_force;
+    _acceleration -= drag_force;
 }
 
 void PhysicsEntity::applySideScrolling() {

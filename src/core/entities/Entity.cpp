@@ -1,15 +1,17 @@
 #include "Entity.h"
 
+#include <utility>
+
 Entity::Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size,
-               std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group)
+               AnimationPlayer animation_player, AudioPlayer audio_player)
         : _position(position), _scale({1, 1}), _rotation(0), _camera(std::move(camera)), _view_size(view_size),
-          _animation_group(std::move(animation_group)), _current_animation_name(""), _h_mirror(false),
-          _current_animation_frame(0), _current_animation_time(0), _hitbox(std::make_shared<Hitbox>()) {
+          _hitbox(std::make_shared<Hitbox>()), _animation_player(std::move(animation_player)),
+          _audio_player(std::move(audio_player)) {
 
 }
 
 void Entity::update(double t, float dt) {
-    advanceAnimation();
+    if (_animation_player.advanceAnimation()) updateAnimationFrame();
     updateView();
 }
 
@@ -28,7 +30,7 @@ Vector2f Entity::getScreenPosition() const {
 void Entity::setPosition(const Vector2f &position) {
     _hitbox->setPosition(position);
 
-    for (const auto& ray: _rays) {
+    for (const auto &ray: _rays) {
         ray->move(position - _position);
     }
 
@@ -49,7 +51,7 @@ void Entity::setScale(const Vector2f &scale) {
 
         _hitbox->scale(scale_mult);
 
-        for (const auto& ray: _rays) {
+        for (const auto &ray: _rays) {
             ray->scale(scale_mult, _position);
         }
     }
@@ -84,58 +86,12 @@ void Entity::setViewSize(const Vector2f &view_size) {
     _view_size = view_size;
 }
 
-unsigned int Entity::getCurrentTextureIndex() const {
-    if (_current_animation_name.empty()) return 0;
-
-    std::vector<unsigned int> texture_indeces = _animation_group->at(_current_animation_name).texture_indeces;
-    return texture_indeces[_current_animation_frame];
-}
-
-bool Entity::isMirrored() const {
-    return _h_mirror;
-}
-
-void Entity::updateAnimationFrame() {
-    std::vector<unsigned int> texture_indeces = _animation_group->at(_current_animation_name).texture_indeces;
-
-    notifyObservers(texture_indeces[_current_animation_frame], _h_mirror);
-}
-
-void Entity::startAnimation(const std::string &animation_name, bool mirrored) {
-    _current_animation_name = animation_name;
-    _h_mirror = mirrored;
-    _current_animation_frame = 0;
-    _current_animation_time = 0;
-
-    updateAnimationFrame();
-}
-
-void Entity::advanceAnimation() {
-    if (_current_animation_name.empty()) {
-        return;
-    }
-
-    float framerate = _animation_group->at(_current_animation_name).framerate;
-    _current_animation_time += framerate;
-
-    if (_current_animation_time >= 1 || framerate == 0) {
-        if (_current_animation_frame + 1 < _animation_group->at(_current_animation_name).texture_indeces.size()) {
-            _current_animation_frame += 1;
-            _current_animation_time -= 1;
-            updateAnimationFrame();
-        } else if (_animation_group->at(_current_animation_name).loop) {
-            _current_animation_frame = 0;
-            _current_animation_time -= 1;
-            updateAnimationFrame();
-        }
-    }
-}
-
-const std::shared_ptr<Hitbox>& Entity::getHitbox() {
+const std::shared_ptr<Hitbox> &Entity::getHitbox() {
     return _hitbox;
 }
 
 std::shared_ptr<Hitbox> Entity::getScreenHitbox() {
+    if (!_hitbox) return nullptr;
     return std::make_shared<Hitbox>(Hitbox(_camera->projectCoordCoreToGame(_hitbox->getPosition()),
                                            _camera->projectSizeCoreToGame(_hitbox->getSize())));
 }
@@ -169,4 +125,27 @@ std::vector<std::shared_ptr<Ray>> Entity::getScreenRays() const {
 
 void Entity::setRays(const std::vector<std::shared_ptr<Ray>> &rays) {
     _rays = rays;
+}
+
+std::string Entity::getTextureGroupName() const {
+    return _animation_player.getName();
+}
+
+bool Entity::isHorizontalMirror() const {
+    return _animation_player.isHorizontalMirror();
+}
+
+unsigned int Entity::getCurrentTextureIndex() const {
+    return _animation_player.getCurrentTextureIndex();
+}
+
+void Entity::updateAnimationFrame() {
+    notifyObservers(_animation_player.getCurrentTextureIndex(), isHorizontalMirror());
+}
+
+void Entity::playAnimation(const std::string &animation_name) {
+    if (_animation_player.getCurrentAnimationName() != animation_name) {
+        _animation_player.startAnimation(animation_name);
+        updateAnimationFrame();
+    }
 }

@@ -17,10 +17,11 @@ void EntityViewCreator::loadTextureGroup(const std::string &texture_group_name,
     _texture_groups[texture_group_name] = texture_group;
 }
 
-void EntityViewCreator::createEntitySpriteView(std::shared_ptr<Entity> entity, const std::string &texture_group_name,
-                                               unsigned int layer) {
+void EntityViewCreator::createEntitySpriteView(std::shared_ptr<Entity> entity, unsigned int layer) {
+    // todo: assert / exception if no texturegroupname than the entity has not corresponding texture files
+
     std::shared_ptr<EntitySpriteView> new_entity_sprite_view(
-            new EntitySpriteView(entity, _texture_groups[texture_group_name]));
+            new EntitySpriteView(entity, _texture_groups[entity->getTextureGroupName()]));
     std::weak_ptr<EntitySpriteView> new_entity_sprite_view_weak = new_entity_sprite_view;
 
     if (_entity_sprite_views.count(layer)) {

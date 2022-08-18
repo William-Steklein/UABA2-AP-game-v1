@@ -3,8 +3,10 @@
 
 #include <map>
 #include <string>
-#include "../animation/AnimationPlayer.h"
+#include "../animation/Animation.h"
 
-extern const std::map<std::string, std::map<std::string, AnimationResource>> animation_data_groups;
+extern const std::map<std::string, std::string> textures_data;
+
+extern const std::map<std::string, std::map<std::string, AnimationResource>> animation_groups_data;
 
 #endif //GAMEENGINE_ANIMATIONDATA_H

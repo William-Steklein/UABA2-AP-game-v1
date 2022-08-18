@@ -50,6 +50,8 @@ void Game::draw() {
     // render entity views
     for (const auto &entity_sprite_view: _entity_view_creator->getEntitySpriteViews()) {
         _window->draw(entity_sprite_view->getSprite());
+
+        // debug information
         _window->draw(entity_sprite_view->getHitbox());
         _window->draw(entity_sprite_view->getRays());
     }

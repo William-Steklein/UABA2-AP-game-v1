@@ -3,7 +3,10 @@
 
 
 class AudioPlayer {
+private:
 
+public:
+    AudioPlayer();
 };
 
 

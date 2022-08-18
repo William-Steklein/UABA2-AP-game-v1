@@ -1,16 +1,14 @@
 #include "resources.h"
 
-const std::map<std::string, std::map<std::string, AnimationResource>> animation_data_groups =
+const std::map<std::string, std::string> textures_data = {
+        {"background", "data/textures/prototype/Dark/texture_07.png"},
+        {"sidescreen_background", "data/textures/black.png"},
+        {"wall", "data/textures/cobble_stone.png"},
+        {"portal_radio", "data/sprites/portal/portal_radio.png"},
+};
+
+const std::map<std::string, std::map<std::string, AnimationResource>> animation_groups_data =
         {
-                {"background", {
-                        {"", {"data/textures/prototype/Dark/texture_07.png"}},
-                }},
-                {"sidescreen_background", {
-                                       {"", {"data/textures/missing_texture.png"}},
-                               }},
-                {"wall", {
-                                       {"", {"data/textures/cobble_stone.png"}},
-                               }},
                 {"doodle", {
                         {"standing", {{
                                           "data/sprites/doodle/doodle-left.png",
@@ -51,7 +49,4 @@ const std::map<std::string, std::map<std::string, AnimationResource>> animation_
                                          "data/sprites/adventurer/adventurer-run-05.png",
                                  }, 0.10f, true}},
                 }},
-                {"portal_radio", {
-                                       {"", {"data/sprites/portal/portal_radio.png"}},
-                               }},
         };

@@ -18,7 +18,7 @@ private:
 
 public:
     Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-           std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group, std::shared_ptr<InputMap> input_map,
+           std::shared_ptr<InputMap> input_map, AnimationPlayer animation_player = {}, AudioPlayer audio_player = {},
            bool is_static = false);
 
     void update(double t, float dt) override;

@@ -49,22 +49,28 @@ std::shared_ptr<InputMap> World::getUserInputMap() {
 }
 
 void World::loadResources() {
+    loadTextures();
     loadAnimations();
     loadAudio();
 }
 
+void World::loadTextures() {
+    for (const auto &texture_data: textures_data) {
+        _animation_players[texture_data.first] = AnimationPlayer(texture_data.first);
+        _entity_view_creator->loadTextureGroup(texture_data.first, {texture_data.second});
+    }
+}
+
 void World::loadAnimations() {
-    for (const auto &animation_data_group: animation_data_groups) {
+    for (const auto &animation_group_data: animation_groups_data) {
         std::vector<std::string> texture_filenames;
-        std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group =
-                std::make_shared<std::map<std::string, AnimationPlayer>>();
+        AnimationPlayer animation_player(animation_group_data.first);
 
         unsigned int current_texture_index = 0;
-
-        for (const auto &animation_data_pair: animation_data_group.second) {
+        for (const auto &animation_data_pair: animation_group_data.second) {
             AnimationResource animation_data = animation_data_pair.second;
 
-            AnimationPlayer animation;
+            Animation animation;
             animation.framerate = animation_data.framerate;
             animation.loop = animation_data.loop;
 
@@ -75,11 +81,11 @@ void World::loadAnimations() {
                 current_texture_index++;
             }
 
-            animation_group->insert({animation_data_pair.first, animation});
+            animation_player.addAnimation(animation_data_pair.first, animation);
         }
 
-        _animation_groups[animation_data_group.first] = animation_group;
-        _entity_view_creator->loadTextureGroup(animation_data_group.first, texture_filenames);
+        _animation_players.insert({animation_group_data.first, animation_player});
+        _entity_view_creator->loadTextureGroup(animation_group_data.first, texture_filenames);
     }
 }
 
@@ -88,28 +94,21 @@ void World::loadAudio() {
 }
 
 void World::initializeUIWidgets() {
+    // sidebars
+    for (int i = 0; i < 2; i++) {
+        _ui_widget_entities.push_back(std::make_shared<UIWidget>(
+                UIWidget({0, 0}, _camera, {1, 1}, _animation_players["sidescreen_background"])));
+        _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 200);
+        _side_bars.push_back(_ui_widget_entities.back());
+    }
+
+    updateSidebars();
+
     // background
-//    Vector2f bottom_left = _camera->projectCoordScreenToCore({_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().x});
-//    Vector2f bottom_right = {_camera->getXBounderies().x, _camera->getYBounderies().x};
-////
-////    std::cout << bottom_right << std::endl;
-
-    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
-            UIWidget({0, 0}, _camera, {1, 1},
-                     _animation_groups["sidescreen_background"], false)));
-    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), "sidescreen_background", 200);
-    _side_bars.push_back(_ui_widget_entities.back());
-
-    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
-            UIWidget({0, 0}, _camera, {1, 1},
-                     _animation_groups["sidescreen_background"], false)));
-    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), "sidescreen_background", 200);
-    _side_bars.push_back(_ui_widget_entities.back());
-
     _ui_widget_entities.push_back(std::make_shared<UIWidget>(
             UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
-                     _animation_groups["background"])));
-    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), "background", 1);
+                     _animation_players["background"])));
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 1);
 }
 
 void World::updateSidebars() {
@@ -126,11 +125,14 @@ void World::updateSidebars() {
                 {_camera->getScreenXBoundaries().y, _camera->getScreenYBoundaries().x});
         Vector2f right_top_left = {_camera->getXBounderies().y, _camera->getYBounderies().y};
 
-        _side_bars.front()->setPosition({(left_bottom_left.x + left_bottom_right.x) / 2, (left_bottom_left.y + left_top_left.y) / 2});
+        _side_bars.front()->setPosition(
+                {(left_bottom_left.x + left_bottom_right.x) / 2, (left_bottom_left.y + left_top_left.y) / 2});
         _side_bars.front()->setScale({left_bottom_right.x - left_bottom_left.x, left_top_left.y - left_bottom_left.y});
 
-        _side_bars.back()->setPosition({(right_bottom_left.x + right_bottom_right.x) / 2, (right_bottom_left.y + right_top_left.y) / 2});
-        _side_bars.back()->setScale({right_bottom_right.x - right_bottom_left.x, right_top_left.y - right_bottom_left.y});
+        _side_bars.back()->setPosition(
+                {(right_bottom_left.x + right_bottom_right.x) / 2, (right_bottom_left.y + right_top_left.y) / 2});
+        _side_bars.back()->setScale(
+                {right_bottom_right.x - right_bottom_left.x, right_top_left.y - right_bottom_left.y});
 
     } else {
         Vector2f bottom_bottom_left = _camera->projectCoordSubscreenToCore(
@@ -144,10 +146,13 @@ void World::updateSidebars() {
         Vector2f top_top_left = _camera->projectCoordSubscreenToCore(
                 {_camera->getScreenXBoundaries().x, _camera->getScreenYBoundaries().y});
 
-        _side_bars.front()->setPosition({(bottom_bottom_left.x + bottom_bottom_right.x) / 2, (bottom_bottom_left.y + bottom_top_left.y) / 2});
-        _side_bars.front()->setScale({bottom_bottom_right.x - bottom_bottom_left.x, bottom_top_left.y - bottom_bottom_left.y});
+        _side_bars.front()->setPosition(
+                {(bottom_bottom_left.x + bottom_bottom_right.x) / 2, (bottom_bottom_left.y + bottom_top_left.y) / 2});
+        _side_bars.front()->setScale(
+                {bottom_bottom_right.x - bottom_bottom_left.x, bottom_top_left.y - bottom_bottom_left.y});
 
-        _side_bars.back()->setPosition({(top_bottom_left.x + top_bottom_right.x) / 2, (top_bottom_left.y + top_top_left.y) / 2});
+        _side_bars.back()->setPosition(
+                {(top_bottom_left.x + top_bottom_right.x) / 2, (top_bottom_left.y + top_top_left.y) / 2});
         _side_bars.back()->setScale({top_bottom_right.x - top_bottom_left.x, top_top_left.y - top_bottom_left.y});
     }
 }
@@ -156,39 +161,30 @@ void World::initializePhysicsEntities() {
     // player
     float scale_mul = 2.f;
     _player = std::make_shared<Doodle>(
-            Doodle({0.f, 2.5f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _animation_groups["adventurer"],
-                   _input_map, false));
-    _entity_view_creator->createEntitySpriteView(_player, "adventurer", 5);
+            Doodle({0.f, 2.5f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _input_map,
+                   _animation_players["adventurer"]));
+    _entity_view_creator->createEntitySpriteView(_player, 5);
 
-//    // walls
-//    _walls.push_back(std::make_shared<Wall>(
-//            Wall({-0.5f, 0.5f}, _camera, {0.4f, 0.4f}, _animation_groups["wall"])));
-//    _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 3);
-//
     // portal radio music object
     _portal_radios.push_back(
             std::make_shared<PortalRadio>(
-                    PortalRadio({0.5f, 2.5f}, _camera, {0.2f, 0.2f}, _animation_groups["portal_radio"])));
-    _entity_view_creator->createEntitySpriteView(_portal_radios.back(), "portal_radio", 4);
+                    PortalRadio({0.5f, 2.5f}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"])));
+    _entity_view_creator->createEntitySpriteView(_portal_radios.back(), 4);
 
     // walls
 
     _walls.push_back(std::make_shared<Wall>(
-            Wall({-0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_groups["wall"], true)));
-    _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 3);
+            Wall({-0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_players["wall"], {}, true)));
+    _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
 
     _walls.push_back(std::make_shared<Wall>(
-            Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_groups["wall"], true)));
-    _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 3);
-
-//    _walls.push_back(std::make_shared<Wall>(
-//            Wall({0.5f, 0.75f}, _camera, {0.5f, 0.5f}, _animation_groups["wall"], 1, false)));
-//    _entity_view_creator->createEntitySpriteView(_walls.back(), "wall", 2);
+            Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_players["wall"], {}, true)));
+    _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
 }
 
 void World::updateUIEntities(double t, float dt) {
     for (const auto &ui_widget: _ui_widget_entities) {
-        if (!ui_widget->is_static() || _force_static_update) {
+        if (!ui_widget->is_static_view() || _force_static_update) {
             ui_widget->update(t, dt);
         }
     }

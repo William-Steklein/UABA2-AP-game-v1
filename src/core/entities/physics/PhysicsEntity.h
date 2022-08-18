@@ -22,7 +22,7 @@ protected:
 
 public:
     PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-                  std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group,
+                  AnimationPlayer animation_player = {}, AudioPlayer audio_player = {},
                   bool is_static = false);
 
     ~PhysicsEntity() = default;
@@ -53,7 +53,9 @@ public:
 
     void applyGravity();
 
-    void applyFrictionAndDrag();
+    void applyFriction();
+
+    void applyDrag();
 
     void applySideScrolling();
 

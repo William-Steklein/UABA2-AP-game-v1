@@ -11,7 +11,7 @@
 #include "entities/ui/UIWidget.h"
 #include "entities/IEntityViewCreator.h"
 #include "entities/physics/Wall.h"
-#include "animation/AnimationPlayer.h"
+#include "animation/Animation.h"
 #include "constants/resources.h"
 #include "entities/physics/PortalRadio.h"
 #include "physics/Ray.h"
@@ -22,7 +22,9 @@ private:
     std::shared_ptr<InputMap> _input_map;
 
     // resources
-    std::map<std::string, std::shared_ptr<std::map<std::string, AnimationPlayer>>> _animation_groups;
+    std::map<std::string, AnimationPlayer> _animation_players;
+    std::map<std::string, AudioPlayer> _audio_players;
+//    std::map<std::string, std::shared_ptr<std::map<std::string, Animation>>> _animation_groups;
 
     // entities
     std::shared_ptr<IEntityViewCreator> _entity_view_creator;
@@ -49,6 +51,8 @@ public:
 
 private:
     void loadResources();
+
+    void loadTextures();
 
     void loadAnimations();
 

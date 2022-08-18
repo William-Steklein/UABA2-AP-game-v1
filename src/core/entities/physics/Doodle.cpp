@@ -3,10 +3,10 @@
 #include <utility>
 
 Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-               std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group,
-               std::shared_ptr<InputMap> input_map, bool is_static)
-        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_group), is_static),
-          _input_map(std::move(input_map)) {
+               std::shared_ptr<InputMap> input_map, AnimationPlayer animation_player, AudioPlayer audio_player,
+               bool is_static)
+        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player),
+                        is_static), _input_map(std::move(input_map)) {
     _hitbox->setSize({_view_size.x / 3.75f, _view_size.y / 1.25f});
     _hitbox->setOffset({0, -0.072f * _view_size.y});
 
@@ -29,12 +29,14 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
 
     setupPlayerPhysics(jump_dt, jump_height);
 
-    startAnimation("idle");
+    playAnimation("idle");
 }
 
 void Doodle::update(double t, float dt) {
     playerController(dt);
 //    testController();
+
+
 
     applySideScrolling();
 
@@ -54,6 +56,8 @@ void Doodle::reset() {
 void Doodle::playerController(float dt) {
     _standing = false;
 
+    std::string curr_anim = _animation_player.getCurrentAnimationName();
+
     // reset player
     if (_input_map->r) {
         reset();
@@ -67,32 +71,48 @@ void Doodle::playerController(float dt) {
         }
     }
 
+    if (_standing && curr_anim != "crouch" && curr_anim != "run") {
+        playAnimation("idle");
+    }
+
+    if (_standing && _input_map->s && curr_anim != "run") {
+        playAnimation("crouch");
+    }
+
+    if ((curr_anim == "crouch" && !_input_map->s) || (curr_anim == "run" && !(_input_map->d || _input_map->a))) {
+        playAnimation("idle");
+    }
+
     // jumping
     if (_standing && _input_map->w) {
         _velocity.y = _initial_jump_velocity;
         _standing = false;
-        startAnimation("jump");
+
+        playAnimation("jump");
     }
 
-    // crouching
-    if (_input_map->s) {
-        if (_current_animation_name != "crouch") {
-            startAnimation("crouch", _h_mirror);
-        }
-    } else if (_current_animation_name != "idle" && (_current_animation_name != "jump" || _standing)) {
-        startAnimation("idle", _h_mirror);
+    if (!_standing && _velocity.y < 0) {
+        playAnimation("fall");
     }
 
     // left / right movement
     if (_input_map->d) {
-        _force.x += _horizontal_movement_force;
-        _h_mirror = false;
-        updateAnimationFrame();
+        _animation_player.setHorizontalMirror(false);
+
+        if (curr_anim != "crouch") _force.x += _horizontal_movement_force;
+
+        if (_standing && curr_anim != "crouch") {
+            playAnimation("run");
+        }
     }
     if (_input_map->a) {
-        _force.x -= _horizontal_movement_force;
-        _h_mirror = true;
-        updateAnimationFrame();
+        _animation_player.setHorizontalMirror(true);
+
+        if (curr_anim != "crouch") _force.x -= _horizontal_movement_force;
+
+        if (_standing && curr_anim != "crouch") {
+            playAnimation("run");
+        }
     }
 
     // gravity
@@ -100,7 +120,8 @@ void Doodle::playerController(float dt) {
         applyGravity();
     }
 
-    applyFrictionAndDrag();
+    applyFriction();
+    applyDrag();
 }
 
 void Doodle::testController() {
@@ -125,5 +146,6 @@ void Doodle::testController() {
         _force += {0, -movement_force};
     }
 
-    applyFrictionAndDrag();
+    applyFriction();
+    applyDrag();
 }

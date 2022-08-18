@@ -9,9 +9,11 @@
 #include "../math/Vector2f.h"
 #include "../Camera.h"
 #include "../observer-pattern-interface/ISubject.h"
+#include "../animation/Animation.h"
 #include "../animation/AnimationPlayer.h"
 #include "../physics/Hitbox.h"
 #include "../physics/Ray.h"
+#include "../audio/AudioPlayer.h"
 
 class Entity : public ISubject {
 protected:
@@ -24,24 +26,17 @@ protected:
     std::shared_ptr<Camera> _camera;
     Vector2f _view_size;
 
-    // animation player
-    std::shared_ptr<std::map<std::string, AnimationPlayer>> _animation_group;
-    std::string _current_animation_name;
-    bool _h_mirror;
-    unsigned int _current_animation_frame;
-    float _current_animation_time;
-
-    // audio player
-
-    // hitbox
+    // physics
     std::shared_ptr<Hitbox> _hitbox;
-
-    // rays
     std::vector<std::shared_ptr<Ray>> _rays;
+
+    // resource players
+    AnimationPlayer _animation_player;
+    AudioPlayer _audio_player;
 
 public:
     Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size,
-           std::shared_ptr<std::map<std::string, AnimationPlayer>> animation_group);
+           AnimationPlayer animation_player = {}, AudioPlayer audio_player = {});
 
     virtual void update(double t, float dt);
 
@@ -53,7 +48,7 @@ public:
 
     virtual void setPosition(const Vector2f &position);
 
-    void move(const Vector2f& vector);
+    void move(const Vector2f &vector);
 
     virtual Vector2f getScale() const;
 
@@ -73,17 +68,7 @@ public:
 
     virtual void setViewSize(const Vector2f &view_size);
 
-    unsigned int getCurrentTextureIndex() const;
-
-    bool isMirrored() const;
-
-    void updateAnimationFrame();
-
-    void startAnimation(const std::string &animation_name, bool mirrored=false);
-
-    void advanceAnimation();
-
-    const std::shared_ptr<Hitbox>& getHitbox();
+    const std::shared_ptr<Hitbox> &getHitbox();
 
     std::shared_ptr<Hitbox> getScreenHitbox();
 
@@ -98,6 +83,16 @@ public:
     std::vector<std::shared_ptr<Ray>> getScreenRays() const;
 
     void setRays(const std::vector<std::shared_ptr<Ray>> &rays);
+
+    std::string getTextureGroupName() const;
+
+    bool isHorizontalMirror() const;
+
+    unsigned int getCurrentTextureIndex() const;
+
+    void updateAnimationFrame();
+
+    void playAnimation(const std::string &animation_name);
 };
 
 

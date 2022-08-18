@@ -5,7 +5,7 @@ EntitySpriteView::EntitySpriteView(std::weak_ptr<Entity> entity,
         : EntityView(std::move(entity)), _h_mirror(false), _texture_group(std::move(texture_group)),
           _current_texture_index(0) {
     std::shared_ptr<Entity> shared_entity = _entity.lock();
-    setTexture(shared_entity->getCurrentTextureIndex(), shared_entity->isMirrored());
+    setTexture(shared_entity->getCurrentTextureIndex(), shared_entity->isHorizontalMirror());
     updateSprite();
 }
 

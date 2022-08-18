@@ -9,7 +9,7 @@ private:
 
 public:
     PortalRadio(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-                std::shared_ptr<std::map<std::string, AnimationPlayer>> animationGroup, bool isStatic = false);
+                AnimationPlayer animation_player = {}, AudioPlayer audio_player = {}, bool is_static = false);
 
     void update(double t, float dt) override;
 };

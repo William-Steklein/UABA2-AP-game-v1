@@ -18,8 +18,7 @@ public:
     void loadTextureGroup(const std::string &texture_group_name,
                           const std::vector<std::string> &texture_filenames) override;
 
-    void createEntitySpriteView(std::shared_ptr<Entity> entity, const std::string &texture_group_name,
-                                unsigned int layer) override;
+    void createEntitySpriteView(std::shared_ptr<Entity> entity, unsigned int layer) override;
 
     void createEntityTextView(std::shared_ptr<Entity> entity) override;
 
