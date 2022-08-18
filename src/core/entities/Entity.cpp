@@ -149,3 +149,7 @@ void Entity::playAnimation(const std::string &animation_name) {
         updateAnimationFrame();
     }
 }
+
+void Entity::playSound(const std::string &sound_name) {
+    notifyObservers(0, 3);
+}

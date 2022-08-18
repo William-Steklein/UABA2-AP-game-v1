@@ -15,20 +15,21 @@
 #include "constants/resources.h"
 #include "entities/physics/PortalRadio.h"
 #include "physics/Ray.h"
+#include "audio/IEntityAudioCreator.h"
 
 class World {
 private:
     std::shared_ptr<Camera> _camera;
     std::shared_ptr<InputMap> _input_map;
 
-    // resources
+    // resource players
     std::map<std::string, AnimationPlayer> _animation_players;
-    std::map<std::string, AudioPlayer> _audio_players;
-//    std::map<std::string, std::shared_ptr<std::map<std::string, Animation>>> _animation_groups;
+    AudioPlayer _audio_player;
 
     // entities
     std::shared_ptr<IEntityViewCreator> _entity_view_creator;
-    bool _force_static_update;
+    std::shared_ptr<IEntityAudioCreator> _entity_audio_creator;
+    bool _force_static_view_update;
     std::shared_ptr<Doodle> _player;
     std::vector<std::shared_ptr<Wall>> _walls;
     std::vector<std::shared_ptr<PortalRadio>> _portal_radios;
@@ -37,7 +38,8 @@ private:
     std::vector<std::shared_ptr<UIWidget>> _side_bars;
 
 public:
-    World(std::shared_ptr<IEntityViewCreator> entity_view_creator, float x_min, float x_max, float y_min, float y_max);
+    World(float x_min, float x_max, float y_min, float y_max, std::shared_ptr<IEntityViewCreator> entity_view_creator,
+          std::shared_ptr<IEntityAudioCreator> entity_audio_creator);
 
     ~World();
 

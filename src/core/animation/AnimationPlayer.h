@@ -20,7 +20,8 @@ private:
 
 public:
     AnimationPlayer(std::string name = "",
-                    std::shared_ptr<std::map<std::string, Animation>> animations = std::make_shared<std::map<std::string, Animation>>());
+                    std::shared_ptr<std::map<std::string, Animation>> animations =
+                    std::make_shared<std::map<std::string, Animation>>());
 
     const std::string &getName() const;
 

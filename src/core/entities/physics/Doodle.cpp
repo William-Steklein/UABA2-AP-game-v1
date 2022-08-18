@@ -71,6 +71,10 @@ void Doodle::playerController(float dt) {
         }
     }
 
+    if (_standing && curr_anim != "idle") {
+        playSound("crouch");
+    }
+
     if (_standing && curr_anim != "crouch" && curr_anim != "run") {
         playAnimation("idle");
     }
@@ -91,7 +95,8 @@ void Doodle::playerController(float dt) {
         playAnimation("jump");
     }
 
-    if (!_standing && _velocity.y < 0) {
+    // falling
+    if (!_standing && _velocity.y < 0 && curr_anim != "fall") {
         playAnimation("fall");
     }
 

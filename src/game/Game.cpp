@@ -2,29 +2,16 @@
 
 Game::Game()
         : _screen_width(constants::screen_width), _screen_height(constants::screen_height),
-          _running(true), _entity_view_creator(new EntityViewCreator) {
+          _running(true), _entity_view_creator(new EntityViewCreator), _entity_audio_creator(new EntityAudioCreator)  {
     _window = std::make_unique<sf::RenderWindow>(sf::VideoMode(_screen_width, _screen_height), "GameEngine");
 
     // coreAPI initialize
-    _world = std::make_unique<World>(_entity_view_creator, 0, _screen_width, _screen_height, 0);
+    _world = std::make_unique<World>(0, _screen_width, _screen_height, 0, _entity_view_creator, _entity_audio_creator);
 }
 
 Game::~Game() = default;
 
 void Game::run() {
-//    sf::SoundBuffer buffer;
-//    if (!buffer.loadFromFile("data/audio/wilhelm_scream.wav"))
-//        return;
-
-//    sf::Sound sound;
-//    sound.setBuffer(buffer);
-//
-//    std::cout << sound.getStatus() << std::endl;
-//
-//    sound.play();
-//
-//    std::cout << sound.getStatus() << std::endl;
-
     while (_running) {
         // coreAPI sleep
         _world->sleep();
@@ -37,10 +24,6 @@ void Game::run() {
 
         // sfml draw
         draw();
-
-//        if (sound.getStatus() == 0) {
-//            sound.play();
-//        }
     }
 }
 
@@ -127,6 +110,7 @@ void Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
 
         case sf::Keyboard::D:
             _world->getUserInputMap()->d = pressed;
+//            std::cout << "d" << std::endl;
             break;
 
         case sf::Keyboard::E:
@@ -187,6 +171,7 @@ void Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
 
         case sf::Keyboard::S:
             _world->getUserInputMap()->s = pressed;
+//            std::cout << "s" << std::endl;
             break;
 
         case sf::Keyboard::T:
@@ -228,6 +213,8 @@ void Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
         default:
             break;
     }
+
+//    std::cout << "***********" << std::endl;
 }
 
 void Game::handleMouseInput(const sf::Event &event, bool pressed) {

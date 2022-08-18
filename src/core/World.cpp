@@ -1,9 +1,11 @@
 #include "World.h"
 
-World::World(std::shared_ptr<IEntityViewCreator> entity_view_creator, float x_min, float x_max, float y_min,
-             float y_max)
+World::World(float x_min, float x_max, float y_min, float y_max,
+             std::shared_ptr<IEntityViewCreator> entity_view_creator,
+             std::shared_ptr<IEntityAudioCreator> entity_audio_creator)
         : _camera(new Camera(x_min, x_max, y_min, y_max)), _entity_view_creator(std::move(entity_view_creator)),
-          _force_static_update(true), _input_map(new InputMap) {
+          _entity_audio_creator(std::move(entity_audio_creator)), _force_static_view_update(true),
+          _input_map(new InputMap) {
     loadResources();
     initializeUIWidgets();
     initializePhysicsEntities();
@@ -41,7 +43,7 @@ void World::updateScreenResolution(float x_min, float x_max, float y_min, float 
     _camera->setScreenBoundaries(x_min, x_max, y_min, y_max);
     updateSidebars();
 
-    _force_static_update = true;
+    _force_static_view_update = true;
 }
 
 std::shared_ptr<InputMap> World::getUserInputMap() {
@@ -55,9 +57,9 @@ void World::loadResources() {
 }
 
 void World::loadTextures() {
-    for (const auto &texture_data: textures_data) {
-        _animation_players[texture_data.first] = AnimationPlayer(texture_data.first);
-        _entity_view_creator->loadTextureGroup(texture_data.first, {texture_data.second});
+    for (const auto &texture_resource: texture_data) {
+        _animation_players[texture_resource.first] = AnimationPlayer(texture_resource.first);
+        _entity_view_creator->loadTextureGroup(texture_resource.first, {texture_resource.second});
     }
 }
 
@@ -90,7 +92,13 @@ void World::loadAnimations() {
 }
 
 void World::loadAudio() {
+    for (const auto &audio_resource: audio_sound_data) {
+        _entity_audio_creator->loadSound(audio_resource.first, audio_resource.second);
+    }
 
+    for (const auto &audio_resource: audio_sound_data) {
+        _entity_audio_creator->loadMusic(audio_resource.first, audio_resource.second);
+    }
 }
 
 void World::initializeUIWidgets() {
@@ -164,6 +172,7 @@ void World::initializePhysicsEntities() {
             Doodle({0.f, 2.5f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _input_map,
                    _animation_players["adventurer"]));
     _entity_view_creator->createEntitySpriteView(_player, 5);
+    _entity_audio_creator->createEntityAudio(_player);
 
     // portal radio music object
     _portal_radios.push_back(
@@ -172,7 +181,6 @@ void World::initializePhysicsEntities() {
     _entity_view_creator->createEntitySpriteView(_portal_radios.back(), 4);
 
     // walls
-
     _walls.push_back(std::make_shared<Wall>(
             Wall({-0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_players["wall"], {}, true)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
@@ -184,11 +192,11 @@ void World::initializePhysicsEntities() {
 
 void World::updateUIEntities(double t, float dt) {
     for (const auto &ui_widget: _ui_widget_entities) {
-        if (!ui_widget->is_static_view() || _force_static_update) {
+        if (!ui_widget->is_static_view() || _force_static_view_update) {
             ui_widget->update(t, dt);
         }
     }
-    if (_force_static_update) _force_static_update = false;
+    if (_force_static_view_update) _force_static_view_update = false;
 }
 
 void World::updatePhysics(double t, float dt) {

@@ -93,6 +93,8 @@ public:
     void updateAnimationFrame();
 
     void playAnimation(const std::string &animation_name);
+
+    void playSound(const std::string &sound_name);
 };
 
 

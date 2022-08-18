@@ -5,6 +5,7 @@
 #include "core/World.h"
 #include "constants.h"
 #include "game/entity_view/EntityViewCreator.h"
+#include "game/audio/EntityAudioCreator.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
@@ -20,6 +21,7 @@ private:
 
     std::unique_ptr<World> _world;
     std::shared_ptr<EntityViewCreator> _entity_view_creator;
+    std::shared_ptr<EntityAudioCreator> _entity_audio_creator;
 
 public:
     Game();
