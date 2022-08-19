@@ -26,6 +26,9 @@ void EntityAudio::handleEvent(const unsigned int &event, const unsigned int &cha
         } else {
             _music.stop();
         }
+    } else if (channel == 8) {
+        std::cout << event << std::endl;
+        setVolume(event);
     }
 }
 
@@ -45,4 +48,9 @@ void EntityAudio::playMusic(unsigned int music_id) {
 
     _music.setLoop(_loop);
     _music.play();
+}
+
+void EntityAudio::setVolume(unsigned int volume) {
+    _sound.setVolume(static_cast<float>(volume));
+    _music.setVolume(static_cast<float>(volume));
 }

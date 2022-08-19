@@ -34,6 +34,8 @@ public:
     void playSound(unsigned int sound_id);
 
     void playMusic(unsigned int music_id);
+
+    void setVolume(unsigned int volume);
 };
 
 

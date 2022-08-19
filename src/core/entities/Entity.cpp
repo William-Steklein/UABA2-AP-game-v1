@@ -171,10 +171,22 @@ void Entity::stopMusic() {
 }
 
 void Entity::replayAudio() {
+    setAudioVolume(_audio_player.getCurrentVolume());
+
     if (!_audio_player.getCurrentSound().empty()) {
         playSound(_audio_player.getCurrentSound());
     }
     if (!_audio_player.getCurrentMusic().empty()) {
         playMusic(_audio_player.getCurrentMusic());
     }
+}
+
+void Entity::setAudioVolume(unsigned int volume) {
+    if (volume > 100) {
+        volume = 100;
+    }
+
+    _audio_player.setCurrentVolume(volume);
+
+    notifyObservers(volume, 8);
 }

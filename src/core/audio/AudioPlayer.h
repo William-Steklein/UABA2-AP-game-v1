@@ -13,8 +13,10 @@ private:
     std::string _current_sound;
     std::string _current_music;
 
+    unsigned int _current_volume;
+
 public:
-    AudioPlayer() = default;
+    AudioPlayer();
 
     void addSound(unsigned int sound_id, const std::string& sound_name);
 
@@ -27,6 +29,10 @@ public:
     const std::string &getCurrentSound() const;
 
     const std::string &getCurrentMusic() const;
+
+    unsigned int getCurrentVolume() const;
+
+    void setCurrentVolume(unsigned int currentVolume);
 };
 
 

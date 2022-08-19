@@ -1,5 +1,9 @@
 #include "AudioPlayer.h"
 
+AudioPlayer::AudioPlayer() : _current_volume(100) {
+
+}
+
 void AudioPlayer::addSound(unsigned int sound_id, const std::string &sound_name) {
     _sound_ids[sound_name] = sound_id;
 }
@@ -28,4 +32,12 @@ const std::string &AudioPlayer::getCurrentSound() const {
 
 const std::string &AudioPlayer::getCurrentMusic() const {
     return _current_music;
+}
+
+unsigned int AudioPlayer::getCurrentVolume() const {
+    return _current_volume;
+}
+
+void AudioPlayer::setCurrentVolume(unsigned int currentVolume) {
+    _current_volume = currentVolume;
 }

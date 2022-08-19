@@ -103,6 +103,8 @@ public:
     void stopMusic();
 
     void replayAudio();
+
+    void setAudioVolume(unsigned int volume);
 };
 
 

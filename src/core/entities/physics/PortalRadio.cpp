@@ -1,7 +1,5 @@
 #include "PortalRadio.h"
 
-#include <utility>
-
 PortalRadio::PortalRadio(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
                          AnimationPlayer animation_player, AudioPlayer audio_player, bool is_static)
         : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player),
@@ -15,6 +13,7 @@ PortalRadio::PortalRadio(const Vector2f &position, std::shared_ptr<Camera> camer
 
     // start music with loop
     playMusic("portal_radio", true, true);
+    setAudioVolume(10);
 }
 
 void PortalRadio::update(double t, float dt) {
