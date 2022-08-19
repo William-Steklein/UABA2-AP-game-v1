@@ -27,7 +27,6 @@ void EntityAudio::handleEvent(const unsigned int &event, const unsigned int &cha
             _music.stop();
         }
     } else if (channel == 8) {
-        std::cout << event << std::endl;
         setVolume(event);
     }
 }

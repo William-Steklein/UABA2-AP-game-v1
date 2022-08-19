@@ -1,6 +1,7 @@
+#include <memory>
 #include "AudioPlayer.h"
 
-AudioPlayer::AudioPlayer() : _current_volume(100) {
+AudioPlayer::AudioPlayer() : _current_volume(100), _max_distance(1) {
 
 }
 
@@ -40,4 +41,20 @@ unsigned int AudioPlayer::getCurrentVolume() const {
 
 void AudioPlayer::setCurrentVolume(unsigned int currentVolume) {
     _current_volume = currentVolume;
+}
+
+const std::shared_ptr<Vector2f> &AudioPlayer::getAudioListenerPosition() const {
+    return _audio_listener_position;
+}
+
+void AudioPlayer::setAudioListenerPosition(const std::shared_ptr<Vector2f> &audio_listener_position) {
+    _audio_listener_position = audio_listener_position;
+}
+
+float AudioPlayer::getMaxDistance() const {
+    return _max_distance;
+}
+
+void AudioPlayer::setMaxDistance(float max_distance) {
+    _max_distance = max_distance;
 }

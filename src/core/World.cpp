@@ -5,7 +5,7 @@ World::World(float x_min, float x_max, float y_min, float y_max,
              std::shared_ptr<IEntityAudioCreator> entity_audio_creator)
         : _camera(new Camera(x_min, x_max, y_min, y_max)), _entity_view_creator(std::move(entity_view_creator)),
           _entity_audio_creator(std::move(entity_audio_creator)), _force_static_view_update(true),
-          _input_map(new InputMap) {
+          _input_map(new InputMap), _audio_listener_position(new Vector2f(0, 0)) {
     loadResources();
     initializeUIWidgets();
     initializePhysicsEntities();
@@ -92,6 +92,9 @@ void World::loadAnimations() {
 }
 
 void World::loadAudio() {
+    _audio_player.setAudioListenerPosition(_audio_listener_position);
+    _audio_player.setMaxDistance(2.f);
+
     for (const auto &audio_resource: audio_sound_data) {
         unsigned int sound_id = _entity_audio_creator->loadSound(audio_resource.second);
 
@@ -257,6 +260,12 @@ void World::updatePhysicsEntities(double t, float dt) {
 
     // enemies
 
+    // audio listener
+    if (_player != nullptr) {
+        *_audio_listener_position = _player->getPosition();
+    } else {
+        *_audio_listener_position = {0, 0};
+    }
 }
 
 bool World::handleCollision(const std::shared_ptr<PhysicsEntity> &entity1,

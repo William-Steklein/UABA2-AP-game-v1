@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include "../math/Vector2f.h"
 
 class AudioPlayer {
 private:
@@ -14,6 +15,8 @@ private:
     std::string _current_music;
 
     unsigned int _current_volume;
+    std::shared_ptr<Vector2f> _audio_listener_position;
+    float _max_distance;
 
 public:
     AudioPlayer();
@@ -33,6 +36,14 @@ public:
     unsigned int getCurrentVolume() const;
 
     void setCurrentVolume(unsigned int currentVolume);
+
+    const std::shared_ptr<Vector2f> &getAudioListenerPosition() const;
+
+    void setAudioListenerPosition(const std::shared_ptr<Vector2f> &audio_listener_position);
+
+    float getMaxDistance() const;
+
+    void setMaxDistance(float max_distance);
 };
 
 

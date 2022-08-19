@@ -13,7 +13,7 @@ PortalRadio::PortalRadio(const Vector2f &position, std::shared_ptr<Camera> camer
 
     // start music with loop
     playMusic("portal_radio", true, true);
-    setAudioVolume(10);
+    setAudioVolume(75);
 }
 
 void PortalRadio::update(double t, float dt) {
