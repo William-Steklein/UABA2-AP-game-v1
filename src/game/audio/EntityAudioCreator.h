@@ -19,9 +19,9 @@ private:
 public:
     EntityAudioCreator() = default;
 
-    unsigned int loadSound(const AudioResource &filename) override;
+    unsigned int loadSound(const std::string &filename) override;
 
-    unsigned int loadMusic(const AudioResource &filename) override;
+    unsigned int loadMusic(const std::string &filename) override;
 
     void createEntityAudio(std::shared_ptr<Entity> entity) override;
 };

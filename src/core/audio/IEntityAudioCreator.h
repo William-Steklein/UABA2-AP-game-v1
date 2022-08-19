@@ -10,9 +10,9 @@ class IEntityAudioCreator {
 private:
 
 public:
-    virtual unsigned int loadSound(const AudioResource &audio_resource) = 0;
+    virtual unsigned int loadSound(const std::string &filename) = 0;
 
-    virtual unsigned int loadMusic(const AudioResource &audio_resource) = 0;
+    virtual unsigned int loadMusic(const std::string &filename) = 0;
 
     virtual void createEntityAudio(std::shared_ptr<Entity> entity) = 0;
 };

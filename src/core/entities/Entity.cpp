@@ -150,22 +150,31 @@ void Entity::playAnimation(const std::string &animation_name) {
     }
 }
 
-void Entity::playSound(const std::string &sound_name) {
+void Entity::playSound(const std::string &sound_name, bool finish, bool loop) {
+    notifyObservers(finish, 5);
+    notifyObservers(loop, 6);
     notifyObservers(_audio_player.getSoundId(sound_name), 3);
 }
 
-void Entity::playMusic(const std::string &music_name) {
+void Entity::playMusic(const std::string &music_name, bool finish, bool loop) {
+    notifyObservers(finish, 5);
+    notifyObservers(loop, 6);
     notifyObservers(_audio_player.getMusicId(music_name), 4);
 }
 
-bool Entity::isAudioLoop() const {
-    return ;
+void Entity::stopSound() {
+    notifyObservers(0, 7);
 }
 
-bool Entity::isAudioFinish() const {
-    return false;
+void Entity::stopMusic() {
+    notifyObservers(1, 7);
 }
 
-float Entity::getSpatialAudioLevel() const {
-    return 1;
+void Entity::replayAudio() {
+    if (!_audio_player.getCurrentSound().empty()) {
+        playSound(_audio_player.getCurrentSound());
+    }
+    if (!_audio_player.getCurrentMusic().empty()) {
+        playMusic(_audio_player.getCurrentMusic());
+    }
 }

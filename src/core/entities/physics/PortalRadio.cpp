@@ -14,15 +14,11 @@ PortalRadio::PortalRadio(const Vector2f &position, std::shared_ptr<Camera> camer
     setupPlayerPhysics(0.6, 1);
 
     // start music with loop
-
+    playMusic("portal_radio", true, true);
 }
 
 void PortalRadio::update(double t, float dt) {
     // spatial audio test
-    if (!start) {
-        playMusic("portal_radio");
-        start = true;
-    }
 
     applySideScrolling();
     applyGravity();

@@ -51,10 +51,10 @@ const std::map<std::string, std::map<std::string, AnimationResource>> animation_
                                }},
         };
 
-const std::map<std::string, AudioResource> audio_sound_data = {
-        {"scream", {"data/audio/wilhelm_scream.wav", false, true}},
+const std::map<std::string, std::string> audio_sound_data = {
+        {"scream", "data/audio/wilhelm_scream.wav"},
 };
 
-const std::map<std::string, AudioResource> audio_music_data = {
-        {"portal_radio", {"data/audio/portal_radio_music.wav", true, true}},
+const std::map<std::string, std::string> audio_music_data = {
+        {"portal_radio", "data/audio/portal_radio_music.wav"},
 };

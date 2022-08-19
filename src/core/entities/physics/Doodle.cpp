@@ -89,7 +89,7 @@ void Doodle::playerController(float dt) {
         _standing = false;
 
         playAnimation("jump");
-        playSound("scream");
+        playSound("scream", true, false);
     }
 
     // falling

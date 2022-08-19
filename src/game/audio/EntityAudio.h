@@ -20,8 +20,8 @@ private:
     sf::Sound _sound;
     sf::Music _music;
 
-    bool loop;
-    bool finish;
+    bool _loop;
+    bool _finish;
 
 public:
     EntityAudio(std::weak_ptr<Entity> entity, std::vector<std::shared_ptr<sf::SoundBuffer>> sound_buffers,

@@ -1,8 +1,8 @@
 #include "EntityAudioCreator.h"
 
-unsigned int EntityAudioCreator::loadSound(const AudioResource &audio_resource) {
+unsigned int EntityAudioCreator::loadSound(const std::string &filename) {
     std::shared_ptr<sf::SoundBuffer> new_sound_buffer = std::make_shared<sf::SoundBuffer>();
-    if (!new_sound_buffer->loadFromFile(audio_resource.filename)) {
+    if (!new_sound_buffer->loadFromFile(filename)) {
         std::cout << "couldn't load sound from file" << std::endl;
         // todo exception
     }
@@ -12,8 +12,8 @@ unsigned int EntityAudioCreator::loadSound(const AudioResource &audio_resource) 
     return _sound_buffers.size() - 1;
 }
 
-unsigned int EntityAudioCreator::loadMusic(const AudioResource &audio_resource) {
-    _music_files.push_back(audio_resource.filename);
+unsigned int EntityAudioCreator::loadMusic(const std::string &filename) {
+    _music_files.push_back(filename);
 
     return _music_files.size() - 1;
 }
@@ -25,4 +25,6 @@ void EntityAudioCreator::createEntityAudio(std::shared_ptr<Entity> entity) {
     _entity_audios.push_back(new_entity_audio_weak);
 
     entity->addObserver(new_entity_audio);
+
+    entity->replayAudio();
 }

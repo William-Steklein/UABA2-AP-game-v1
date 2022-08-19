@@ -94,15 +94,15 @@ public:
 
     void playAnimation(const std::string &animation_name);
 
-    void playSound(const std::string &sound_name);
+    void playSound(const std::string &sound_name, bool finish=false, bool loop=false);
 
-    void playMusic(const std::string &music_name);
+    void playMusic(const std::string &music_name, bool finish=false, bool loop=false);
 
-    bool isAudioLoop() const;
+    void stopSound();
 
-    bool isAudioFinish() const;
+    void stopMusic();
 
-    float getSpatialAudioLevel() const;
+    void replayAudio();
 };
 
 
