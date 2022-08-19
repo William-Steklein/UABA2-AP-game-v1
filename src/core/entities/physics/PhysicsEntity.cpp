@@ -159,8 +159,8 @@ void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
             alpha = 1 - (_mass / other._mass);
         }
 
-        move(lerp({0, 0}, move_vector, alpha));
-        other.move(lerp({0, 0}, move_vector * -1, 1 - alpha));
+        move(corelerp({0, 0}, move_vector, alpha));
+        other.move(corelerp({0, 0}, move_vector * -1, 1 - alpha));
 
         Vector2f new_velocity;
 

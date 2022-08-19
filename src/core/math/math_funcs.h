@@ -4,9 +4,9 @@
 #include <cmath>
 #include "Vector2f.h"
 
-float lerp(float x0, float x1, float alpha);
+float corelerp(float x0, float x1, float alpha);
 
-Vector2f lerp(const Vector2f &p0, const Vector2f &p1, float alpha);
+Vector2f corelerp(const Vector2f &p0, const Vector2f &p1, float alpha);
 
 float to_radian(float angle);
 

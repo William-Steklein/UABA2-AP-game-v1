@@ -1,6 +1,10 @@
+#include <iostream>
+#include <SDL2/SDL.h>
 #include "game/Game.h"
 
-int main(int argc, char* argv[]) {
+int WinMain(int argc, char* argv[]) {
     Game game;
     game.run();
+
+    return 0;
 }

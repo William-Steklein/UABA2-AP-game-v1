@@ -1,9 +1,9 @@
 #include "math_funcs.h"
 
-float lerp(float x0, float x1, float alpha) { return (1 - alpha) * x0 + alpha * x1; }
+float corelerp(float x0, float x1, float alpha) { return (1 - alpha) * x0 + alpha * x1; }
 
-Vector2f lerp(const Vector2f &p0, const Vector2f &p1, float alpha) {
-    return {lerp(p0.x, p1.x, alpha), lerp(p0.y, p1.y, alpha)};
+Vector2f corelerp(const Vector2f &p0, const Vector2f &p1, float alpha) {
+    return {corelerp(p0.x, p1.x, alpha), corelerp(p0.y, p1.y, alpha)};
 }
 
 float to_radian(float angle) { return angle * static_cast<float>(M_PI) / 180.f; }

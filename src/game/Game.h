@@ -6,8 +6,9 @@
 #include "constants.h"
 #include "game/entity_view/EntityViewCreator.h"
 #include "game/audio/EntityAudioCreator.h"
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
+//#include <SFML/Graphics.hpp>
+//#include <SFML/Audio.hpp>
+#include <SDL2/SDL.h>
 #include <iostream>
 #include <memory>
 
@@ -17,7 +18,8 @@ private:
     unsigned int _screen_height;
     bool _running;
 
-    std::unique_ptr<sf::RenderWindow> _window;
+    SDL_Window* _window;
+    SDL_Renderer* _renderer;
 
     std::unique_ptr<World> _world;
     std::shared_ptr<EntityViewCreator> _entity_view_creator;
@@ -35,9 +37,9 @@ private:
 
     void handleEvents();
 
-    void handleKeyboardInput(const sf::Event &event, bool pressed);
-
-    void handleMouseInput(const sf::Event &event, bool pressed);
+//    void handleKeyboardInput(const sf::Event &event, bool pressed);
+//
+//    void handleMouseInput(const sf::Event &event, bool pressed);
 
     void resizeWindow(unsigned int screen_width, unsigned int screen_height);
 };
