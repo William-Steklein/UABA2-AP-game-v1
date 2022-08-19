@@ -93,11 +93,15 @@ void World::loadAnimations() {
 
 void World::loadAudio() {
     for (const auto &audio_resource: audio_sound_data) {
-        _entity_audio_creator->loadSound(audio_resource.first, audio_resource.second);
+        unsigned int sound_id = _entity_audio_creator->loadSound(audio_resource.second);
+
+        _audio_player.addSound(sound_id, audio_resource.first);
     }
 
-    for (const auto &audio_resource: audio_sound_data) {
-        _entity_audio_creator->loadMusic(audio_resource.first, audio_resource.second);
+    for (const auto &audio_resource: audio_music_data) {
+        unsigned int music_id = _entity_audio_creator->loadMusic(audio_resource.second);
+
+        _audio_player.addMusic(music_id, audio_resource.first);
     }
 }
 
@@ -170,15 +174,16 @@ void World::initializePhysicsEntities() {
     float scale_mul = 2.f;
     _player = std::make_shared<Doodle>(
             Doodle({0.f, 2.5f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _input_map,
-                   _animation_players["adventurer"]));
+                   _animation_players["adventurer"], _audio_player));
     _entity_view_creator->createEntitySpriteView(_player, 5);
     _entity_audio_creator->createEntityAudio(_player);
 
     // portal radio music object
     _portal_radios.push_back(
             std::make_shared<PortalRadio>(
-                    PortalRadio({0.5f, 2.5f}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"])));
+                    PortalRadio({0.5f, 2.5f}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"], _audio_player)));
     _entity_view_creator->createEntitySpriteView(_portal_radios.back(), 4);
+    _entity_audio_creator->createEntityAudio(_portal_radios.back());
 
     // walls
     _walls.push_back(std::make_shared<Wall>(

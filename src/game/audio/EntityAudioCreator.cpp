@@ -1,16 +1,21 @@
 #include "EntityAudioCreator.h"
 
-void EntityAudioCreator::loadSound(const std::string &sound_name, const std::string &filename) {
+unsigned int EntityAudioCreator::loadSound(const AudioResource &audio_resource) {
     std::shared_ptr<sf::SoundBuffer> new_sound_buffer = std::make_shared<sf::SoundBuffer>();
-    if (!new_sound_buffer->loadFromFile("data/audio/wilhelm_scream.wav")) {
+    if (!new_sound_buffer->loadFromFile(audio_resource.filename)) {
         std::cout << "couldn't load sound from file" << std::endl;
-        return;
+        // todo exception
     }
-    _sound_buffers.insert({sound_name, new_sound_buffer});
+
+    _sound_buffers.push_back(new_sound_buffer);
+
+    return _sound_buffers.size() - 1;
 }
 
-void EntityAudioCreator::loadMusic(const std::string &music_name, const std::string &filename) {
+unsigned int EntityAudioCreator::loadMusic(const AudioResource &audio_resource) {
+    _music_files.push_back(audio_resource.filename);
 
+    return _music_files.size() - 1;
 }
 
 void EntityAudioCreator::createEntityAudio(std::shared_ptr<Entity> entity) {

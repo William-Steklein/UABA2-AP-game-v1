@@ -95,6 +95,14 @@ public:
     void playAnimation(const std::string &animation_name);
 
     void playSound(const std::string &sound_name);
+
+    void playMusic(const std::string &music_name);
+
+    bool isAudioLoop() const;
+
+    bool isAudioFinish() const;
+
+    float getSpatialAudioLevel() const;
 };
 
 

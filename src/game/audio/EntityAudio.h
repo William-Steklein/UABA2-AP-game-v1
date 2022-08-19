@@ -14,23 +14,26 @@ class EntityAudio : public IObserver {
 private:
     std::weak_ptr<Entity> _entity;
 
-    std::map<std::string, std::shared_ptr<sf::SoundBuffer>> _sound_buffers;
-    std::map<std::string, std::shared_ptr<std::string>> _music_files;
+    std::vector<std::shared_ptr<sf::SoundBuffer>> _sound_buffers;
+    std::vector<std::string> _music_files;
 
     sf::Sound _sound;
     sf::Music _music;
 
+    bool loop;
+    bool finish;
+
 public:
-    EntityAudio(std::weak_ptr<Entity> entity, std::map<std::string, std::shared_ptr<sf::SoundBuffer>> sound_buffers,
-                std::map<std::string, std::shared_ptr<std::string>> music_files);
+    EntityAudio(std::weak_ptr<Entity> entity, std::vector<std::shared_ptr<sf::SoundBuffer>> sound_buffers,
+                std::vector<std::string> music_files);
 
     void handleEvent() override;
 
     void handleEvent(const unsigned int &event, const unsigned int &channel) override;
 
-    void playSound(const std::string &sound_name);
+    void playSound(unsigned int sound_id);
 
-    void playMusic(const std::string &music_name);
+    void playMusic(unsigned int music_id);
 };
 
 

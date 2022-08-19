@@ -28,7 +28,6 @@ private:
 
     // entities
     std::shared_ptr<IEntityViewCreator> _entity_view_creator;
-    std::shared_ptr<IEntityAudioCreator> _entity_audio_creator;
     bool _force_static_view_update;
     std::shared_ptr<Doodle> _player;
     std::vector<std::shared_ptr<Wall>> _walls;
@@ -36,6 +35,10 @@ private:
 
     std::vector<std::shared_ptr<UIWidget>> _ui_widget_entities;
     std::vector<std::shared_ptr<UIWidget>> _side_bars;
+
+    // audio
+    std::shared_ptr<IEntityAudioCreator> _entity_audio_creator;
+    std::shared_ptr<Vector2f> _audio_listener_position;
 
 public:
     World(float x_min, float x_max, float y_min, float y_max, std::shared_ptr<IEntityViewCreator> entity_view_creator,

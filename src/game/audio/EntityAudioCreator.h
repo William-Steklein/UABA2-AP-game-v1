@@ -11,17 +11,17 @@
 
 class EntityAudioCreator : public IEntityAudioCreator {
 private:
-    std::map<std::string, std::shared_ptr<sf::SoundBuffer>> _sound_buffers;
-    std::map<std::string, std::shared_ptr<std::string>> _music_files;
+    std::vector<std::shared_ptr<sf::SoundBuffer>> _sound_buffers;
+    std::vector<std::string> _music_files;
 
     std::vector<std::weak_ptr<EntityAudio>> _entity_audios;
 
 public:
     EntityAudioCreator() = default;
 
-    void loadSound(const std::string &sound_name, const std::string &filename) override;
+    unsigned int loadSound(const AudioResource &filename) override;
 
-    void loadMusic(const std::string &music_name, const std::string &filename) override;
+    unsigned int loadMusic(const AudioResource &filename) override;
 
     void createEntityAudio(std::shared_ptr<Entity> entity) override;
 };

@@ -151,5 +151,21 @@ void Entity::playAnimation(const std::string &animation_name) {
 }
 
 void Entity::playSound(const std::string &sound_name) {
-    notifyObservers(0, 3);
+    notifyObservers(_audio_player.getSoundId(sound_name), 3);
+}
+
+void Entity::playMusic(const std::string &music_name) {
+    notifyObservers(_audio_player.getMusicId(music_name), 4);
+}
+
+bool Entity::isAudioLoop() const {
+    return ;
+}
+
+bool Entity::isAudioFinish() const {
+    return false;
+}
+
+float Entity::getSpatialAudioLevel() const {
+    return 1;
 }
