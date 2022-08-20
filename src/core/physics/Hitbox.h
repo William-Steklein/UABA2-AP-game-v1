@@ -36,6 +36,8 @@ public:
 
     bool collides(const Hitbox &other) const;
 
+    bool collides(const Vector2f &point) const;
+
     Vector2f getDisplacementToCollision(const Hitbox &other) const;
 };
 

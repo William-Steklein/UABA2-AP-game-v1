@@ -2,6 +2,8 @@
 
 const std::map<std::string, std::string> texture_data = {
         {"background",            "data/textures/prototype/Dark/texture_07.png"},
+        {"menu",                  "data/ui/menu.png"},
+        {"button",                "data/ui/button.png"},
         {"sidescreen_background", "data/textures/black.png"},
         {"wall",                  "data/textures/cobble_stone.png"},
         {"portal_radio",          "data/sprites/portal/portal_radio.png"},

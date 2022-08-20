@@ -38,12 +38,13 @@ struct InputMap {
     bool get_input_stream{false};
     std::string input_stream;
 
-    Vector2f mouse_pos_world;
-    Vector2f mouse_pos_representation_window;
+    Vector2f mouse_pos_core;
 
     bool mouse_button_left{false};
     bool mouse_button_right{false};
     bool mouse_button_middle{false};
+
+    bool mouse_button_left_clicked{false};
 
     float mouse_wheel_delta{0};
 };

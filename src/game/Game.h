@@ -23,6 +23,9 @@ private:
     std::shared_ptr<EntityViewCreator> _entity_view_creator;
     std::shared_ptr<EntityAudioCreator> _entity_audio_creator;
 
+    bool draw_hitbox = true;
+    bool mouse_button_left_clicked;
+
 public:
     Game();
 
@@ -38,6 +41,8 @@ private:
     void handleKeyboardInput(const sf::Event &event, bool pressed);
 
     void handleMouseInput(const sf::Event &event, bool pressed);
+
+    void handleMouseMovement();
 
     void resizeWindow(unsigned int screen_width, unsigned int screen_height);
 };

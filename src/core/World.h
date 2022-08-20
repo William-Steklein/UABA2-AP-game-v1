@@ -9,8 +9,10 @@
 #include "entities/physics/Doodle.h"
 #include "entities/IEntityViewCreator.h"
 #include "entities/ui/UIWidget.h"
+#include "entities/ui/Button.h"
 #include "entities/IEntityViewCreator.h"
 #include "entities/physics/Wall.h"
+#include "entities/ui/Text.h"
 #include "animation/Animation.h"
 #include "constants/resources.h"
 #include "entities/physics/PortalRadio.h"
@@ -35,6 +37,7 @@ private:
 
     std::vector<std::shared_ptr<UIWidget>> _ui_widget_entities;
     std::vector<std::shared_ptr<UIWidget>> _side_bars;
+    std::vector<std::shared_ptr<Button>> _buttons;
 
     // audio
     std::shared_ptr<IEntityAudioCreator> _entity_audio_creator;
@@ -51,6 +54,8 @@ public:
     void update();
 
     void updateScreenResolution(float x_min, float x_max, float y_min, float y_max);
+
+    void updateMousePosition(float x, float y);
 
     std::shared_ptr<InputMap> getUserInputMap();
 

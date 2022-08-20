@@ -44,10 +44,15 @@ bool Hitbox::empty() const {
 }
 
 bool Hitbox::collides(const Hitbox &other) const {
-    return this->_position.x - this->_size.x / 2 < other._position.x + other._size.x / 2 &&
-           this->_position.x + this->_size.x / 2 > other._position.x - other._size.x / 2 &&
-           this->_position.y - this->_size.y / 2 < other._position.y + other._size.y / 2 &&
-           this->_position.y + this->_size.y / 2 > other._position.y - other._size.y / 2;
+    return _position.x - _size.x / 2 < other._position.x + other._size.x / 2 &&
+           _position.x + _size.x / 2 > other._position.x - other._size.x / 2 &&
+           _position.y - _size.y / 2 < other._position.y + other._size.y / 2 &&
+           _position.y + _size.y / 2 > other._position.y - other._size.y / 2;
+}
+
+bool Hitbox::collides(const Vector2f &point) const {
+    return point.x < _position.x + _size.x / 2 && point.x > _position.x - _size.x / 2 &&
+           point.y < _position.y + _size.y / 2 && point.y > _position.y - _size.y / 2;
 }
 
 Vector2f Hitbox::getDisplacementToCollision(const Hitbox &other) const {

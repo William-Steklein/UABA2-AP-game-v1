@@ -8,7 +8,7 @@ World::World(float x_min, float x_max, float y_min, float y_max,
           _input_map(new InputMap), _audio_listener_position(new Vector2f(0, 0)) {
     loadResources();
     initializeUIWidgets();
-    initializePhysicsEntities();
+//    initializePhysicsEntities();
 }
 
 World::~World() = default;
@@ -21,6 +21,7 @@ void World::update() {
     if (_input_map->z) {
         Stopwatch::getInstance().setPhysicsSpeed(1);
     }
+
     if (_input_map->x) {
         Stopwatch::getInstance().setPhysicsSpeed(1.f / 60);
     }
@@ -44,6 +45,11 @@ void World::updateScreenResolution(float x_min, float x_max, float y_min, float 
     updateSidebars();
 
     _force_static_view_update = true;
+}
+
+void World::updateMousePosition(float x, float y) {
+    _input_map->mouse_pos_core = _camera->projectCoordScreenToCore({x, y});
+//    std::cout << _input_map->mouse_pos_core << std::endl;
 }
 
 std::shared_ptr<InputMap> World::getUserInputMap() {
@@ -124,6 +130,23 @@ void World::initializeUIWidgets() {
             UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
                      _animation_players["background"])));
     _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 1);
+
+    // menu
+    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
+            UIWidget({0, 1.5f}, _camera, {1.f, 1.5f},
+                     _animation_players["menu"])));
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 1);
+
+    _buttons.push_back(std::make_shared<Button>(
+            Button({0, 1.5f}, _camera, {0.5f, 0.25f},
+                   _animation_players["button"])));
+    _ui_widget_entities.push_back(_buttons.back());
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 2);
+
+    // text
+    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
+            Text({0, 1.1f}, _camera, {0.5, 0.5})));
+    _entity_view_creator->createEntityTextView(_ui_widget_entities.back());
 }
 
 void World::updateSidebars() {
@@ -179,14 +202,14 @@ void World::initializePhysicsEntities() {
             Doodle({0.f, 2.5f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _input_map,
                    _animation_players["adventurer"], _audio_player));
     _entity_view_creator->createEntitySpriteView(_player, 5);
-    _entity_audio_creator->createEntityAudio(_player);
+//    _entity_audio_creator->createEntityAudio(_player);
 
     // portal radio music object
     _portal_radios.push_back(
             std::make_shared<PortalRadio>(
                     PortalRadio({0.5f, 2.5f}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"], _audio_player)));
     _entity_view_creator->createEntitySpriteView(_portal_radios.back(), 4);
-    _entity_audio_creator->createEntityAudio(_portal_radios.back());
+//    _entity_audio_creator->createEntityAudio(_portal_radios.back());
 
     // walls
     _walls.push_back(std::make_shared<Wall>(
@@ -199,6 +222,17 @@ void World::initializePhysicsEntities() {
 }
 
 void World::updateUIEntities(double t, float dt) {
+    // mouse clicks
+    if (_input_map->mouse_button_left) {
+//        std::cout << _input_map->mouse_pos_core << std::endl;
+        for (const auto &button: _buttons) {
+            if (button->getHitbox() && button->getHitbox()->collides(_input_map->mouse_pos_core) && !_input_map->mouse_button_left_clicked) {
+                button->setPressed(true);
+                _input_map->mouse_button_left_clicked = true;
+            }
+        }
+    }
+
     for (const auto &ui_widget: _ui_widget_entities) {
         if (!ui_widget->is_static_view() || _force_static_view_update) {
             ui_widget->update(t, dt);

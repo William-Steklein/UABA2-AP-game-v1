@@ -5,7 +5,7 @@
 Entity::Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size,
                AnimationPlayer animation_player, AudioPlayer audio_player)
         : _position(position), _scale({1, 1}), _rotation(0), _camera(std::move(camera)), _view_size(view_size),
-          _hitbox(std::make_shared<Hitbox>()), _animation_player(std::move(animation_player)),
+          _hitbox(nullptr), _animation_player(std::move(animation_player)),
           _audio_player(std::move(audio_player)) {
 
 }
@@ -39,7 +39,9 @@ Vector2f Entity::getScreenPosition() const {
 }
 
 void Entity::setPosition(const Vector2f &position) {
-    _hitbox->setPosition(position);
+    if (_hitbox) {
+        _hitbox->setPosition(position);
+    }
 
     for (const auto &ray: _rays) {
         ray->move(position - _position);
@@ -60,7 +62,9 @@ void Entity::setScale(const Vector2f &scale) {
     if (!(_scale.x == 0 || _scale.y == 0)) {
         Vector2f scale_mult(scale.x / _scale.x, scale.y / _scale.y);
 
-        _hitbox->scale(scale_mult);
+        if (_hitbox) {
+            _hitbox->scale(scale_mult);
+        }
 
         for (const auto &ray: _rays) {
             ray->scale(scale_mult, _position);

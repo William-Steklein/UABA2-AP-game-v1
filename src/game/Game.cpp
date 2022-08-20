@@ -2,7 +2,7 @@
 
 Game::Game()
         : _screen_width(constants::screen_width), _screen_height(constants::screen_height),
-          _running(true), _entity_view_creator(new EntityViewCreator), _entity_audio_creator(new EntityAudioCreator)  {
+          _running(true), _entity_view_creator(new EntityViewCreator), _entity_audio_creator(new EntityAudioCreator) {
     _window = std::make_unique<sf::RenderWindow>(sf::VideoMode(_screen_width, _screen_height), "GameEngine");
 
     // coreAPI initialize
@@ -34,12 +34,21 @@ void Game::draw() {
     for (const auto &entity_sprite_view: _entity_view_creator->getEntitySpriteViews()) {
         _window->draw(entity_sprite_view->getSprite());
 
-        // debug information
-        _window->draw(entity_sprite_view->getHitbox());
-        _window->draw(entity_sprite_view->getRays());
+        if (draw_hitbox) {
+            // debug information
+            _window->draw(entity_sprite_view->getHitbox());
+            _window->draw(entity_sprite_view->getRays());
+        }
     }
     for (const auto &entity_text_view: _entity_view_creator->getEntityTextViews()) {
-        _window->draw(entity_text_view->getText());
+        sf::Text new_text = entity_text_view->getText();
+        _window->draw(new_text);
+
+        if (draw_hitbox) {
+            // debug information
+            _window->draw(entity_text_view->getHitbox());
+            _window->draw(entity_text_view->getRays());
+        }
     }
 
     _window->display();
@@ -88,6 +97,10 @@ void Game::handleEvents() {
                 handleMouseInput(event, false);
                 break;
 
+            case sf::Event::MouseMoved:
+                handleMouseMovement();
+                break;
+
             default:
                 break;
         }
@@ -110,7 +123,6 @@ void Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
 
         case sf::Keyboard::D:
             _world->getUserInputMap()->d = pressed;
-//            std::cout << "d" << std::endl;
             break;
 
         case sf::Keyboard::E:
@@ -127,6 +139,9 @@ void Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
 
         case sf::Keyboard::H:
             _world->getUserInputMap()->h = pressed;
+            if (pressed) {
+                draw_hitbox = !draw_hitbox;
+            }
             break;
 
         case sf::Keyboard::I:
@@ -171,7 +186,6 @@ void Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
 
         case sf::Keyboard::S:
             _world->getUserInputMap()->s = pressed;
-//            std::cout << "s" << std::endl;
             break;
 
         case sf::Keyboard::T:
@@ -213,12 +227,31 @@ void Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
         default:
             break;
     }
-
-//    std::cout << "***********" << std::endl;
 }
 
 void Game::handleMouseInput(const sf::Event &event, bool pressed) {
+    switch (event.mouseButton.button) {
+        case sf::Mouse::Left:
+            _world->getUserInputMap()->mouse_button_left = pressed;
+            _world->getUserInputMap()->mouse_button_left_clicked = false;
+            break;
 
+        case sf::Mouse::Middle:
+            _world->getUserInputMap()->mouse_button_middle = pressed;
+            break;
+
+        case sf::Mouse::Right:
+            _world->getUserInputMap()->mouse_button_right = pressed;
+            break;
+
+        default:
+            break;
+    }
+}
+
+void Game::handleMouseMovement() {
+    _world->updateMousePosition(static_cast<float>(sf::Mouse::getPosition(*_window).x),
+                                static_cast<float>(sf::Mouse::getPosition(*_window).y));
 }
 
 void Game::resizeWindow(unsigned int screen_width, unsigned int screen_height) {

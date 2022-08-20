@@ -7,7 +7,6 @@
 
 class PortalRadio : public PhysicsEntity {
 private:
-    bool start = false;
 public:
     PortalRadio(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
                 AnimationPlayer animation_player = {}, AudioPlayer audio_player = {}, bool is_static = false);
