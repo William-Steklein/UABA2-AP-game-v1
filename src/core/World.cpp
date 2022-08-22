@@ -5,10 +5,13 @@ World::World(float x_min, float x_max, float y_min, float y_max,
              std::shared_ptr<IEntityAudioCreator> entity_audio_creator)
         : _camera(new Camera(x_min, x_max, y_min, y_max)), _entity_view_creator(std::move(entity_view_creator)),
           _entity_audio_creator(std::move(entity_audio_creator)), _force_static_view_update(true),
-          _input_map(new InputMap), _audio_listener_position(new Vector2f(0, 0)) {
+          _input_map(new InputMap), _audio_listener_position(new Vector2f(0, 0)), _start_game(new bool(false)) {
+
     loadResources();
-    initializeUIWidgets();
-//    initializePhysicsEntities();
+    initializeSideBars();
+
+    initializePhysicsEntities();
+//    initializeStartMenu();
 }
 
 World::~World() = default;
@@ -24,6 +27,14 @@ void World::update() {
 
     if (_input_map->x) {
         Stopwatch::getInstance().setPhysicsSpeed(1.f / 60);
+    }
+
+    if (*_start_game || _input_map->e) {
+        std::cout << "Starting game..." << std::endl;
+        *_start_game = false;
+
+        resetEntities();
+        initializePhysicsEntities();
     }
 
     // update UI entities
@@ -114,39 +125,24 @@ void World::loadAudio() {
     }
 }
 
-void World::initializeUIWidgets() {
+void World::resetEntities() {
+    _player.reset();
+    _walls.clear();
+    _portal_radios.clear();
+
+    _ui_widget_entities.clear();
+    _buttons.clear();
+}
+
+void World::initializeSideBars() {
     // sidebars
     for (int i = 0; i < 2; i++) {
-        _ui_widget_entities.push_back(std::make_shared<UIWidget>(
+        _side_bars.push_back(std::make_shared<UIWidget>(
                 UIWidget({0, 0}, _camera, {1, 1}, _animation_players["sidescreen_background"])));
-        _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 200);
-        _side_bars.push_back(_ui_widget_entities.back());
+        _entity_view_creator->createEntitySpriteView(_side_bars.back(), 200);
     }
 
     updateSidebars();
-
-    // background
-    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
-            UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
-                     _animation_players["background"])));
-    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 1);
-
-    // menu
-    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
-            UIWidget({0, 1.5f}, _camera, {1.f, 1.5f},
-                     _animation_players["menu"])));
-    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 1);
-
-    _buttons.push_back(std::make_shared<Button>(
-            Button({0, 1.5f}, _camera, {0.5f, 0.25f},
-                   _animation_players["button"])));
-    _ui_widget_entities.push_back(_buttons.back());
-    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 2);
-
-    // text
-    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
-            Text({0, 1.1f}, _camera, {0.5, 0.5})));
-    _entity_view_creator->createEntityTextView(_ui_widget_entities.back());
 }
 
 void World::updateSidebars() {
@@ -195,6 +191,34 @@ void World::updateSidebars() {
     }
 }
 
+void World::initializeStartMenu() {
+    // background
+    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
+            UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
+                     _animation_players["background"])));
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 1);
+
+    // menu
+    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
+            UIWidget({0, 1.5f}, _camera, {1.f, 1.5f},
+                     _animation_players["menu"])));
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 1);
+
+    // button
+    _buttons.push_back(std::make_shared<Button>(
+            Button({0, 1.5f}, _camera, {0.5f, 0.25f},
+                   _animation_players["button"])));
+    _ui_widget_entities.push_back(_buttons.back());
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 2);
+    _start_game = _buttons.back()->getPressedPointer();
+
+    std::shared_ptr<std::string> button_string = std::make_shared<std::string>("start");
+    std::shared_ptr<TextBox> text_box = std::make_shared<TextBox>(
+            TextBox({0, 1.5f}, _camera, {0.5f, 0.25f}, button_string));
+    _ui_widget_entities.push_back(text_box);
+    _entity_view_creator->createEntityTextView(text_box);
+}
+
 void World::initializePhysicsEntities() {
     // player
     float scale_mul = 2.f;
@@ -219,6 +243,10 @@ void World::initializePhysicsEntities() {
     _walls.push_back(std::make_shared<Wall>(
             Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_players["wall"], {}, true)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
+
+    _platforms.push_back(std::make_shared<Platform>(
+            Platform({0.5f, 1.f}, _camera, {0.5f, 0.2f}, _animation_players["wall"], {}, true)));
+    _entity_view_creator->createEntitySpriteView(_platforms.back(), 3);
 }
 
 void World::updateUIEntities(double t, float dt) {
@@ -238,6 +266,12 @@ void World::updateUIEntities(double t, float dt) {
             ui_widget->update(t, dt);
         }
     }
+
+    for (const auto &side_bar: _side_bars) {
+        if (!side_bar->is_static_view() || _force_static_view_update) {
+            side_bar->update(t, dt);
+        }
+    }
     if (_force_static_view_update) _force_static_view_update = false;
 }
 
@@ -251,6 +285,14 @@ void World::updatePhysics(double t, float dt) {
 
             for (const auto &ray: _player->getRays()) {
                 handleCollision(ray, wall);
+            }
+        }
+
+        for (const auto &platform: _platforms) {
+            handleCollision(_player, platform, true);
+
+            for (const auto &ray: _player->getRays()) {
+                handleCollision(ray, platform);
             }
         }
 
@@ -279,6 +321,11 @@ void World::updatePhysicsEntities(double t, float dt) {
     // walls
     for (const auto &wall: _walls) {
         wall->update(t, dt);
+    }
+
+    // platforms
+    for (const auto& platform: _platforms) {
+        platform->update(t, dt);
     }
 
     // portal radios

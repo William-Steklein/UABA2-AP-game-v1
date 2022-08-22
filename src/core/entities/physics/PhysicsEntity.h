@@ -20,6 +20,8 @@ protected:
     Vector2f _drag;
     Vector2f _friction;
 
+    bool _passthrough;
+
 public:
     PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
                   AnimationPlayer animation_player = {}, AudioPlayer audio_player = {},
@@ -56,6 +58,10 @@ public:
     void applyFriction();
 
     void applyDrag();
+
+    bool isPassthrough() const;
+
+    void setPassthrough(bool passthrough);
 
     void applySideScrolling();
 

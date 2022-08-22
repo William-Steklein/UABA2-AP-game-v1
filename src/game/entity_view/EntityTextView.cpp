@@ -1,40 +1,51 @@
-#include "EntityTextView.h"
+#include "EntityTextBoxView.h"
 
-EntityTextView::EntityTextView(std::weak_ptr<Entity> entity) : EntityView(std::move(entity)) {
+EntityTextBoxView::EntityTextBoxView(const std::weak_ptr<TextBox>& entity_text_box)
+        : EntityView(entity_text_box), _entity_text_box(entity_text_box) {
     if (!_font.loadFromFile("data/fonts/PT_Sans/PTSans-Regular.ttf")) {
         // todo: exception handling
         std::cout << "couldn't load font" << std::endl;
     }
 
-    _text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    if (!_entity_text_box.expired()) {
+        std::shared_ptr<TextBox> entity_text_box_shared = _entity_text_box.lock();
+        _text = entity_text_box_shared->getText();
+    } else {
+        _text = std::make_shared<std::string>("");
+    }
 
     _text_render.setFont(_font);
-    _text_render.setString(_text);
-    _text_render.setCharacterSize(100);
+    _text_render.setString(*_text);
+    _text_render.setCharacterSize(30);
     _text_render.setFillColor(sf::Color::Red);
     _text_render.setStyle(sf::Text::Regular);
 
+    std::shared_ptr<Entity> entity_shared = _entity.lock();
+    if (entity_shared) {
+        updateTextWrap(entity_shared->getScreenViewSize());
+    }
+
     sf::FloatRect text_rect = _text_render.getLocalBounds();
-//    std::cout << text_rect.width << std::endl;
-//    std::cout << text_rect.height << std::endl;
     _text_render.setOrigin(text_rect.left + text_rect.width / 2, text_rect.top + text_rect.height / 2);
 
     updateText();
 }
 
-void EntityTextView::handleEvent() {
+void EntityTextBoxView::handleEvent() {
     updateText();
 }
 
-void EntityTextView::handleEvent(const unsigned int &event, const unsigned int &channel) {
+void EntityTextBoxView::handleEvent(const unsigned int &event, const unsigned int &channel) {
 
 }
 
-sf::Text EntityTextView::getText() const {
+sf::Text EntityTextBoxView::getText() const {
     return _text_render;
 }
 
-void EntityTextView::updateText() {
+void EntityTextBoxView::updateText() {
+    _text_render.setString(*_text);
+
     std::shared_ptr<Entity> entity_shared = _entity.lock();
     if (entity_shared) {
         // transform
@@ -48,25 +59,55 @@ void EntityTextView::updateText() {
     }
 }
 
-void EntityTextView::updateTextWrap(const Vector2f& view_size) {
-    std::shared_ptr<Entity> entity_shared = _entity.lock();
-    if (entity_shared) {
-        sf::FloatRect text_render_rect = _text_render.getLocalBounds();
-        std::cout << text_render_rect.width << std::endl;
-        std::cout << text_render_rect.height << std::endl;
+void EntityTextBoxView::updateTextWrap(const Vector2f &view_size) {
+    sf::FloatRect text_render_rect = _text_render.getLocalBounds();
+    std::cout << text_render_rect.width << std::endl;
+    std::cout << text_render_rect.height << std::endl;
 
-        if (text_render_rect.width >= entity_shared->getScreenViewSize().x) {
-            _text_wrapped = "";
+    if (text_render_rect.width >= view_size.x) {
+        _text_wrapped = "";
 
-            std::string _text_wrap_buffer;
+        std::string _text_wrap_buffer;
+        std::string current_line;
+        std::string previous_current_line;
+        std::string current_word;
+        unsigned int word_count = 0;
 
-            for (const char &c: _text) {
-                _text_wrap_buffer.push_back(c);
+        for (const char &c: *_text) {
+            if (c != ' ') {
+                current_line.push_back(c);
+                current_word.push_back(c);
+            } else {
+                word_count++;
+
+                sf::Text new_text_wrap;
+                new_text_wrap.setString(current_line);
+                new_text_wrap.setFont(_font);
+                new_text_wrap.setCharacterSize(30);
+
+                if (new_text_wrap.getLocalBounds().width > view_size.x) {
+                    if (word_count == 1) {
+                        _text_wrap_buffer += current_word + "\n";
+                        current_line.clear();
+                        previous_current_line = current_word;
+                        current_word.clear();
+                        continue;
+                    }
+                    _text_wrap_buffer += previous_current_line + "\n";
+                    current_line = current_word + " ";
+                    previous_current_line = current_word;
+                    word_count = 1;
+
+                } else {
+                    previous_current_line = current_line;
+                    current_line.push_back(' ');
+                }
+
+                current_word.clear();
             }
-
-            _text_wrapped = _text_wrap_buffer;
         }
 
-        std::cout << _text_wrapped << std::endl;
+        _text_wrapped = _text_wrap_buffer + current_word;
+        _text_render.setString(_text_wrapped);
     }
 }

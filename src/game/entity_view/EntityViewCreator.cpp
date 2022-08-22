@@ -33,13 +33,13 @@ void EntityViewCreator::createEntitySpriteView(std::shared_ptr<Entity> entity, u
     entity->addObserver(new_entity_sprite_view);
 }
 
-void EntityViewCreator::createEntityTextView(std::shared_ptr<Entity> entity) {
-    std::shared_ptr<EntityTextView> new_entity_text_view(new EntityTextView(entity));
-    std::weak_ptr<EntityTextView> new_entity_text_view_weak = new_entity_text_view;
+void EntityViewCreator::createEntityTextView(std::shared_ptr<TextBox> entity_text_box) {
+    std::shared_ptr<EntityTextBoxView> new_entity_text_view(new EntityTextBoxView(entity_text_box));
+    std::weak_ptr<EntityTextBoxView> new_entity_text_view_weak = new_entity_text_view;
 
     _entity_text_views.push_back(new_entity_text_view_weak);
 
-    entity->addObserver(new_entity_text_view);
+    entity_text_box->addObserver(new_entity_text_view);
 }
 
 std::vector<std::shared_ptr<EntitySpriteView>> EntityViewCreator::getEntitySpriteViews() {
@@ -65,9 +65,9 @@ std::vector<std::shared_ptr<EntitySpriteView>> EntityViewCreator::getEntitySprit
     return render_entity_sprite_views;
 }
 
-std::vector<std::shared_ptr<EntityTextView>> EntityViewCreator::getEntityTextViews() {
-    std::vector<std::weak_ptr<EntityTextView>> new_entity_text_views;
-    std::vector<std::shared_ptr<EntityTextView>> render_entity_text_views;
+std::vector<std::shared_ptr<EntityTextBoxView>> EntityViewCreator::getEntityTextViews() {
+    std::vector<std::weak_ptr<EntityTextBoxView>> new_entity_text_views;
+    std::vector<std::shared_ptr<EntityTextBoxView>> render_entity_text_views;
 
     for (const auto &entity_text_view: _entity_text_views) {
         if (!entity_text_view.expired()) {

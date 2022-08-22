@@ -12,12 +12,13 @@
 #include "entities/ui/Button.h"
 #include "entities/IEntityViewCreator.h"
 #include "entities/physics/Wall.h"
-#include "entities/ui/Text.h"
+#include "entities/ui/TextBox.h"
 #include "animation/Animation.h"
 #include "constants/resources.h"
 #include "entities/physics/PortalRadio.h"
 #include "physics/Ray.h"
 #include "audio/IEntityAudioCreator.h"
+#include "entities/physics/Platform.h"
 
 class World {
 private:
@@ -32,8 +33,10 @@ private:
     std::shared_ptr<IEntityViewCreator> _entity_view_creator;
     bool _force_static_view_update;
     std::shared_ptr<Doodle> _player;
-    std::vector<std::shared_ptr<Wall>> _walls;
     std::vector<std::shared_ptr<PortalRadio>> _portal_radios;
+
+    std::vector<std::shared_ptr<Wall>> _walls;
+    std::vector<std::shared_ptr<Platform>> _platforms;
 
     std::vector<std::shared_ptr<UIWidget>> _ui_widget_entities;
     std::vector<std::shared_ptr<UIWidget>> _side_bars;
@@ -42,6 +45,9 @@ private:
     // audio
     std::shared_ptr<IEntityAudioCreator> _entity_audio_creator;
     std::shared_ptr<Vector2f> _audio_listener_position;
+
+    // flow
+    std::shared_ptr<bool> _start_game;
 
 public:
     World(float x_min, float x_max, float y_min, float y_max, std::shared_ptr<IEntityViewCreator> entity_view_creator,
@@ -68,9 +74,14 @@ private:
 
     void loadAudio();
 
-    void initializeUIWidgets();
+    void resetEntities();
+
+    void initializeSideBars();
 
     void updateSidebars();
+
+    // scenes
+    void initializeStartMenu();
 
     void initializePhysicsEntities();
 

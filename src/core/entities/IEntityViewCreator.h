@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include "Entity.h"
+#include "ui/TextBox.h"
 #include "../animation/Animation.h"
 
 class IEntityViewCreator {
@@ -15,7 +16,7 @@ public:
 
     virtual void createEntitySpriteView(std::shared_ptr<Entity> entity, unsigned int layer) = 0;
 
-    virtual void createEntityTextView(std::shared_ptr<Entity> entity) = 0;
+    virtual void createEntityTextView(std::shared_ptr<TextBox> entity_text_box) = 0;
 };
 
 

@@ -28,6 +28,8 @@ public:
     void playerController(float dt);
 
     void testController();
+
+    void setHitPlatform(bool hit_platform);
 };
 
 

@@ -6,7 +6,8 @@
 
 class Button : public UIWidget {
 private:
-    bool _pressed;
+    bool _pressed_button;
+    std::shared_ptr<bool> _pressed;
 
 public:
     Button(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
@@ -17,6 +18,8 @@ public:
     bool isPressed() const;
 
     void setPressed(bool pressed);
+
+    std::shared_ptr<bool> getPressedPointer();
 };
 
 

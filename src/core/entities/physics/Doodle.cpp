@@ -66,7 +66,9 @@ void Doodle::playerController(float dt) {
     // check if standing
     for (const auto &standing_ray: _rays) {
         if (standing_ray->isCollided()) {
-            _standing = true;
+            if (_velocity.y <= 0) {
+                _standing = true;
+            }
             standing_ray->reset();
         }
     }
@@ -87,6 +89,7 @@ void Doodle::playerController(float dt) {
     if (_standing && _input_map->w) {
         _velocity.y = _initial_jump_velocity;
         _standing = false;
+        _hit_platform = false;
 
         playAnimation("jump");
         playSound("scream", true, false);
@@ -150,4 +153,8 @@ void Doodle::testController() {
 
     applyFriction();
     applyDrag();
+}
+
+void Doodle::setHitPlatform(bool hit_platform) {
+    _hit_platform = hit_platform;
 }

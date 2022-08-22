@@ -3,7 +3,7 @@
 PhysicsEntity::PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
                              AnimationPlayer animation_player, AudioPlayer audio_player, bool is_static) :
         Entity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player)),
-        _is_static(is_static), _mass(1), _gravitational_acceleration({0, 0}) {
+        _is_static(is_static), _mass(1), _gravitational_acceleration({0, 0}), _passthrough(false) {
     _hitbox = std::make_shared<Hitbox>(_position, _view_size);
 
 }
@@ -104,6 +104,14 @@ void PhysicsEntity::applyDrag() {
     _acceleration -= drag_force;
 }
 
+bool PhysicsEntity::isPassthrough() const {
+    return _passthrough;
+}
+
+void PhysicsEntity::setPassthrough(bool passthrough) {
+    _passthrough = passthrough;
+}
+
 void PhysicsEntity::applySideScrolling() {
     if (_position.x <= constants::world_x_min) {
         setPosition({constants::world_x_max, _position.y});
@@ -113,13 +121,24 @@ void PhysicsEntity::applySideScrolling() {
 }
 
 void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
-
-
     Vector2f displacement = _hitbox->getDisplacementToCollision(*other._hitbox);
     Vector2f move_vector;
 
     Vector2f new_velocity_this = _velocity;
     Vector2f new_velocity_other = other._velocity;
+
+    if (other._passthrough) {
+
+        if (_velocity.y < 0 && displacement.y > 0) {
+            move_vector.y = displacement.y;
+            move(move_vector);
+            _velocity.y = 0;
+
+            updateView();
+        }
+
+        return;
+    }
 
     if (std::abs(displacement.x) == std::abs(displacement.y)) {
         move_vector = {displacement.x, displacement.y};
