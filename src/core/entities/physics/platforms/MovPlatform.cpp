@@ -1,45 +1,49 @@
 #include "MovPlatform.h"
 
 MovPlatform::MovPlatform(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-                         AnimationPlayer animationPlayer, AudioPlayer audioPlayer, bool isStatic)
+                         bool horizontal, AnimationPlayer animationPlayer, AudioPlayer audioPlayer, bool isStatic)
         : Platform(position, std::move(camera), viewSize, std::move(animationPlayer), std::move(audioPlayer),
-                   isStatic), _horizontal(true), _going_left(true), _vertical_pivot(_position.y) {
+                   isStatic), _horizontal(horizontal), _going_left(Random::get_instance().uniform_int(0, 1)) {
+    if (_horizontal) {
+        _bounderies = {constants::camera_view_x_min + _hitbox->getSize().x / 2,
+                                  constants::camera_view_x_max - _hitbox->getSize().x / 2};
+    } else {
+        // todo: constant
+        float y_boundery_scale = 0.3f;
 
+        _bounderies = {_position.y -
+                                ((constants::camera_view_y_max - constants::camera_view_y_min) / 2) * y_boundery_scale,
+                                _position.y +
+                                ((constants::camera_view_y_max - constants::camera_view_y_min) / 2) * y_boundery_scale};
+    }
 }
 
 void MovPlatform::update(double t, float dt) {
-    float boundery_scale = 0.8f;
+    // todo: constant
     float movement_amount = 0.01;
 
     if (_horizontal) {
-        Vector2f bounderies = Vector2f(constants::camera_view_x_min, constants::camera_view_x_max) * boundery_scale;
-
         if (_going_left) {
             move({-movement_amount, 0});
         } else {
             move({movement_amount, 0});
         }
 
-        if (_position.x < bounderies.x) {
+        if (_position.x < _bounderies.x) {
             _going_left = false;
-        } else if (_position.x > bounderies.y) {
+        } else if (_position.x > _bounderies.y) {
             _going_left = true;
         }
     } else {
-        Vector2f bounderies =
-                Vector2f(_vertical_pivot - (constants::camera_view_y_max - constants::camera_view_y_min) / 2,
-                         _vertical_pivot + (constants::camera_view_y_max - constants::camera_view_y_min) / 2) *
-                boundery_scale;
-
         if (_going_left) {
             move({0, -movement_amount});
         } else {
             move({0, movement_amount});
         }
 
-        if (_position.y < bounderies.x) {
+        if (_position.y < _bounderies.x) {
             _going_left = false;
-        } else if (_position.y > bounderies.y) {
+        } else if (_position.y > _bounderies.y) {
             _going_left = true;
         }
     }

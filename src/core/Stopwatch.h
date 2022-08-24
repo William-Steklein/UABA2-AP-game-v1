@@ -26,9 +26,9 @@ class Stopwatch {
     float _frame_count;
     float _average_fps;
 
-public:
     Stopwatch();
 
+public:
     Stopwatch(const Stopwatch &) = delete;
 
     Stopwatch &operator=(const Stopwatch &) = delete;

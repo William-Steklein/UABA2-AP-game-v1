@@ -41,17 +41,17 @@ void timerSleep(double seconds) {
 
 #endif
 
-Stopwatch &Stopwatch::getInstance() {
-    static Stopwatch instance;
-    return instance;
-}
-
 Stopwatch::Stopwatch()
         : _a(std::chrono::steady_clock::now()), _b(std::chrono::steady_clock::now()), _fps_limit(60),
           _cap_framerate(true),
           _delta_time(0), _physics_delta_time(1.0f / 60), _physics_time(0), _accumulator(0), _physics_speed(1),
           _sample_duration(500), _duration(0), _frame_count(0), _average_fps(0) {
     _ms_limit = (1000.f / static_cast<float>(_fps_limit));
+}
+
+Stopwatch &Stopwatch::getInstance() {
+    static Stopwatch instance;
+    return instance;
 }
 
 void Stopwatch::sleep_frame() {

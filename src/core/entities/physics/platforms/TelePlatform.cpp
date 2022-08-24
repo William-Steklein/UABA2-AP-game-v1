@@ -1,49 +1,55 @@
 #include "TelePlatform.h"
 
 TelePlatform::TelePlatform(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-                           AnimationPlayer animationPlayer, AudioPlayer audioPlayer, bool isStatic)
+                           bool horizontal, AnimationPlayer animationPlayer, AudioPlayer audioPlayer, bool isStatic)
         : Platform(position, std::move(camera), viewSize, std::move(animationPlayer), std::move(audioPlayer),
-                   isStatic), _horizontal(false), _left(true), _vertical_pivot(_position.y) {
+                   isStatic), _horizontal(horizontal) {
     if (_horizontal) {
-        _position.x = constants::camera_view_x_min * 0.6f;
+        _bounderies = {constants::camera_view_x_min + _hitbox->getSize().x / 2,
+                       constants::camera_view_x_max - _hitbox->getSize().x / 2};
     } else {
-        _position.y =
-                (_vertical_pivot - (constants::camera_view_y_max - constants::camera_view_y_min) / 2) * (0.6f / 2);
+        // todo: constant
+        float y_boundery_scale = 0.3f;
+
+        _bounderies = {_position.y -
+                       ((constants::camera_view_y_max - constants::camera_view_y_min) / 2) * y_boundery_scale,
+                       _position.y +
+                       ((constants::camera_view_y_max - constants::camera_view_y_min) / 2) * y_boundery_scale};
     }
 }
 
 void TelePlatform::update(double t, float dt) {
-    float boundery_scale = 0.6f;
+    // todo: constant
+    float min_tele_distance = 0.1f;
 
     if (_horizontal) {
-        Vector2f bounderies = Vector2f(constants::camera_view_x_min, constants::camera_view_x_max) * boundery_scale;
-
         if (_collided) {
             _collided = false;
-            if (_left) {
-                // go right
-                setPosition({bounderies.y, _position.y});
-            } else {
-                setPosition({bounderies.x, _position.y});
-            }
-            _left = !_left;
+
+            float new_position;
+            float distance;
+
+            do {
+                new_position = Random::get_instance().uniform_real(_bounderies.x, _bounderies.y);
+                distance = std::abs(new_position - _position.x);
+            } while (distance < min_tele_distance);
+
+            _position.x = new_position;
         }
 
     } else {
-        Vector2f bounderies =
-                Vector2f(_vertical_pivot - (constants::camera_view_y_max - constants::camera_view_y_min) / 2,
-                         _vertical_pivot + (constants::camera_view_y_max - constants::camera_view_y_min) / 2) *
-                boundery_scale / 2;
-
         if (_collided) {
             _collided = false;
-            if (_left) {
-                // go right
-                setPosition({_position.x, bounderies.y});
-            } else {
-                setPosition({_position.x, bounderies.x});
-            }
-            _left = !_left;
+
+            float new_position;
+            float distance;
+
+            do {
+                new_position = Random::get_instance().uniform_real(_bounderies.x, _bounderies.y);
+                distance = std::abs(new_position - _position.y);
+            } while (distance < min_tele_distance);
+
+            _position.y = new_position;
         }
     }
 

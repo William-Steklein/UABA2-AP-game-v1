@@ -21,8 +21,9 @@
 #include "entities/physics/platforms/Platform.h"
 #include "entities/physics/platforms/MovPlatform.h"
 #include "entities/physics/platforms/TelePlatform.h"
-#include "entities/physics/platforms/DisappearingPlatform.h"
+#include "entities/physics/platforms/TempPlatform.h"
 #include "Score.h"
+#include "Random.h"
 
 class World {
 private:

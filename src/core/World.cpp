@@ -39,8 +39,8 @@ void World::update() {
         _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
     } else if (_doodle_mode) {
         // camera movement
-        if (_player->getPosition().y > _camera->getPosition().y) {
-            _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
+        if (_player->getPosition().y > _camera->getPosition().y + 0.4f) {
+            _camera->setPosition({_camera->getPosition().x, _player->getPosition().y - 0.4f});
         }
 //        std::cout << _score->getScore() << std::endl;
         spawnPlatforms();
@@ -138,7 +138,7 @@ void World::initializeSideBars() {
     // sidebars
     for (int i = 0; i < 2; i++) {
         _side_bars.push_back(std::make_shared<UIWidget>(
-                UIWidget({0, 0}, _camera, {1, 1}, _animation_players["sidescreen_background"])));
+                UIWidget({0, 0}, _camera, {1, 1}, _animation_players["black"])));
         _entity_view_creator->createEntitySpriteView(_side_bars.back(), 200);
     }
 
@@ -235,6 +235,12 @@ void World::loadStartMenu() {
 }
 
 void World::startDebugMode() {
+    // background
+    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
+            UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
+                     _animation_players["background"])));
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 1);
+
     spawnPlayer();
 
     // portal radio music object
@@ -254,12 +260,18 @@ void World::startDebugMode() {
             Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_players["wall"], {}, true)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
 
-    _platforms.push_back(std::make_shared<DisappearingPlatform>(
-            DisappearingPlatform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, _animation_players["wall2"], {}, true)));
+    _platforms.push_back(std::make_shared<TelePlatform>(
+            TelePlatform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, true, _animation_players["wall2"])));
     _entity_view_creator->createEntitySpriteView(_platforms.back(), 3);
 }
 
 void World::startDoodleMode() {
+    // background
+    _ui_widget_entities.push_back(std::make_shared<UIWidget>(
+            UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
+                     _animation_players["background"])));
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 1);
+
     spawnPlayer();
 
     _player->addObserver(_score);
@@ -278,19 +290,64 @@ void World::spawnPlayer() {
 }
 
 void World::spawnPlatforms() {
-    float distance = 0.75f;
+    // todo: constants
+    float y_distance = 0.5f;
+    float platform_width = 0.4f;
+    float platform_height = 0.075f;
+    unsigned int platform_render_layer = 3;
+
+
     while (last_y_pos_spawn < _camera->getPosition().y + constants::camera_view_y_max - constants::camera_view_y_min) {
-        last_y_pos_spawn += distance;
-//        std::cout << "spawning platform!" << std::endl;
-        _platforms.push_back(std::make_shared<Platform>(
-                Platform({0.f, last_y_pos_spawn}, _camera, {0.4f, 0.1f}, _animation_players["wall"], {}, true)));
-        _entity_view_creator->createEntitySpriteView(_platforms.back(), 3);
+        float x_pos = Random::get_instance().uniform_real(-0.8, 0.8);
+        last_y_pos_spawn += y_distance;
+
+        float platform_type = Random::get_instance().uniform_real(0, 1);
+
+        if (platform_type < 0.25f) {
+            // static platforms
+            _platforms.push_back(std::make_shared<Platform>(
+                    Platform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height},
+                             _animation_players["green"])));
+            _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
+
+        } else if (platform_type < 0.40f) {
+            // moving platforms
+            _platforms.push_back(std::make_shared<MovPlatform>(
+                    MovPlatform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height}, true,
+                                _animation_players["blue"])));
+            _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
+
+        } else if (platform_type < 0.55f) {
+            _platforms.push_back(std::make_shared<MovPlatform>(
+                    MovPlatform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height}, false,
+                                _animation_players["yellow"])));
+            _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
+
+        } else if (platform_type < 0.70f) {
+            // temporary platforms
+            _platforms.push_back(std::make_shared<TempPlatform>(
+                    TempPlatform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height},
+                                 _animation_players["white"])));
+            _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
+
+        } else if (platform_type < 0.85f) {
+            // teleporting platforms
+            _platforms.push_back(std::make_shared<TelePlatform>(
+                    TelePlatform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height}, true,
+                                 _animation_players["blue_redsides"])));
+            _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
+
+        } else if (platform_type <= 1.f) {
+            _platforms.push_back(std::make_shared<TelePlatform>(
+                    TelePlatform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height}, false,
+                                 _animation_players["yellow_redsides"])));
+            _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
+        }
     }
 }
 
 void World::destroyPlatforms() {
     if (_platforms.front()->getPosition().y - _player->getPosition().y < -3.f) {
-//        std::cout << "erasing" << std::endl;
         _platforms.erase(_platforms.begin());
     }
 }

@@ -2,7 +2,8 @@
 
 Game::Game()
         : _screen_width(constants::screen_width), _screen_height(constants::screen_height),
-          _running(true), _entity_view_creator(new EntityViewCreator), _entity_audio_creator(new EntityAudioCreator) {
+          _running(true), _entity_view_creator(new EntityViewCreator), _entity_audio_creator(new EntityAudioCreator),
+          _draw_hitbox(false) {
     _window = std::make_unique<sf::RenderWindow>(sf::VideoMode(_screen_width, _screen_height), "GameEngine");
 
     // coreAPI initialize
@@ -34,7 +35,7 @@ void Game::draw() {
     for (const auto &entity_sprite_view: _entity_view_creator->getEntitySpriteViews()) {
         _window->draw(entity_sprite_view->getSprite());
 
-        if (draw_hitbox) {
+        if (_draw_hitbox) {
             // debug information
             _window->draw(entity_sprite_view->getHitbox());
             _window->draw(entity_sprite_view->getRays());
@@ -44,7 +45,7 @@ void Game::draw() {
         sf::Text new_text = entity_text_view->getText();
         _window->draw(new_text);
 
-        if (draw_hitbox) {
+        if (_draw_hitbox) {
             // debug information
             _window->draw(entity_text_view->getHitbox());
             _window->draw(entity_text_view->getRays());
@@ -140,7 +141,7 @@ void Game::handleKeyboardInput(const sf::Event &event, bool pressed) {
         case sf::Keyboard::H:
             _world->getUserInputMap()->h = pressed;
             if (pressed) {
-                draw_hitbox = !draw_hitbox;
+                _draw_hitbox = !_draw_hitbox;
             }
             break;
 

@@ -23,8 +23,8 @@ private:
     std::shared_ptr<EntityViewCreator> _entity_view_creator;
     std::shared_ptr<EntityAudioCreator> _entity_audio_creator;
 
-    bool draw_hitbox = true;
-    bool mouse_button_left_clicked;
+    bool _draw_hitbox;
+    bool _mouse_button_left_clicked;
 
 public:
     Game();
