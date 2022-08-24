@@ -370,14 +370,14 @@ void World::destroyPlatforms() {
 
 void World::spawnBgTiles() {
     // todo: constant
-    unsigned int amount = 20;
+    unsigned int amount = 50;
     float bg_tile_size = _camera->getWidth() / static_cast<float>(amount);
 
     while (_last_bg_tile_y_pos < getSpawnPosY()) {
         _last_bg_tile_y_pos += bg_tile_size;
 
         float current_x_pos = constants::camera_view_x_min + bg_tile_size / 2;
-        for (unsigned int i = 0; i < 20; i++) {
+        for (unsigned int i = 0; i < amount; i++) {
             _bg_tiles.push_back(std::make_shared<BgTile>(
                     BgTile({current_x_pos, _last_bg_tile_y_pos}, _camera, {bg_tile_size, bg_tile_size},
                            _animation_players["background_tile"])));
