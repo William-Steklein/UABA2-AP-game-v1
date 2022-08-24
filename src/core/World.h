@@ -24,6 +24,7 @@
 #include "entities/physics/platforms/TempPlatform.h"
 #include "Score.h"
 #include "Random.h"
+#include "entities/ui/BgTile.h"
 
 class World {
 private:
@@ -42,7 +43,9 @@ private:
 
     std::vector<std::shared_ptr<Wall>> _walls;
     std::vector<std::shared_ptr<Platform>> _platforms;
-    float last_y_pos_spawn = -0.75;
+    float _last_platform_y_pos;
+    std::vector<std::shared_ptr<BgTile>> _bg_tiles;
+    float _last_bg_tile_y_pos;
 
     std::vector<std::shared_ptr<UIWidget>> _ui_widget_entities;
     std::vector<std::shared_ptr<UIWidget>> _side_bars;
@@ -99,9 +102,17 @@ private:
 
     void spawnPlayer();
 
+    float getSpawnPosY();
+
+    float getDestroyPosY();
+
     void spawnPlatforms();
 
     void destroyPlatforms();
+
+    void spawnBgTiles();
+
+    void destroyBgTiles();
 
     // update
     void updateUIEntities(double t, float dt);

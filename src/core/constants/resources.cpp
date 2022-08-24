@@ -1,19 +1,20 @@
 #include "resources.h"
 
 const std::map<std::string, std::string> texture_data = {
-        {"background",            "data/textures/prototype/Dark/texture_07.png"},
-        {"menu",                  "data/ui/menu.png"},
-        {"button",                "data/ui/button.png"},
-        {"green", "data/textures/colors/green.png"},
-        {"blue", "data/textures/colors/blue.png"},
-        {"blue_redsides", "data/textures/colors/blue_redsides.png"},
-        {"yellow", "data/textures/colors/yellow.png"},
+        {"background",      "data/textures/prototype/Dark/texture_07.png"},
+        {"background_tile", "data/sprites/background_tile/background_tile.png"},
+        {"menu",            "data/ui/menu.png"},
+        {"button",          "data/ui/button.png"},
+        {"green",           "data/textures/colors/green.png"},
+        {"blue",            "data/textures/colors/blue.png"},
+        {"blue_redsides",   "data/textures/colors/blue_redsides.png"},
+        {"yellow",          "data/textures/colors/yellow.png"},
         {"yellow_redsides", "data/textures/colors/yellow_redsides.png"},
-        {"white", "data/textures/colors/white.png"},
-        {"black", "data/textures/colors/black.png"},
-        {"wall",                  "data/textures/cobble_stone.png"},
-        {"wall2",                  "data/textures/prototype/Red/texture_03.png"},
-        {"portal_radio",          "data/sprites/portal/portal_radio.png"},
+        {"white",           "data/textures/colors/white.png"},
+        {"black",           "data/textures/colors/black.png"},
+        {"wall",            "data/textures/cobble_stone.png"},
+        {"wall2",           "data/textures/prototype/Red/texture_03.png"},
+        {"portal_radio",    "data/sprites/portal/portal_radio.png"},
 };
 
 const std::map<std::string, std::map<std::string, AnimationResource>> animation_groups_data =

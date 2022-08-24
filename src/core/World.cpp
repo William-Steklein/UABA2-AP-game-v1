@@ -7,7 +7,8 @@ World::World(float x_min, float x_max, float y_min, float y_max,
           _entity_audio_creator(std::move(entity_audio_creator)), _force_static_view_update(true),
           _input_map(new InputMap), _audio_listener_position(new Vector2f(0, 0)),
           _start_debug_mode(new bool(false)), _debug_mode(false),
-          _start_doodle_mode(new bool(false)), _doodle_mode(false), _score(new Score()) {
+          _start_doodle_mode(new bool(false)), _doodle_mode(false), _score(new Score()),
+          _last_platform_y_pos(-1.f), _last_bg_tile_y_pos(-1.f) {
 
     loadResources();
     initializeSideBars();
@@ -44,7 +45,9 @@ void World::update() {
         }
 //        std::cout << _score->getScore() << std::endl;
         spawnPlatforms();
+        spawnBgTiles();
         destroyPlatforms();
+        destroyBgTiles();
     }
 
     handleUpdatePhysicsSpeed();
@@ -260,8 +263,8 @@ void World::startDebugMode() {
             Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_players["wall"], {}, true)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
 
-    _platforms.push_back(std::make_shared<TelePlatform>(
-            TelePlatform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, true, _animation_players["wall2"])));
+    _platforms.push_back(std::make_shared<MovPlatform>(
+            MovPlatform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, true, _animation_players["background_tile"])));
     _entity_view_creator->createEntitySpriteView(_platforms.back(), 3);
 }
 
@@ -278,6 +281,7 @@ void World::startDoodleMode() {
     _camera->addObserver(_score);
 
     spawnPlatforms();
+    spawnBgTiles();
 }
 
 void World::spawnPlayer() {
@@ -289,6 +293,16 @@ void World::spawnPlayer() {
     //    _entity_audio_creator->createEntityAudio(_player);
 }
 
+float World::getSpawnPosY() {
+    // todo constant
+    return _camera->getPosition().y + constants::camera_view_y_max - constants::camera_view_y_min;
+}
+
+float World::getDestroyPosY() {
+    // todo constant
+    return _camera->getPosition().y - 6.f;
+}
+
 void World::spawnPlatforms() {
     // todo: constants
     float y_distance = 0.5f;
@@ -297,49 +311,49 @@ void World::spawnPlatforms() {
     unsigned int platform_render_layer = 3;
 
 
-    while (last_y_pos_spawn < _camera->getPosition().y + constants::camera_view_y_max - constants::camera_view_y_min) {
+    while (_last_platform_y_pos < getSpawnPosY()) {
         float x_pos = Random::get_instance().uniform_real(-0.8, 0.8);
-        last_y_pos_spawn += y_distance;
+        _last_platform_y_pos += y_distance;
 
         float platform_type = Random::get_instance().uniform_real(0, 1);
 
         if (platform_type < 0.25f) {
             // static platforms
             _platforms.push_back(std::make_shared<Platform>(
-                    Platform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height},
+                    Platform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height},
                              _animation_players["green"])));
             _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
 
         } else if (platform_type < 0.40f) {
             // moving platforms
             _platforms.push_back(std::make_shared<MovPlatform>(
-                    MovPlatform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height}, true,
+                    MovPlatform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height}, true,
                                 _animation_players["blue"])));
             _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
 
         } else if (platform_type < 0.55f) {
             _platforms.push_back(std::make_shared<MovPlatform>(
-                    MovPlatform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height}, false,
+                    MovPlatform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height}, false,
                                 _animation_players["yellow"])));
             _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
 
         } else if (platform_type < 0.70f) {
             // temporary platforms
             _platforms.push_back(std::make_shared<TempPlatform>(
-                    TempPlatform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height},
+                    TempPlatform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height},
                                  _animation_players["white"])));
             _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
 
         } else if (platform_type < 0.85f) {
             // teleporting platforms
             _platforms.push_back(std::make_shared<TelePlatform>(
-                    TelePlatform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height}, true,
+                    TelePlatform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height}, true,
                                  _animation_players["blue_redsides"])));
             _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
 
         } else if (platform_type <= 1.f) {
             _platforms.push_back(std::make_shared<TelePlatform>(
-                    TelePlatform({x_pos, last_y_pos_spawn}, _camera, {platform_width, platform_height}, false,
+                    TelePlatform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height}, false,
                                  _animation_players["yellow_redsides"])));
             _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
         }
@@ -347,8 +361,37 @@ void World::spawnPlatforms() {
 }
 
 void World::destroyPlatforms() {
-    if (_platforms.front()->getPosition().y - _player->getPosition().y < -3.f) {
+    if (_platforms.empty()) return;
+    // todo: constant
+    while (_platforms.front()->getPosition().y < getDestroyPosY()) {
         _platforms.erase(_platforms.begin());
+    }
+}
+
+void World::spawnBgTiles() {
+    // todo: constant
+    unsigned int amount = 20;
+    float bg_tile_size = _camera->getWidth() / static_cast<float>(amount);
+
+    while (_last_bg_tile_y_pos < getSpawnPosY()) {
+        _last_bg_tile_y_pos += bg_tile_size;
+
+        float current_x_pos = constants::camera_view_x_min + bg_tile_size / 2;
+        for (unsigned int i = 0; i < 20; i++) {
+            _bg_tiles.push_back(std::make_shared<BgTile>(
+                    BgTile({current_x_pos, _last_bg_tile_y_pos}, _camera, {bg_tile_size, bg_tile_size},
+                           _animation_players["background_tile"])));
+            _entity_view_creator->createEntitySpriteView(_bg_tiles.back(), 1);
+
+            current_x_pos += bg_tile_size;
+        }
+    }
+}
+
+void World::destroyBgTiles() {
+    if (_bg_tiles.empty()) return;
+    while (_bg_tiles.front()->getPosition().y < getDestroyPosY()) {
+        _bg_tiles.erase(_bg_tiles.begin());
     }
 }
 
@@ -369,6 +412,11 @@ void World::updateUIEntities(double t, float dt) {
         if (!ui_widget->is_static_view() || _force_static_view_update) {
             ui_widget->update(t, dt);
         }
+    }
+
+    // background tiles
+    for (const auto &bg_tile: _bg_tiles) {
+        bg_tile->update(t, dt);
     }
 
     for (const auto &side_bar: _side_bars) {
@@ -431,8 +479,6 @@ void World::updatePhysicsEntities(double t, float dt) {
     for (const auto &platform: _platforms) {
         platform->update(t, dt);
     }
-
-    // background tiles
 
     // bonuses
 
