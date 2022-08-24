@@ -3,7 +3,7 @@
 PhysicsEntity::PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
                              AnimationPlayer animation_player, AudioPlayer audio_player, bool is_static) :
         Entity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player)),
-        _is_static(is_static), _mass(1), _gravitational_acceleration({0, 0}), _passthrough(false) {
+        _is_static(is_static), _mass(1), _gravitational_acceleration({0, 0}), _passthrough(false), _collided(false) {
     _hitbox = std::make_shared<Hitbox>(_position, _view_size);
 
 }
@@ -135,6 +135,8 @@ void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
             _velocity.y = 0;
 
             updateView();
+            _collided = true;
+            other._collided = true;
         }
 
         return;
@@ -195,4 +197,11 @@ void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
         updateView();
         other.updateView();
     }
+
+    _collided = true;
+    other._collided = true;
+}
+
+void PhysicsEntity::setCollided() {
+    _collided = true;
 }

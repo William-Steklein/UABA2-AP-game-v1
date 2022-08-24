@@ -8,6 +8,7 @@
 class PhysicsEntity : public Entity {
 protected:
     bool _is_static;
+    bool _collided;
 
     // physics
     float _mass;
@@ -66,6 +67,8 @@ public:
     void applySideScrolling();
 
     virtual void resolveCollision(PhysicsEntity &other);
+
+    void setCollided();
 };
 
 

@@ -2,7 +2,7 @@
 #define GAMEENGINE_PLATFORM_H
 
 
-#include "PhysicsEntity.h"
+#include "../PhysicsEntity.h"
 
 class Platform : public PhysicsEntity {
 

@@ -18,7 +18,11 @@
 #include "entities/physics/PortalRadio.h"
 #include "physics/Ray.h"
 #include "audio/IEntityAudioCreator.h"
-#include "entities/physics/Platform.h"
+#include "entities/physics/platforms/Platform.h"
+#include "entities/physics/platforms/MovPlatform.h"
+#include "entities/physics/platforms/TelePlatform.h"
+#include "entities/physics/platforms/DisappearingPlatform.h"
+#include "Score.h"
 
 class World {
 private:
@@ -37,17 +41,24 @@ private:
 
     std::vector<std::shared_ptr<Wall>> _walls;
     std::vector<std::shared_ptr<Platform>> _platforms;
+    float last_y_pos_spawn = -0.75;
 
     std::vector<std::shared_ptr<UIWidget>> _ui_widget_entities;
     std::vector<std::shared_ptr<UIWidget>> _side_bars;
     std::vector<std::shared_ptr<Button>> _buttons;
 
+    // score
+    std::shared_ptr<Score> _score;
+
     // audio
     std::shared_ptr<IEntityAudioCreator> _entity_audio_creator;
     std::shared_ptr<Vector2f> _audio_listener_position;
 
-    // flow
-    std::shared_ptr<bool> _start_game;
+    // game states
+    std::shared_ptr<bool> _start_debug_mode;
+    bool _debug_mode;
+    std::shared_ptr<bool> _start_doodle_mode;
+    bool _doodle_mode;
 
 public:
     World(float x_min, float x_max, float y_min, float y_max, std::shared_ptr<IEntityViewCreator> entity_view_creator,
@@ -74,17 +85,24 @@ private:
 
     void loadAudio();
 
-    void resetEntities();
-
     void initializeSideBars();
 
     void updateSidebars();
 
     // scenes
-    void initializeStartMenu();
+    void loadStartMenu();
 
-    void initializePhysicsEntities();
+    void startDebugMode();
 
+    void startDoodleMode();
+
+    void spawnPlayer();
+
+    void spawnPlatforms();
+
+    void destroyPlatforms();
+
+    // update
     void updateUIEntities(double t, float dt);
 
     void updatePhysics(double t, float dt);
@@ -94,7 +112,12 @@ private:
     bool handleCollision(const std::shared_ptr<PhysicsEntity> &entity1, const std::shared_ptr<PhysicsEntity> &entity2,
                          bool resolve = true);
 
-    bool handleCollision(const std::shared_ptr<Ray> &ray, const std::shared_ptr<PhysicsEntity> &entity);
+    bool handleCollision(const std::shared_ptr<Ray> &ray, const std::shared_ptr<PhysicsEntity> &entity,
+                         bool set_collides = false);
+
+    void handleUpdatePhysicsSpeed();
+
+    void reset();
 };
 
 

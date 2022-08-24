@@ -61,8 +61,6 @@ void EntityTextBoxView::updateText() {
 
 void EntityTextBoxView::updateTextWrap(const Vector2f &view_size) {
     sf::FloatRect text_render_rect = _text_render.getLocalBounds();
-    std::cout << text_render_rect.width << std::endl;
-    std::cout << text_render_rect.height << std::endl;
 
     if (text_render_rect.width >= view_size.x) {
         _text_wrapped = "";

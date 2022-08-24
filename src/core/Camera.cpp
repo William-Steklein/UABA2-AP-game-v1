@@ -4,7 +4,7 @@ Camera::Camera(float x_min, float x_max, float y_min, float y_max)
         : _camera_x_boundaries(constants::camera_view_x_min, constants::camera_view_x_max),
           _camera_y_boundaries(constants::camera_view_y_min, constants::camera_view_y_max),
           _screen_x_boundaries(x_min, x_max), _screen_y_boundaries(y_min, y_max),
-          _aspect_ratio(constants::aspect_ratio) {
+          _aspect_ratio(constants::aspect_ratio), _score_amount(0) {
     _position = {(_camera_x_boundaries.y + _camera_x_boundaries.x) / 2,
                  (_camera_y_boundaries.y + _camera_y_boundaries.x) / 2};
 
@@ -19,6 +19,15 @@ void Camera::move(const Vector2f &vector) {
     _camera_x_boundaries += vector.x;
     _camera_y_boundaries += vector.y;
     _position += vector;
+
+    // todo: score constant
+    _score_amount += vector.length() * 50;
+    if (_score_amount > 1) {
+        float score_amount = std::floor(_score_amount);
+        _score_amount -= score_amount;
+
+        notifyObservers(static_cast<unsigned int>(score_amount), 25);
+    }
 }
 
 void Camera::reset() {
@@ -26,6 +35,7 @@ void Camera::reset() {
     _camera_y_boundaries = {constants::camera_view_y_min, constants::camera_view_y_max};
     _position = {(_camera_x_boundaries.y + _camera_x_boundaries.x) / 2,
                  (_camera_y_boundaries.y + _camera_y_boundaries.x) / 2};
+    _score_amount = 0;
 }
 
 Vector2f Camera::getXBounderies() const { return _camera_x_boundaries; }

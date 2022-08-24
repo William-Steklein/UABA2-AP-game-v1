@@ -5,13 +5,14 @@ World::World(float x_min, float x_max, float y_min, float y_max,
              std::shared_ptr<IEntityAudioCreator> entity_audio_creator)
         : _camera(new Camera(x_min, x_max, y_min, y_max)), _entity_view_creator(std::move(entity_view_creator)),
           _entity_audio_creator(std::move(entity_audio_creator)), _force_static_view_update(true),
-          _input_map(new InputMap), _audio_listener_position(new Vector2f(0, 0)), _start_game(new bool(false)) {
+          _input_map(new InputMap), _audio_listener_position(new Vector2f(0, 0)),
+          _start_debug_mode(new bool(false)), _debug_mode(false),
+          _start_doodle_mode(new bool(false)), _doodle_mode(false), _score(new Score()) {
 
     loadResources();
     initializeSideBars();
 
-    initializePhysicsEntities();
-//    initializeStartMenu();
+    loadStartMenu();
 }
 
 World::~World() = default;
@@ -21,28 +22,36 @@ void World::sleep() {
 }
 
 void World::update() {
-    if (_input_map->z) {
-        Stopwatch::getInstance().setPhysicsSpeed(1);
+    if (*_start_debug_mode) {
+        *_start_debug_mode = false;
+        reset();
+        startDebugMode();
+        _debug_mode = true;
+    } else if (*_start_doodle_mode) {
+        *_start_doodle_mode = false;
+        reset();
+        startDoodleMode();
+        _doodle_mode = true;
     }
 
-    if (_input_map->x) {
-        Stopwatch::getInstance().setPhysicsSpeed(1.f / 60);
+    if (_debug_mode) {
+        // camera movement
+        _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
+    } else if (_doodle_mode) {
+        // camera movement
+        if (_player->getPosition().y > _camera->getPosition().y) {
+            _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
+        }
+//        std::cout << _score->getScore() << std::endl;
+        spawnPlatforms();
+        destroyPlatforms();
     }
 
-    if (*_start_game || _input_map->e) {
-        std::cout << "Starting game..." << std::endl;
-        *_start_game = false;
+    handleUpdatePhysicsSpeed();
 
-        resetEntities();
-        initializePhysicsEntities();
-    }
-
-    // update UI entities
     updateUIEntities(Stopwatch::getInstance().getPhysicsTime(), Stopwatch::getInstance().getDeltaTime());
 
-    // update physics entities
     Stopwatch::getInstance().increaseAccumulator();
-
     while (Stopwatch::getInstance().getAccumulator() >= Stopwatch::getInstance().getPhysicsDeltaTime()) {
         updatePhysics(Stopwatch::getInstance().getPhysicsTime(), Stopwatch::getInstance().getPhysicsDeltaTime());
 
@@ -125,15 +134,6 @@ void World::loadAudio() {
     }
 }
 
-void World::resetEntities() {
-    _player.reset();
-    _walls.clear();
-    _portal_radios.clear();
-
-    _ui_widget_entities.clear();
-    _buttons.clear();
-}
-
 void World::initializeSideBars() {
     // sidebars
     for (int i = 0; i < 2; i++) {
@@ -191,7 +191,7 @@ void World::updateSidebars() {
     }
 }
 
-void World::initializeStartMenu() {
+void World::loadStartMenu() {
     // background
     _ui_widget_entities.push_back(std::make_shared<UIWidget>(
             UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
@@ -204,34 +204,44 @@ void World::initializeStartMenu() {
                      _animation_players["menu"])));
     _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 1);
 
-    // button
+    // buttons
+    Vector2f button_position = {0, 2.f};
     _buttons.push_back(std::make_shared<Button>(
-            Button({0, 1.5f}, _camera, {0.5f, 0.25f},
+            Button(button_position, _camera, {0.5f, 0.25f},
                    _animation_players["button"])));
     _ui_widget_entities.push_back(_buttons.back());
     _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 2);
-    _start_game = _buttons.back()->getPressedPointer();
+    _start_debug_mode = _buttons.back()->getPressedPointer();
 
-    std::shared_ptr<std::string> button_string = std::make_shared<std::string>("start");
+    std::shared_ptr<std::string> button_string = std::make_shared<std::string>("debug");
     std::shared_ptr<TextBox> text_box = std::make_shared<TextBox>(
-            TextBox({0, 1.5f}, _camera, {0.5f, 0.25f}, button_string));
+            TextBox(button_position, _camera, {0.5f, 0.25f}, button_string));
+    _ui_widget_entities.push_back(text_box);
+    _entity_view_creator->createEntityTextView(text_box);
+
+    button_position = {0, 1.625f};
+    _buttons.push_back(std::make_shared<Button>(
+            Button(button_position, _camera, {0.5f, 0.25f},
+                   _animation_players["button"])));
+    _ui_widget_entities.push_back(_buttons.back());
+    _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 2);
+    _start_doodle_mode = _buttons.back()->getPressedPointer();
+
+    button_string = std::make_shared<std::string>("doodle");
+    text_box = std::make_shared<TextBox>(
+            TextBox(button_position, _camera, {0.5f, 0.25f}, button_string));
     _ui_widget_entities.push_back(text_box);
     _entity_view_creator->createEntityTextView(text_box);
 }
 
-void World::initializePhysicsEntities() {
-    // player
-    float scale_mul = 2.f;
-    _player = std::make_shared<Doodle>(
-            Doodle({0.f, 2.5f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _input_map,
-                   _animation_players["adventurer"], _audio_player));
-    _entity_view_creator->createEntitySpriteView(_player, 5);
-//    _entity_audio_creator->createEntityAudio(_player);
+void World::startDebugMode() {
+    spawnPlayer();
 
     // portal radio music object
     _portal_radios.push_back(
             std::make_shared<PortalRadio>(
-                    PortalRadio({0.5f, 2.5f}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"], _audio_player)));
+                    PortalRadio({0.5f, 2.5f}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"],
+                                _audio_player)));
     _entity_view_creator->createEntitySpriteView(_portal_radios.back(), 4);
 //    _entity_audio_creator->createEntityAudio(_portal_radios.back());
 
@@ -244,9 +254,45 @@ void World::initializePhysicsEntities() {
             Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_players["wall"], {}, true)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
 
-    _platforms.push_back(std::make_shared<Platform>(
-            Platform({0.5f, 1.f}, _camera, {0.5f, 0.2f}, _animation_players["wall"], {}, true)));
+    _platforms.push_back(std::make_shared<DisappearingPlatform>(
+            DisappearingPlatform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, _animation_players["wall2"], {}, true)));
     _entity_view_creator->createEntitySpriteView(_platforms.back(), 3);
+}
+
+void World::startDoodleMode() {
+    spawnPlayer();
+
+    _player->addObserver(_score);
+    _camera->addObserver(_score);
+
+    spawnPlatforms();
+}
+
+void World::spawnPlayer() {
+    float scale_mul = 2.f;
+    _player = std::make_shared<Doodle>(
+            Doodle({0.f, 1.f}, _camera, {0.3f * scale_mul, 0.222f * scale_mul}, _input_map,
+                   _animation_players["adventurer"], _audio_player));
+    _entity_view_creator->createEntitySpriteView(_player, 5);
+    //    _entity_audio_creator->createEntityAudio(_player);
+}
+
+void World::spawnPlatforms() {
+    float distance = 0.75f;
+    while (last_y_pos_spawn < _camera->getPosition().y + constants::camera_view_y_max - constants::camera_view_y_min) {
+        last_y_pos_spawn += distance;
+//        std::cout << "spawning platform!" << std::endl;
+        _platforms.push_back(std::make_shared<Platform>(
+                Platform({0.f, last_y_pos_spawn}, _camera, {0.4f, 0.1f}, _animation_players["wall"], {}, true)));
+        _entity_view_creator->createEntitySpriteView(_platforms.back(), 3);
+    }
+}
+
+void World::destroyPlatforms() {
+    if (_platforms.front()->getPosition().y - _player->getPosition().y < -3.f) {
+//        std::cout << "erasing" << std::endl;
+        _platforms.erase(_platforms.begin());
+    }
 }
 
 void World::updateUIEntities(double t, float dt) {
@@ -254,7 +300,8 @@ void World::updateUIEntities(double t, float dt) {
     if (_input_map->mouse_button_left) {
 //        std::cout << _input_map->mouse_pos_core << std::endl;
         for (const auto &button: _buttons) {
-            if (button->getHitbox() && button->getHitbox()->collides(_input_map->mouse_pos_core) && !_input_map->mouse_button_left_clicked) {
+            if (button->getHitbox() && button->getHitbox()->collides(_input_map->mouse_pos_core) &&
+                !_input_map->mouse_button_left_clicked) {
                 button->setPressed(true);
                 _input_map->mouse_button_left_clicked = true;
             }
@@ -292,7 +339,7 @@ void World::updatePhysics(double t, float dt) {
             handleCollision(_player, platform, true);
 
             for (const auto &ray: _player->getRays()) {
-                handleCollision(ray, platform);
+                handleCollision(ray, platform, true);
             }
         }
 
@@ -324,22 +371,20 @@ void World::updatePhysicsEntities(double t, float dt) {
     }
 
     // platforms
-    for (const auto& platform: _platforms) {
+    for (const auto &platform: _platforms) {
         platform->update(t, dt);
     }
-
-    // portal radios
-    for (const auto &portal_radio: _portal_radios) {
-        portal_radio->update(t, dt);
-    }
-
-    // platforms
 
     // background tiles
 
     // bonuses
 
     // enemies
+
+    // portal radios
+    for (const auto &portal_radio: _portal_radios) {
+        portal_radio->update(t, dt);
+    }
 
     // audio listener
     if (_player != nullptr) {
@@ -365,10 +410,39 @@ bool World::handleCollision(const std::shared_ptr<PhysicsEntity> &entity1,
     return collided;
 }
 
-bool World::handleCollision(const std::shared_ptr<Ray> &ray, const std::shared_ptr<PhysicsEntity> &entity) {
+bool World::handleCollision(const std::shared_ptr<Ray> &ray, const std::shared_ptr<PhysicsEntity> &entity,
+                            bool set_collides) {
     if (entity->getHitbox()->empty()) {
         return false;
     }
 
-    return ray->collides(*entity->getHitbox());
+    bool collides = ray->collides(*entity->getHitbox());
+
+    if (set_collides && collides) {
+        entity->setCollided();
+    }
+
+    return collides;
+}
+
+void World::handleUpdatePhysicsSpeed() {
+    if (_input_map->z) {
+        Stopwatch::getInstance().setPhysicsSpeed(1);
+    }
+
+    if (_input_map->x) {
+        Stopwatch::getInstance().setPhysicsSpeed(1.f / 60);
+    }
+}
+
+void World::reset() {
+    _player.reset();
+    _walls.clear();
+    _portal_radios.clear();
+
+    _ui_widget_entities.clear();
+    _buttons.clear();
+
+    _camera->reset();
+    _score->reset();
 }

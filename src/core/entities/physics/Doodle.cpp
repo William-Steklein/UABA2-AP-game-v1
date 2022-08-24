@@ -6,7 +6,7 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
                std::shared_ptr<InputMap> input_map, AnimationPlayer animation_player, AudioPlayer audio_player,
                bool is_static)
         : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player),
-                        is_static), _input_map(std::move(input_map)) {
+                        is_static), _input_map(std::move(input_map)), _standing(false), _jumped(false) {
     _hitbox->setSize({_view_size.x / 3.75f, _view_size.y / 1.25f});
     _hitbox->setOffset({0, -0.072f * _view_size.y});
 
@@ -36,7 +36,11 @@ void Doodle::update(double t, float dt) {
     playerController(dt);
 //    testController();
 
-
+    // todo: constant for jump score substraction
+    if (_jumped) {
+        _jumped = false;
+        notifyObservers(5, 26);
+    }
 
     applySideScrolling();
 
@@ -89,7 +93,7 @@ void Doodle::playerController(float dt) {
     if (_standing && _input_map->w) {
         _velocity.y = _initial_jump_velocity;
         _standing = false;
-        _hit_platform = false;
+        _jumped = true;
 
         playAnimation("jump");
         playSound("scream", true, false);
@@ -156,5 +160,5 @@ void Doodle::testController() {
 }
 
 void Doodle::setHitPlatform(bool hit_platform) {
-    _hit_platform = hit_platform;
+    _jumped = hit_platform;
 }

@@ -5,8 +5,9 @@
 #include "math/Vector2f.h"
 #include "math/math_funcs.h"
 #include "constants/constants.h"
+#include "observer-pattern-interface/ISubject.h"
 
-class Camera {
+class Camera : public ISubject {
 private:
     Vector2f _position;
     Vector2f _camera_x_boundaries;
@@ -18,6 +19,8 @@ private:
     Vector2f _aspect_ratio;
     Vector2f _subscreen_x_boundaries;
     Vector2f _subscreen_y_boundaries;
+
+    float _score_amount;
 
 public:
     Camera(float x_min, float x_max, float y_min, float y_max);

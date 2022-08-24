@@ -6,6 +6,7 @@ const std::map<std::string, std::string> texture_data = {
         {"button",                "data/ui/button.png"},
         {"sidescreen_background", "data/textures/black.png"},
         {"wall",                  "data/textures/cobble_stone.png"},
+        {"wall2",                  "data/textures/prototype/Red/texture_03.png"},
         {"portal_radio",          "data/sprites/portal/portal_radio.png"},
 };
 

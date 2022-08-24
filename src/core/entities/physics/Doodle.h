@@ -8,8 +8,8 @@
 
 class Doodle : public PhysicsEntity {
 private:
-    bool _standing{false};
-    bool _hit_platform{false};
+    bool _standing;
+    bool _jumped;
 
     float _initial_jump_velocity;
     float _horizontal_movement_force;
