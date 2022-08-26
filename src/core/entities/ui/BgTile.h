@@ -3,9 +3,9 @@
 
 
 #include <utility>
-#include "UIWidget.h"
+#include "UIEntity.h"
 
-class BgTile : public UIWidget {
+class BgTile : public UIEntity {
 private:
 
 public:

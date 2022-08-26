@@ -2,11 +2,11 @@
 #define GAMEENGINE_TEXTBOX_H
 
 
-#include "UIWidget.h"
+#include "UIEntity.h"
 #include <utility>
 #include <string>
 
-class TextBox : public UIWidget {
+class TextBox : public UIEntity {
 private:
     std::shared_ptr<std::string> _text;
 

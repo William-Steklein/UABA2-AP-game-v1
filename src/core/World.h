@@ -3,67 +3,72 @@
 
 
 #include <memory>
+
 #include "Stopwatch.h"
-#include "InputMap.h"
-#include "Camera.h"
-#include "entities/physics/Doodle.h"
-#include "entities/IEntityViewCreator.h"
-#include "entities/ui/UIWidget.h"
-#include "entities/ui/Button.h"
-#include "entities/IEntityViewCreator.h"
-#include "entities/physics/Wall.h"
-#include "entities/ui/TextBox.h"
-#include "animation/Animation.h"
-#include "constants/resources.h"
-#include "entities/physics/PortalRadio.h"
-#include "physics/Ray.h"
-#include "audio/IEntityAudioCreator.h"
-#include "entities/physics/platforms/Platform.h"
-#include "entities/physics/platforms/MovPlatform.h"
-#include "entities/physics/platforms/TelePlatform.h"
-#include "entities/physics/platforms/TempPlatform.h"
-#include "Score.h"
 #include "Random.h"
+#include "Camera.h"
+#include "InputMap.h"
+#include "Score.h"
+
+#include "physics/Ray.h"
+#include "physics/collisions.h"
+
+#include "entities/IEntityViewCreator.h"
+#include "entities/physics/Doodle.h"
+#include "entities/physics/Wall.h"
+#include "entities/physics/platform/Platform.h"
+#include "entities/physics/platform/MovPlatform.h"
+#include "entities/physics/platform/TelePlatform.h"
+#include "entities/physics/platform/TempPlatform.h"
+#include "entities/physics/PortalRadio.h"
+
+#include "entities/ui/UIEntity.h"
 #include "entities/ui/BgTile.h"
+#include "entities/ui/Button.h"
+#include "entities/ui/TextBox.h"
+
+#include "constants/resources.h"
+#include "animation/Animation.h"
+#include "audio/IEntityAudioCreator.h"
 
 class World {
 private:
     std::shared_ptr<Camera> _camera;
     std::shared_ptr<InputMap> _input_map;
-
-    // resource players
-    std::map<std::string, AnimationPlayer> _animation_players;
-    AudioPlayer _audio_player;
-
-    // entities
-    std::shared_ptr<IEntityViewCreator> _entity_view_creator;
-    bool _force_static_view_update;
-    std::shared_ptr<Doodle> _player;
-    std::vector<std::shared_ptr<PortalRadio>> _portal_radios;
-
-    std::vector<std::shared_ptr<Wall>> _walls;
-    std::vector<std::shared_ptr<Platform>> _platforms;
-    float _last_platform_y_pos;
-    std::vector<std::shared_ptr<BgTile>> _bg_tiles;
-    float _last_bg_tile_y_pos;
-
-    std::vector<std::shared_ptr<UIWidget>> _ui_widget_entities;
-    std::vector<std::shared_ptr<UIWidget>> _side_bars;
-    std::vector<std::shared_ptr<Button>> _buttons;
-
-    // score
     std::shared_ptr<Score> _score;
-    std::shared_ptr<TextBox> _score_text_box;
-
-    // audio
-    std::shared_ptr<IEntityAudioCreator> _entity_audio_creator;
-    std::shared_ptr<Vector2f> _audio_listener_position;
 
     // game states
     std::shared_ptr<bool> _start_debug_mode;
     bool _debug_mode;
     std::shared_ptr<bool> _start_doodle_mode;
     bool _doodle_mode;
+
+    // entities
+    std::shared_ptr<IEntityViewCreator> _entity_view_creator;
+    bool _force_static_view_update;
+
+    std::vector<std::weak_ptr<PhysicsEntity>> _physics_entities;
+    std::shared_ptr<Doodle> _player;
+    std::vector<std::shared_ptr<Wall>> _walls;
+    std::vector<std::shared_ptr<Platform>> _platforms;
+    float _last_platform_y_pos;
+    std::vector<std::shared_ptr<PortalRadio>> _portal_radios;
+
+    std::vector<std::weak_ptr<UIEntity>> _ui_entities;
+    std::vector<std::shared_ptr<UIEntity>> _static_ui;
+    std::vector<std::shared_ptr<UIEntity>> _side_bars;
+    std::vector<std::shared_ptr<BgTile>> _bg_tiles;
+    float _last_bg_tile_y_pos;
+    std::shared_ptr<TextBox> _score_text_box;
+    std::vector<std::shared_ptr<Button>> _buttons;
+
+    // resource players
+    std::map<std::string, AnimationPlayer> _animation_players;
+    AudioPlayer _audio_player;
+
+    // audio
+    std::shared_ptr<IEntityAudioCreator> _entity_audio_creator;
+    std::shared_ptr<Vector2f> _audio_listener_position;
 
 public:
     World(float x_min, float x_max, float y_min, float y_max, std::shared_ptr<IEntityViewCreator> entity_view_creator,
@@ -94,14 +99,33 @@ private:
 
     void updateSidebars();
 
+    // update
+    void gameUpdate(double t, float dt);
+
+    void updateUIEntities(double t, float dt);
+
+    void physicsUpdate(double t, float dt);
+
+    void updatePhysicsEntities(double t, float dt);
+
+    void updatePhysicsCollisions();
+
+    void handleUpdatePhysicsSpeed();
+
+    void clear();
+
     // scenes
     void loadStartMenu();
 
     void startDebugMode();
 
+    void updateDebugMode(double t, float dt);
+
     void startDoodleMode();
 
-    void spawnPlayer();
+    void updateDoodleMode(double t, float dt);
+
+    void spawnPlayer(const Vector2f &spawn = constants::player::spawn_position);
 
     float getSpawnPosY();
 
@@ -114,23 +138,6 @@ private:
     void spawnBgTiles();
 
     void destroyBgTiles();
-
-    // update
-    void updateUIEntities(double t, float dt);
-
-    void updatePhysics(double t, float dt);
-
-    void updatePhysicsEntities(double t, float dt);
-
-    bool handleCollision(const std::shared_ptr<PhysicsEntity> &entity1, const std::shared_ptr<PhysicsEntity> &entity2,
-                         bool set_collided = true, bool resolve = true);
-
-    bool handleCollision(const std::shared_ptr<Ray> &ray, const std::shared_ptr<PhysicsEntity> &entity,
-                         bool set_collided = true);
-
-    void handleUpdatePhysicsSpeed();
-
-    void reset();
 };
 
 

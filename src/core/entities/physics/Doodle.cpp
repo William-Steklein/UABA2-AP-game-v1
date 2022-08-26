@@ -20,21 +20,20 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
     _rays.push_back(std::make_shared<Ray>(Ray(r2, {r2.x, r2.y - ray_length})));
 
     // movement / jump physics
-    float jump_dt = 0.6;
-    float jump_height = 1;
+    float jump_dt = constants::player::jump_dt;
+    float jump_height = constants::player::jump_height;
 
-    _mass = 20;
+    _mass = constants::player::mass;
     _initial_jump_velocity = 2 * jump_height / jump_dt;
-    _horizontal_movement_force = 200;
+    _horizontal_movement_force = constants::player::horizontal_movement_force;
 
     setupPlayerPhysics(jump_dt, jump_height);
 
-    playAnimation("idle");
+    playAnimation("jump");
 }
 
 void Doodle::update(double t, float dt) {
-    playerController(dt);
-//    testController();
+    playerController();
 
     // todo: constant for jump score substraction
     if (_jumped) {
@@ -48,24 +47,26 @@ void Doodle::update(double t, float dt) {
 }
 
 void Doodle::reset() {
-    setPosition({0, 2.5f});
+    setPosition(constants::player::spawn_position);
 
     _velocity.clear();
+    _force.clear();
+    _acceleration.clear();
 
     for (const auto &standing_ray: _rays) {
         standing_ray->reset();
     }
 }
 
-void Doodle::playerController(float dt) {
+void Doodle::playerController() {
     _standing = false;
 
     std::string curr_anim = _animation_player.getCurrentAnimationName();
 
-    // reset player
-    if (_input_map->r) {
-        reset();
-    }
+//    // clear player
+//    if (_input_map->r) {
+//        reset();
+//    }
 
     // check if standing
     for (const auto &standing_ray: _rays) {
@@ -91,6 +92,7 @@ void Doodle::playerController(float dt) {
 
     // jumping
     if (_standing && _input_map->w) {
+//    if (_standing) {
         _velocity.y = _initial_jump_velocity;
         _standing = false;
         _jumped = true;
@@ -133,32 +135,10 @@ void Doodle::playerController(float dt) {
     applyDrag();
 }
 
-void Doodle::testController() {
-    float movement_force = 15.f;
-
-    // reset player
-    if (_input_map->r) {
-        reset();
-    }
-
-    // player controller
-    if (_input_map->a) {
-        _force += {-movement_force, 0};
-    }
-    if (_input_map->d) {
-        _force += {movement_force, 0};
-    }
-    if (_input_map->w) {
-        _force += {0, movement_force};
-    }
-    if (_input_map->s) {
-        _force += {0, -movement_force};
-    }
-
-    applyFriction();
-    applyDrag();
+float Doodle::getInitialJumpVelocity() const {
+    return _initial_jump_velocity;
 }
 
-void Doodle::setHitPlatform(bool hit_platform) {
-    _jumped = hit_platform;
+float Doodle::getHorizontalMovementForce() const {
+    return _horizontal_movement_force;
 }

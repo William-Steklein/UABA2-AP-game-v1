@@ -2,9 +2,10 @@
 #define GAMEENGINE_DOODLE_H
 
 
+#include <utility>
 #include "PhysicsEntity.h"
 #include "../../InputMap.h"
-#include <utility>
+#include "../../constants/constants.h"
 
 class Doodle : public PhysicsEntity {
 private:
@@ -25,11 +26,11 @@ public:
 
     void reset();
 
-    void playerController(float dt);
+    void playerController();
 
-    void testController();
+    float getInitialJumpVelocity() const;
 
-    void setHitPlatform(bool hit_platform);
+    float getHorizontalMovementForce() const;
 };
 
 

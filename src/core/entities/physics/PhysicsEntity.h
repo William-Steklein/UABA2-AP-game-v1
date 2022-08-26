@@ -46,13 +46,25 @@ public:
 
     void setForce(const Vector2f &force);
 
+    void addForce(const Vector2f &force);
+
     const Vector2f &getVelocity() const;
 
     void setVelocity(const Vector2f &velocity);
 
+    void addVelocity(const Vector2f &velocity);
+
     const Vector2f &getAcceleration() const;
 
     void setAcceleration(const Vector2f &acceleration);
+
+    const Vector2f &getGravitationalAcceleration() const;
+
+    const Vector2f &getMaxVelocity() const;
+
+    const Vector2f &getDrag() const;
+
+    const Vector2f &getFriction() const;
 
     void applyGravity();
 

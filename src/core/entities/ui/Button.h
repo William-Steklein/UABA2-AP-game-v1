@@ -2,9 +2,9 @@
 #define GAMEENGINE_BUTTON_H
 
 
-#include "UIWidget.h"
+#include "UIEntity.h"
 
-class Button : public UIWidget {
+class Button : public UIEntity {
 private:
     bool _pressed_button;
     std::shared_ptr<bool> _pressed;

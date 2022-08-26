@@ -71,6 +71,10 @@ void PhysicsEntity::setForce(const Vector2f &force) {
     _force = force;
 }
 
+void PhysicsEntity::addForce(const Vector2f &force) {
+    _force += force;
+}
+
 const Vector2f &PhysicsEntity::getVelocity() const {
     return _velocity;
 }
@@ -79,12 +83,32 @@ void PhysicsEntity::setVelocity(const Vector2f &velocity) {
     _velocity = velocity;
 }
 
+void PhysicsEntity::addVelocity(const Vector2f &velocity) {
+    _velocity += velocity;
+}
+
 const Vector2f &PhysicsEntity::getAcceleration() const {
     return _acceleration;
 }
 
 void PhysicsEntity::setAcceleration(const Vector2f &acceleration) {
     _acceleration = acceleration;
+}
+
+const Vector2f &PhysicsEntity::getGravitationalAcceleration() const {
+    return _gravitational_acceleration;
+}
+
+const Vector2f &PhysicsEntity::getMaxVelocity() const {
+    return _max_velocity;
+}
+
+const Vector2f &PhysicsEntity::getDrag() const {
+    return _drag;
+}
+
+const Vector2f &PhysicsEntity::getFriction() const {
+    return _friction;
 }
 
 void PhysicsEntity::applyGravity() {
@@ -197,9 +221,6 @@ void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
         updateView();
         other.updateView();
     }
-
-    _collided = true;
-    other._collided = true;
 }
 
 void PhysicsEntity::setCollided() {

@@ -20,7 +20,7 @@ void Game::run() {
         // sfml events (window & keyboard)
         handleEvents();
 
-        // coreAPI updatePhysics
+        // coreAPI physicsUpdate
         _world->update();
 
         // sfml draw
