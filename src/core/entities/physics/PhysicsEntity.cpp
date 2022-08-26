@@ -10,7 +10,9 @@ PhysicsEntity::PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> c
 
 void PhysicsEntity::setupPlayerPhysics(float jump_dt, float jump_height) {
     _gravitational_acceleration = {0, -2 * jump_height / (jump_dt * jump_dt)};
-    _max_velocity = {1.5f, 2 * jump_height / jump_dt * 1.5f};
+    // todo: constants
+    _min_neg_velocity = {-1.5f, - (2 * jump_height / jump_dt * 1.5f)};
+    _max_pos_velocity = {1.5f, jump_height / jump_dt * 5.f};
     _drag = {0.15f, 0};
     _friction = {5.f, 0};
 }
@@ -21,8 +23,8 @@ void PhysicsEntity::update(double t, float dt) {
         return;
     }
     // max velocity
-    _velocity = {std::clamp(_velocity.x, -_max_velocity.x, _max_velocity.x),
-                 std::clamp(_velocity.y, -_max_velocity.y, _max_velocity.y)};
+    _velocity = {std::clamp(_velocity.x, _min_neg_velocity.x, _max_pos_velocity.x),
+                 std::clamp(_velocity.y, _min_neg_velocity.y, _max_pos_velocity.y)};
 
     // force acceleration
     _acceleration += _force / _mass;
@@ -100,7 +102,7 @@ const Vector2f &PhysicsEntity::getGravitationalAcceleration() const {
 }
 
 const Vector2f &PhysicsEntity::getMaxVelocity() const {
-    return _max_velocity;
+    return _min_neg_velocity;
 }
 
 const Vector2f &PhysicsEntity::getDrag() const {
@@ -225,4 +227,10 @@ void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
 
 void PhysicsEntity::setCollided() {
     _collided = true;
+}
+
+void PhysicsEntity::disappear() {
+    setHitbox({0, 0}, {0, 0});
+    setViewSize({0, 0});
+    _rays.clear();
 }

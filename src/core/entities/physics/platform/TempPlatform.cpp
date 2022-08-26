@@ -12,9 +12,7 @@ TempPlatform::TempPlatform(const Vector2f &position, std::shared_ptr<Camera> cam
 
 void TempPlatform::update(double t, float dt) {
     if (_collided) {
-        setHitbox({0, 0}, {0, 0});
-        setViewSize({0, 0});
-        _rays.clear();
+        disappear();
     }
 
     PhysicsEntity::update(t, dt);

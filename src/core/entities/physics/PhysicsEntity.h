@@ -17,7 +17,8 @@ protected:
     Vector2f _acceleration;
 
     Vector2f _gravitational_acceleration;
-    Vector2f _max_velocity;
+    Vector2f _min_neg_velocity;
+    Vector2f _max_pos_velocity;
     Vector2f _drag;
     Vector2f _friction;
 
@@ -81,6 +82,8 @@ public:
     virtual void resolveCollision(PhysicsEntity &other);
 
     void setCollided();
+
+    void disappear();
 };
 
 

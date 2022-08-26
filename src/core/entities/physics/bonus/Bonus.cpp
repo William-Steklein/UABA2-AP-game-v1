@@ -6,3 +6,11 @@ Bonus::Bonus(const Vector2f &position, std::shared_ptr<Camera> camera, const Vec
                         isStatic) {
 
 }
+
+void Bonus::update(double t, float dt) {
+    if (_collided) {
+        disappear();
+    }
+
+    PhysicsEntity::update(t, dt);
+}

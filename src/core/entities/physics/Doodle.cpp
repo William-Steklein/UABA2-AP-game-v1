@@ -104,6 +104,8 @@ void Doodle::playerController() {
     // falling
     if (!_standing && _velocity.y < 0 && curr_anim != "fall") {
         playAnimation("fall");
+    } else if (!_standing && _velocity.y > 0 && curr_anim != "jump") {
+        playAnimation("jump");
     }
 
     // left / right movement

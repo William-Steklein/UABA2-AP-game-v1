@@ -259,14 +259,6 @@ void World::updatePhysicsEntities(double t, float dt) {
 
 void World::updatePhysicsCollisions() {
     if (_player) {
-        for (const auto &wall: _walls) {
-            handleCollision(_player, wall);
-
-            for (const auto &ray: _player->getRays()) {
-                handleCollision(ray, wall);
-            }
-        }
-
         for (const auto &platform: _platforms) {
             handleCollision(_player, platform, false, true);
 
@@ -274,6 +266,20 @@ void World::updatePhysicsCollisions() {
                 if (handleCollision(ray, platform, false) && _player->getVelocity().y < 0) {
                     platform->setCollided();
                 }
+            }
+        }
+
+        for (const auto &bonus: _bonuses) {
+            if (handleCollision(_player, bonus, true, false)) {
+                bonus->applyBonus(_player);
+            }
+        }
+
+        for (const auto &wall: _walls) {
+            handleCollision(_player, wall);
+
+            for (const auto &ray: _player->getRays()) {
+                handleCollision(ray, wall);
             }
         }
 
@@ -407,10 +413,17 @@ void World::startDebugMode() {
             TelePlatform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, true, _animation_players["blue_redsides"])));
     _physics_entities.push_back(_platforms.back());
     _entity_view_creator->createEntitySpriteView(_platforms.back(), 3);
+
+    _bonuses.push_back(
+            std::make_shared<SpringBonus>(
+                    SpringBonus({-0.5, 0.75f}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"])));
+    _physics_entities.push_back(_bonuses.back());
+    _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
 }
 
 void World::updateDebugMode(double t, float dt) {
-
+    // camera
+    _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
 }
 
 void World::startDoodleMode() {
@@ -469,7 +482,7 @@ void World::spawnPlayer(const Vector2f &spawn) {
                    _audio_player));
     _physics_entities.push_back(_player);
     _entity_view_creator->createEntitySpriteView(_player, 5);
-    _entity_audio_creator->createEntityAudio(_player);
+//    _entity_audio_creator->createEntityAudio(_player);
 }
 
 float World::getSpawnPosY() {

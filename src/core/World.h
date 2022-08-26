@@ -20,6 +20,8 @@
 #include "entities/physics/platform/MovPlatform.h"
 #include "entities/physics/platform/TelePlatform.h"
 #include "entities/physics/platform/TempPlatform.h"
+#include "entities/physics/bonus/Bonus.h"
+#include "entities/physics/bonus/SpringBonus.h"
 #include "entities/physics/PortalRadio.h"
 
 #include "entities/ui/UIEntity.h"
@@ -52,6 +54,7 @@ private:
     std::vector<std::shared_ptr<Wall>> _walls;
     std::vector<std::shared_ptr<Platform>> _platforms;
     float _last_platform_y_pos;
+    std::vector<std::shared_ptr<Bonus>> _bonuses;
     std::vector<std::shared_ptr<PortalRadio>> _portal_radios;
 
     std::vector<std::weak_ptr<UIEntity>> _ui_entities;
