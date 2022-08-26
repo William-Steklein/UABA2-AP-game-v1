@@ -22,6 +22,7 @@
 #include "entities/physics/platform/TempPlatform.h"
 #include "entities/physics/bonus/Bonus.h"
 #include "entities/physics/bonus/SpringBonus.h"
+#include "entities/physics/bonus/JetpackBonus.h"
 #include "entities/physics/PortalRadio.h"
 
 #include "entities/ui/UIEntity.h"

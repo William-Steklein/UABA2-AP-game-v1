@@ -6,7 +6,9 @@
 #include "../PhysicsEntity.h"
 
 class Bonus : public PhysicsEntity {
-private:
+protected:
+    std::weak_ptr<PhysicsEntity> _affected_entity;
+    bool _active;
 
 public:
     Bonus(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
@@ -14,7 +16,12 @@ public:
 
     void update(double t, float dt) override;
 
-    virtual void applyBonus(const std::shared_ptr<PhysicsEntity>& other) = 0;
+    virtual void applyEntity(const std::weak_ptr<PhysicsEntity>& other);
+
+    bool isActive() const;
+
+private:
+    virtual void applyEffect() = 0;
 };
 
 

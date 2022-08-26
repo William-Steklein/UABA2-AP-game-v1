@@ -10,9 +10,8 @@ PhysicsEntity::PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> c
 
 void PhysicsEntity::setupPlayerPhysics(float jump_dt, float jump_height) {
     _gravitational_acceleration = {0, -2 * jump_height / (jump_dt * jump_dt)};
-    // todo: constants
-    _min_neg_velocity = {-1.5f, - (2 * jump_height / jump_dt * 1.5f)};
-    _max_pos_velocity = {1.5f, jump_height / jump_dt * 5.f};
+    _min_neg_velocity = {-1.5f, -(constants::player::jump_velocity * 1.5f)};
+    _max_pos_velocity = {1.5f, constants::player::jump_velocity * 5.f};
     _drag = {0.15f, 0};
     _friction = {5.f, 0};
 }

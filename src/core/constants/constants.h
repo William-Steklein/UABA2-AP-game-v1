@@ -25,8 +25,16 @@ namespace constants {
         extern const float jump_dt;
         extern const float jump_height;
 
+        extern const float jump_velocity;
+
         extern const float mass;
         extern const float horizontal_movement_force;
+    }
+
+    namespace bonus {
+        extern const float spring_jump_velocity_multiplier;
+        extern const float jetpack_force_amount;
+        extern const float jetpack_duration;
     }
 }
 

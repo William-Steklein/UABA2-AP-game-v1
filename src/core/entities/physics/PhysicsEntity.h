@@ -33,7 +33,7 @@ public:
 
     void setupPlayerPhysics(float jump_dt, float jump_height);
 
-    virtual void update(double t, float dt);
+    void update(double t, float dt) override;
 
     bool isIsStatic() const;
 

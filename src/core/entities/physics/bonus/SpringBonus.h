@@ -6,12 +6,10 @@
 #include "../../../constants/constants.h"
 
 class SpringBonus : public Bonus {
-private:
-
 public:
     using Bonus::Bonus;
 
-    void applyBonus(const std::shared_ptr<PhysicsEntity> &other) override;
+    void applyEffect() override;
 };
 
 

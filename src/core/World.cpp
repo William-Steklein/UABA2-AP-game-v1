@@ -271,7 +271,7 @@ void World::updatePhysicsCollisions() {
 
         for (const auto &bonus: _bonuses) {
             if (handleCollision(_player, bonus, true, false)) {
-                bonus->applyBonus(_player);
+                bonus->applyEntity(_player);
             }
         }
 
@@ -318,6 +318,7 @@ void World::clear() {
     _walls.clear();
     _platforms.clear();
     _last_platform_y_pos = -1.f;
+    _bonuses.clear();
     _portal_radios.clear();
 
     _ui_entities.clear();
@@ -409,16 +410,18 @@ void World::startDebugMode() {
     _physics_entities.push_back(_walls.back());
     _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
 
+    _bonuses.push_back(std::make_shared<JetpackBonus>(
+                    JetpackBonus({-0.5, 0.75f}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"])));
+    _physics_entities.push_back(_bonuses.back());
+    _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+
     _platforms.push_back(std::make_shared<TelePlatform>(
             TelePlatform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, true, _animation_players["blue_redsides"])));
     _physics_entities.push_back(_platforms.back());
     _entity_view_creator->createEntitySpriteView(_platforms.back(), 3);
 
-    _bonuses.push_back(
-            std::make_shared<SpringBonus>(
-                    SpringBonus({-0.5, 0.75f}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"])));
-    _physics_entities.push_back(_bonuses.back());
-    _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+    // add bonus
+    _platforms.back()->addBonus(_bonuses.back());
 }
 
 void World::updateDebugMode(double t, float dt) {
@@ -551,6 +554,18 @@ void World::spawnPlatforms() {
 
         _physics_entities.push_back(_platforms.back());
         _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
+
+        // bonus
+        float place_bonus = Random::get_instance().uniform_real(0, 1);
+        if (place_bonus < 0.05f) {
+            _bonuses.push_back(std::make_shared<JetpackBonus>(
+                    JetpackBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"])));
+            _physics_entities.push_back(_bonuses.back());
+            _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+
+            // add bonus
+            _platforms.back()->addBonus(_bonuses.back());
+        }
     }
 }
 
