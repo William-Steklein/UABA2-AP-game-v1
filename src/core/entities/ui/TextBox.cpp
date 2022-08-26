@@ -12,3 +12,8 @@ TextBox::TextBox(const Vector2f &position, std::shared_ptr<Camera> camera, const
 std::shared_ptr<std::string> TextBox::getText() {
     return _text;
 }
+
+void TextBox::setText(const std::string &text) {
+    *_text = text;
+    notifyObservers(0, 27);
+}

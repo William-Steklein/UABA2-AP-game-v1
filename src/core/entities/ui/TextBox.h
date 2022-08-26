@@ -16,6 +16,8 @@ public:
             bool staticView = false);
 
     std::shared_ptr<std::string> getText();
+
+    void setText(const std::string &text);
 };
 
 

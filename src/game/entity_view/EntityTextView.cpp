@@ -36,7 +36,16 @@ void EntityTextBoxView::handleEvent() {
 }
 
 void EntityTextBoxView::handleEvent(const unsigned int &event, const unsigned int &channel) {
+    if (channel == 27) {
+        if (!_entity_text_box.expired()) {
+            std::shared_ptr<TextBox> entity_text_box_shared = _entity_text_box.lock();
+            _text = entity_text_box_shared->getText();
+        } else {
+            _text = std::make_shared<std::string>("");
+        }
 
+        updateText();
+    }
 }
 
 sf::Text EntityTextBoxView::getText() const {

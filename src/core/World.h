@@ -53,6 +53,7 @@ private:
 
     // score
     std::shared_ptr<Score> _score;
+    std::shared_ptr<TextBox> _score_text_box;
 
     // audio
     std::shared_ptr<IEntityAudioCreator> _entity_audio_creator;

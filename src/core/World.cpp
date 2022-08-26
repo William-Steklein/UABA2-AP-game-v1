@@ -38,12 +38,19 @@ void World::update() {
     if (_debug_mode) {
         // camera movement
 //        _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
+
     } else if (_doodle_mode) {
         // camera movement
         if (_player->getPosition().y > _camera->getPosition().y + 0.4f) {
             _camera->setPosition({_camera->getPosition().x, _player->getPosition().y - 0.4f});
+
+            _score_text_box->setPosition(
+                    {_camera->getPosition().x, _camera->getPosition().y + constants::camera_view_y_max / 2 - 0.25f});
         }
-//        std::cout << _score->getScore() << std::endl;
+        if (_score_text_box) {
+            _score_text_box->setText("score\n" + std::to_string(_score->getScore()));
+        }
+
         spawnPlatforms();
         spawnBgTiles();
         destroyPlatforms();
@@ -214,9 +221,9 @@ void World::loadStartMenu() {
                    _animation_players["button"])));
     _ui_widget_entities.push_back(_buttons.back());
     _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 2);
-    _start_debug_mode = _buttons.back()->getPressedPointer();
+    _start_doodle_mode = _buttons.back()->getPressedPointer();
 
-    std::shared_ptr<std::string> button_string = std::make_shared<std::string>("debug");
+    std::shared_ptr<std::string> button_string = std::make_shared<std::string>("doodle jump");
     std::shared_ptr<TextBox> text_box = std::make_shared<TextBox>(
             TextBox(button_position, _camera, {0.5f, 0.25f}, button_string));
     _ui_widget_entities.push_back(text_box);
@@ -228,9 +235,9 @@ void World::loadStartMenu() {
                    _animation_players["button"])));
     _ui_widget_entities.push_back(_buttons.back());
     _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 2);
-    _start_doodle_mode = _buttons.back()->getPressedPointer();
+    _start_debug_mode = _buttons.back()->getPressedPointer();
 
-    button_string = std::make_shared<std::string>("doodle");
+    button_string = std::make_shared<std::string>("debug");
     text_box = std::make_shared<TextBox>(
             TextBox(button_position, _camera, {0.5f, 0.25f}, button_string));
     _ui_widget_entities.push_back(text_box);
@@ -266,6 +273,11 @@ void World::startDebugMode() {
     _platforms.push_back(std::make_shared<TelePlatform>(
             TelePlatform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, true, _animation_players["blue_redsides"])));
     _entity_view_creator->createEntitySpriteView(_platforms.back(), 3);
+
+    std::shared_ptr<std::string> button_string = std::make_shared<std::string>("score");
+    _score_text_box = std::make_shared<TextBox>(
+            TextBox({0, constants::camera_view_y_max - 0.25f}, _camera, {0.5f, 0.25f}, button_string));
+    _entity_view_creator->createEntityTextView(_score_text_box);
 }
 
 void World::startDoodleMode() {
@@ -274,6 +286,12 @@ void World::startDoodleMode() {
             UIWidget({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
                      _animation_players["background"])));
     _entity_view_creator->createEntitySpriteView(_ui_widget_entities.back(), 1);
+
+    // score
+    std::shared_ptr<std::string> text_box_string = std::make_shared<std::string>("score");
+    _score_text_box = std::make_shared<TextBox>(
+            TextBox({0, constants::camera_view_y_max - 0.25f}, _camera, {0.5f, 0.25f}, text_box_string));
+    _entity_view_creator->createEntityTextView(_score_text_box);
 
     spawnPlayer();
 
@@ -449,7 +467,7 @@ void World::updatePhysics(double t, float dt) {
         }
 
         for (const auto &platform: _platforms) {
-            handleCollision(_player, platform, false, true);
+            handleCollision(_player, platform, true, true);
 
             for (const auto &ray: _player->getRays()) {
                 if (handleCollision(ray, platform, false) && _player->getVelocity().y < 0) {
