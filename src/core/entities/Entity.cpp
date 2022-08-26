@@ -11,7 +11,8 @@ Entity::Entity(const Vector2f &position, std::shared_ptr<Camera> camera, const V
 }
 
 void Entity::update(double t, float dt) {
-    if (_animation_player.advanceAnimation()) updateAnimationFrame();
+    _animation_player.advanceAnimation();
+    updateAnimationFrame();
 
     std::shared_ptr<Vector2f> audio_listener_position = _audio_player.getAudioListenerPosition();
     if (audio_listener_position != nullptr) {
