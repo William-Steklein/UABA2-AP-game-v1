@@ -34,7 +34,7 @@ void TelePlatform::update(double t, float dt) {
                 distance = std::abs(new_position - _position.x);
             } while (distance < min_tele_distance);
 
-            _position.x = new_position;
+            setPosition({new_position, _position.y});
         }
 
     } else {
@@ -49,7 +49,7 @@ void TelePlatform::update(double t, float dt) {
                 distance = std::abs(new_position - _position.y);
             } while (distance < min_tele_distance);
 
-            _position.y = new_position;
+            setPosition({_position.x, new_position});
         }
     }
 

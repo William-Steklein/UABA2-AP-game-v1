@@ -5,6 +5,7 @@
 #include "../PhysicsEntity.h"
 
 class Platform : public PhysicsEntity {
+private:
 
 public:
     Platform(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,

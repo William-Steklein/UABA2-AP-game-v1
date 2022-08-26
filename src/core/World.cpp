@@ -37,7 +37,7 @@ void World::update() {
 
     if (_debug_mode) {
         // camera movement
-        _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
+//        _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
     } else if (_doodle_mode) {
         // camera movement
         if (_player->getPosition().y > _camera->getPosition().y + 0.4f) {
@@ -263,8 +263,8 @@ void World::startDebugMode() {
             Wall({0.5f, 0.f}, _camera, {1.f, 1.f}, _animation_players["wall"], {}, true)));
     _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
 
-    _platforms.push_back(std::make_shared<MovPlatform>(
-            MovPlatform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, true, _animation_players["background_tile"])));
+    _platforms.push_back(std::make_shared<TelePlatform>(
+            TelePlatform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, true, _animation_players["blue_redsides"])));
     _entity_view_creator->createEntitySpriteView(_platforms.back(), 3);
 }
 
@@ -295,17 +295,17 @@ void World::spawnPlayer() {
 
 float World::getSpawnPosY() {
     // todo constant
-    return _camera->getPosition().y + constants::camera_view_y_max - constants::camera_view_y_min;
+    return _camera->getPosition().y + (_camera->getHeight() / 2) * 1.1f;
 }
 
 float World::getDestroyPosY() {
     // todo constant
-    return _camera->getPosition().y - 6.f;
+    return _camera->getPosition().y - (_camera->getHeight() / 2) * 1.1f;
 }
 
 void World::spawnPlatforms() {
     // todo: constants
-    float y_distance = 0.5f;
+    float y_distance = 0.7f;
     float platform_width = 0.4f;
     float platform_height = 0.075f;
     unsigned int platform_render_layer = 3;
@@ -316,6 +316,13 @@ void World::spawnPlatforms() {
         _last_platform_y_pos += y_distance;
 
         float platform_type = Random::get_instance().uniform_real(0, 1);
+
+//        _platforms.push_back(std::make_shared<Platform>(
+//                Platform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height},
+//                         _animation_players["green"])));
+//        _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
+//
+//        continue;
 
         if (platform_type < 0.25f) {
             // static platforms
@@ -363,14 +370,14 @@ void World::spawnPlatforms() {
 void World::destroyPlatforms() {
     if (_platforms.empty()) return;
     // todo: constant
-    while (_platforms.front()->getPosition().y < getDestroyPosY()) {
+    while (_platforms.front()->getPosition().y < getDestroyPosY() - 1.f) {
         _platforms.erase(_platforms.begin());
     }
 }
 
 void World::spawnBgTiles() {
     // todo: constant
-    unsigned int amount = 50;
+    unsigned int amount = 40;
     float bg_tile_size = _camera->getWidth() / static_cast<float>(amount);
 
     while (_last_bg_tile_y_pos < getSpawnPosY()) {
@@ -433,7 +440,7 @@ void World::updatePhysics(double t, float dt) {
     // collisions
     if (_player) {
         for (const auto &wall: _walls) {
-            handleCollision(_player, wall, true);
+            handleCollision(_player, wall);
 
             for (const auto &ray: _player->getRays()) {
                 handleCollision(ray, wall);
@@ -441,10 +448,12 @@ void World::updatePhysics(double t, float dt) {
         }
 
         for (const auto &platform: _platforms) {
-            handleCollision(_player, platform, true);
+            handleCollision(_player, platform, false, true);
 
             for (const auto &ray: _player->getRays()) {
-                handleCollision(ray, platform, true);
+                if (handleCollision(ray, platform, false) && _player->getVelocity().y < 0) {
+                    platform->setCollided();
+                }
             }
         }
 
@@ -459,7 +468,7 @@ void World::updatePhysics(double t, float dt) {
 
     for (const auto &portal_radio: _portal_radios) {
         for (const auto &wall: _walls) {
-            handleCollision(portal_radio, wall, true);
+            handleCollision(portal_radio, wall);
         }
     }
 }
@@ -499,7 +508,7 @@ void World::updatePhysicsEntities(double t, float dt) {
 
 bool World::handleCollision(const std::shared_ptr<PhysicsEntity> &entity1,
                             const std::shared_ptr<PhysicsEntity> &entity2,
-                            bool resolve) {
+                            bool set_collided, bool resolve) {
     if (entity1->getHitbox()->empty() || entity2->getHitbox()->empty()) {
         return false;
     }
@@ -510,22 +519,27 @@ bool World::handleCollision(const std::shared_ptr<PhysicsEntity> &entity1,
         entity1->resolveCollision(*entity2);
     }
 
+    if (set_collided && collided) {
+        entity1->setCollided();
+        entity2->setCollided();
+    }
+
     return collided;
 }
 
 bool World::handleCollision(const std::shared_ptr<Ray> &ray, const std::shared_ptr<PhysicsEntity> &entity,
-                            bool set_collides) {
+                            bool set_collided) {
     if (entity->getHitbox()->empty()) {
         return false;
     }
 
-    bool collides = ray->collides(*entity->getHitbox());
+    bool collided = ray->collides(*entity->getHitbox());
 
-    if (set_collides && collides) {
+    if (set_collided && collided) {
         entity->setCollided();
     }
 
-    return collides;
+    return collided;
 }
 
 void World::handleUpdatePhysicsSpeed() {

@@ -14,6 +14,7 @@ void TempPlatform::update(double t, float dt) {
     if (_collided) {
         setHitbox({0, 0}, {0, 0});
         setViewSize({0, 0});
+        _rays.clear();
     }
 
     PhysicsEntity::update(t, dt);

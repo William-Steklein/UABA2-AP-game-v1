@@ -122,10 +122,10 @@ private:
     void updatePhysicsEntities(double t, float dt);
 
     bool handleCollision(const std::shared_ptr<PhysicsEntity> &entity1, const std::shared_ptr<PhysicsEntity> &entity2,
-                         bool resolve = true);
+                         bool set_collided = true, bool resolve = true);
 
     bool handleCollision(const std::shared_ptr<Ray> &ray, const std::shared_ptr<PhysicsEntity> &entity,
-                         bool set_collides = false);
+                         bool set_collided = true);
 
     void handleUpdatePhysicsSpeed();
 
