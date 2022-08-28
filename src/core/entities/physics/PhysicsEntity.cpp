@@ -145,7 +145,7 @@ void PhysicsEntity::applySideScrolling() {
     }
 }
 
-void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
+void PhysicsEntity::resolveCollision(PhysicsEntity &other, bool resolve, bool set_collided) {
     Vector2f displacement = _hitbox->getDisplacementToCollision(*other._hitbox);
     Vector2f move_vector;
 
@@ -153,19 +153,31 @@ void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
     Vector2f new_velocity_other = other._velocity;
 
     if (other._passthrough) {
-
         if (_velocity.y < 0 && displacement.y > 0) {
             move_vector.y = displacement.y;
-            move(move_vector);
-            _velocity.y = 0;
 
-            updateView();
-            _collided = true;
-            other._collided = true;
+            if (resolve) {
+                move(move_vector);
+                _velocity.y = 0;
+
+                updateView();
+            }
+
+            if (set_collided) {
+                _collided = true;
+                other._collided = true;
+            }
         }
 
         return;
     }
+
+    if (set_collided) {
+        _collided = true;
+        other._collided = true;
+    }
+
+    if (!resolve) return;
 
     if (std::abs(displacement.x) == std::abs(displacement.y)) {
         move_vector = {displacement.x, displacement.y};
@@ -222,6 +234,10 @@ void PhysicsEntity::resolveCollision(PhysicsEntity &other) {
         updateView();
         other.updateView();
     }
+}
+
+bool PhysicsEntity::isCollided() const {
+    return _collided;
 }
 
 void PhysicsEntity::setCollided() {

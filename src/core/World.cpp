@@ -264,7 +264,7 @@ void World::updatePhysicsEntities(double t, float dt) {
 void World::updatePhysicsCollisions() {
     if (_player) {
         for (const auto &platform: _platforms) {
-            handleCollision(_player, platform, false, true);
+            handleCollision(_player, platform, true, true);
 
             for (const auto &ray: _player->getRays()) {
                 if (handleCollision(ray, platform, false) && _player->getVelocity().y < 0) {
@@ -273,9 +273,18 @@ void World::updatePhysicsCollisions() {
             }
         }
 
-        for (const auto &bonus: _bonuses) {
-            if (handleCollision(_player, bonus, true, false)) {
-                bonus->applyEntity(_player);
+        // bonuses
+        if (!_active_bonus) {
+            for (const auto &bonus: _bonuses) {
+                if (handleCollision(_player, bonus, true, false)) {
+                    std::cout << "baba" << std::endl;
+                }
+                handleCollision(_player, bonus, true, false);
+
+                if (bonus->isCollided()) {
+                    bonus->applyEntity(_player);
+                    _active_bonus = bonus;
+                }
             }
         }
 
@@ -323,6 +332,7 @@ void World::clear() {
     _platforms.clear();
     _last_platform_y_pos = -1.f;
     _bonuses.clear();
+    _active_bonus = nullptr;
     _portal_radios.clear();
 
     _ui_entities.clear();
@@ -414,8 +424,8 @@ void World::startDebugMode() {
     _physics_entities.push_back(_walls.back());
     _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
 
-    _bonuses.push_back(std::make_shared<JetpackBonus>(
-                    JetpackBonus({-0.5, 0.75f}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"])));
+    _bonuses.push_back(std::make_shared<SpringBonus>(
+            SpringBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["spring"])));
     _physics_entities.push_back(_bonuses.back());
     _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
 
@@ -567,7 +577,7 @@ void World::spawnPlatforms() {
 
             // add bonus
             _platforms.back()->addBonus(_bonuses.back());
-        } else if (place_bonus < 0.2f) {
+        } else if (place_bonus < 0.12f) {
             _bonuses.push_back(std::make_shared<JetpackBonus>(
                     JetpackBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["jetpack"])));
             _physics_entities.push_back(_bonuses.back());
@@ -617,14 +627,22 @@ void World::destroyPhysicsEntities() {
         }
     }
 
-    if (!_bonuses.empty()) {
-        for (auto iter = _bonuses.begin(); iter != _bonuses.end();) {
-//            std::cout << (*iter)->getPosition().y << std::endl;
-            if ((*iter)->getPosition().y < destroy_pos && !(*iter)->isActive()) {
-                iter = _bonuses.erase(iter);
-            } else {
-                iter++;
-            }
-        }
+    while (!_bonuses.empty() && _bonuses.front()->getPosition().y < destroy_pos) {
+        _bonuses.erase(_bonuses.begin());
     }
+
+    if (_active_bonus && !_active_bonus->isActive()) {
+        _active_bonus = nullptr;
+    }
+
+//    if (!_bonuses.empty()) {
+//        for (auto iter = _bonuses.begin(); iter != _bonuses.end();) {
+////            std::cout << (*iter)->getPosition().y << std::endl;
+//            if ((*iter)->getPosition().y < destroy_pos && !(*iter)->isActive()) {
+//                iter = _bonuses.erase(iter);
+//            } else {
+//                iter++;
+//            }
+//        }
+//    }
 }

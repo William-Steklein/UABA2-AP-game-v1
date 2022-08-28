@@ -7,7 +7,8 @@
 
 class SpringBonus : public Bonus {
 public:
-    using Bonus::Bonus;
+    SpringBonus(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
+                AnimationPlayer animationPlayer = {}, AudioPlayer audioPlayer = {}, bool isStatic = false);
 
 private:
     void applyEffect() override;

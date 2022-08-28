@@ -56,6 +56,7 @@ private:
     std::vector<std::shared_ptr<Platform>> _platforms;
     float _last_platform_y_pos;
     std::vector<std::shared_ptr<Bonus>> _bonuses;
+    std::shared_ptr<Bonus> _active_bonus;
     std::vector<std::shared_ptr<PortalRadio>> _portal_radios;
 
     std::vector<std::weak_ptr<UIEntity>> _ui_entities;

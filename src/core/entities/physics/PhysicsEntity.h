@@ -79,7 +79,9 @@ public:
 
     void applySideScrolling();
 
-    virtual void resolveCollision(PhysicsEntity &other);
+    virtual void resolveCollision(PhysicsEntity &other, bool resolve = true, bool set_collided = true);
+
+    bool isCollided() const;
 
     void setCollided();
 
