@@ -15,6 +15,8 @@ const std::map<std::string, std::string> texture_data = {
         {"wall",            "data/textures/cobble_stone.png"},
         {"wall2",           "data/textures/prototype/Red/texture_03.png"},
         {"portal_radio",    "data/sprites/portal/portal_radio.png"},
+        {"spring",          "data/sprites/bonus/spring.png"},
+        {"jetpack",         "data/sprites/bonus/raketa_on_panel.png"},
 };
 
 const std::map<std::string, std::map<std::string, AnimationResource>> animation_groups_data =

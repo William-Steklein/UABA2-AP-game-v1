@@ -21,5 +21,6 @@ bool Bonus::isActive() const {
 
 void Bonus::applyEntity(const std::weak_ptr<PhysicsEntity> &other) {
     _affected_entity = other;
+    _active = true;
     applyEffect();
 }

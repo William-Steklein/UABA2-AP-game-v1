@@ -137,11 +137,9 @@ private:
 
     void spawnPlatforms();
 
-    void destroyPlatforms();
-
     void spawnBgTiles();
 
-    void destroyBgTiles();
+    void destroyPhysicsEntities();
 };
 
 

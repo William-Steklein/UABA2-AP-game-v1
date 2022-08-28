@@ -236,6 +236,10 @@ void World::physicsUpdate(double t, float dt) {
     updatePhysicsEntities(t, dt);
     // collisions update
     updatePhysicsCollisions();
+
+//    std::cout << _physics_entities.size() << std::endl;
+//    std::cout << _ui_entities.size() << std::endl;
+//    std::cout << "*******************************" << std::endl;
 }
 
 void World::updatePhysicsEntities(double t, float dt) {
@@ -415,8 +419,8 @@ void World::startDebugMode() {
     _physics_entities.push_back(_bonuses.back());
     _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
 
-    _platforms.push_back(std::make_shared<TelePlatform>(
-            TelePlatform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, true, _animation_players["blue_redsides"])));
+    _platforms.push_back(std::make_shared<Platform>(
+            Platform({-0.5f, 1.f}, _camera, {0.4f, 0.1f}, _animation_players["green"])));
     _physics_entities.push_back(_platforms.back());
     _entity_view_creator->createEntitySpriteView(_platforms.back(), 3);
 
@@ -465,13 +469,10 @@ void World::updateDoodleMode(double t, float dt) {
         _score_text_box->setText("score\n" + std::to_string(_score->getScore()));
     }
 
-    // platforms
     spawnPlatforms();
-    destroyPlatforms();
-
-    // bg tiles
     spawnBgTiles();
-    destroyBgTiles();
+
+    destroyPhysicsEntities();
 
     // reset
     if (_input_map->r) {
@@ -495,7 +496,7 @@ float World::getSpawnPosY() {
 
 float World::getDestroyPosY() {
     // todo constant
-    return _camera->getPosition().y - (_camera->getHeight() / 2) * 1.1f;
+    return _camera->getPosition().y - (_camera->getHeight() / 2) - 1.f;
 }
 
 void World::spawnPlatforms() {
@@ -557,23 +558,24 @@ void World::spawnPlatforms() {
 
         // bonus
         float place_bonus = Random::get_instance().uniform_real(0, 1);
-        if (place_bonus < 0.05f) {
+
+        if (place_bonus < 0.1f) {
+            _bonuses.push_back(std::make_shared<SpringBonus>(
+                    SpringBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["spring"])));
+            _physics_entities.push_back(_bonuses.back());
+            _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+
+            // add bonus
+            _platforms.back()->addBonus(_bonuses.back());
+        } else if (place_bonus < 0.2f) {
             _bonuses.push_back(std::make_shared<JetpackBonus>(
-                    JetpackBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["portal_radio"])));
+                    JetpackBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["jetpack"])));
             _physics_entities.push_back(_bonuses.back());
             _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
 
             // add bonus
             _platforms.back()->addBonus(_bonuses.back());
         }
-    }
-}
-
-void World::destroyPlatforms() {
-    if (_platforms.empty()) return;
-    // todo: constant
-    while (_platforms.front()->getPosition().y < getDestroyPosY() - 1.f) {
-        _platforms.erase(_platforms.begin());
     }
 }
 
@@ -599,9 +601,30 @@ void World::spawnBgTiles() {
     }
 }
 
-void World::destroyBgTiles() {
-    if (_bg_tiles.empty()) return;
-    while (_bg_tiles.front()->getPosition().y < getDestroyPosY()) {
-        _bg_tiles.erase(_bg_tiles.begin());
+void World::destroyPhysicsEntities() {
+    float destroy_pos = getDestroyPosY();
+
+    if (!_platforms.empty()) {
+        // todo: constant
+        while (_platforms.front()->getPosition().y < destroy_pos) {
+            _platforms.erase(_platforms.begin());
+        }
+    }
+
+    if (!_bg_tiles.empty()) {
+        while (_bg_tiles.front()->getPosition().y < destroy_pos) {
+            _bg_tiles.erase(_bg_tiles.begin());
+        }
+    }
+
+    if (!_bonuses.empty()) {
+        for (auto iter = _bonuses.begin(); iter != _bonuses.end();) {
+//            std::cout << (*iter)->getPosition().y << std::endl;
+            if ((*iter)->getPosition().y < destroy_pos && !(*iter)->isActive()) {
+                iter = _bonuses.erase(iter);
+            } else {
+                iter++;
+            }
+        }
     }
 }

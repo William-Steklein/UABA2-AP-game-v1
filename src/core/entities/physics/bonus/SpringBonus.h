@@ -9,6 +9,7 @@ class SpringBonus : public Bonus {
 public:
     using Bonus::Bonus;
 
+private:
     void applyEffect() override;
 };
 

@@ -28,6 +28,6 @@ namespace constants {
         const float spring_jump_velocity_multiplier = 5.f;
 
         const float jetpack_force_amount = 250.f;
-        const float jetpack_duration = 4.f;
+        const float jetpack_duration = 3.f;
     }
 }

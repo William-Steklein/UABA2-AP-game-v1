@@ -13,6 +13,7 @@ void Platform::addBonus(const std::weak_ptr<Bonus> &bonus) {
     _bonus = bonus;
     std::shared_ptr<Bonus> bonus_shared = _bonus.lock();
     _bonus_y_offset = bonus_shared->getViewSize().y / 2 + _view_size.y / 2;
+    setPosition(_position);
 }
 
 void Platform::setPosition(const Vector2f &position) {

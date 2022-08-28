@@ -15,6 +15,9 @@ public:
 
     void update(double t, float dt) override;
 
+    void applyEntity(const std::weak_ptr<PhysicsEntity> &other) override;
+
+private:
     void applyEffect() override;
 };
 
