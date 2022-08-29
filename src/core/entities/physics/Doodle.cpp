@@ -12,9 +12,9 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
     _hitbox->setOffset({0, -0.072f * _view_size.y});
 
     // standing rays
-    Vector2f r1(_hitbox->getPosition().x - _hitbox->getSize().x / 2.1f,
-                _hitbox->getPosition().y - _hitbox->getSize().y / 2);
-    Vector2f r2(_hitbox->getPosition().x + _hitbox->getSize().x / 2.1f, r1.y);
+    Vector2f r1(_hitbox->getPosition().x - _hitbox->getSize().x / 2.f,
+                _hitbox->getPosition().y - _hitbox->getSize().y / 2.f);
+    Vector2f r2(_hitbox->getPosition().x + _hitbox->getSize().x / 2.f, r1.y);
     float ray_length = 0.05;
 
     _rays.push_back(std::make_shared<Ray>(Ray(r1, {r1.x, r1.y - ray_length})));

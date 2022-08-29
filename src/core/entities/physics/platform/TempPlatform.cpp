@@ -13,6 +13,10 @@ TempPlatform::TempPlatform(const Vector2f &position, std::shared_ptr<Camera> cam
 void TempPlatform::update(double t, float dt) {
     if (_collided) {
         disappear();
+        if (!_bonus.expired()) {
+            std::shared_ptr<Bonus> bonus = _bonus.lock();
+            bonus->disappear();
+        }
     }
 
     PhysicsEntity::update(t, dt);

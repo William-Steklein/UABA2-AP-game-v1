@@ -6,7 +6,7 @@
 #include "../bonus/Bonus.h"
 
 class Platform : public PhysicsEntity {
-private:
+protected:
     std::weak_ptr<Bonus> _bonus;
     float _bonus_y_offset;
 
