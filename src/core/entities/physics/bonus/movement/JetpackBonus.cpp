@@ -20,6 +20,8 @@ void JetpackBonus::update(double t, float dt) {
 
 void JetpackBonus::applyEntity(const std::weak_ptr<PhysicsEntity> &other) {
     Bonus::applyEntity(other);
+    // todo: constants
+    notifyObservers(200, 25);
 }
 
 void JetpackBonus::applyEffect() {

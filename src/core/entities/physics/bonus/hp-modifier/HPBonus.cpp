@@ -17,4 +17,6 @@ void HPBonus::applyEffect() {
         affected_entity->addHitPoints(_hp_addition);
     }
     _active = false;
+    // todo: constants
+    notifyObservers(200, 25);
 }

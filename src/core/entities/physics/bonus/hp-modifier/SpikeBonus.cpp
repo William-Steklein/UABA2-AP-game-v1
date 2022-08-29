@@ -17,4 +17,6 @@ void SpikeBonus::applyEffect() {
         affected_entity->subtractHitPoints(_damage);
     }
     _active = false;
+    // todo: constants
+    notifyObservers(100, 26);
 }

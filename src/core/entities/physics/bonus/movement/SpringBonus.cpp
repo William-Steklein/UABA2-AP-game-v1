@@ -6,6 +6,12 @@ SpringBonus::SpringBonus(const Vector2f &position, std::shared_ptr<Camera> camer
     _passthrough = true;
 }
 
+void SpringBonus::applyEntity(const std::weak_ptr<PhysicsEntity> &other) {
+    Bonus::applyEntity(other);
+    // todo: constants
+    notifyObservers(100, 25);
+}
+
 void SpringBonus::applyEffect() {
     std::shared_ptr<PhysicsEntity> affected_entity = _affected_entity.lock();
     if (_active && affected_entity) {

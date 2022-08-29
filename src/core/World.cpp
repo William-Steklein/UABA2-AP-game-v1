@@ -200,7 +200,7 @@ void World::updateUIEntities(double t, float dt) {
             iter = _ui_entities.erase(iter);
         } else {
             std::shared_ptr<UIEntity> ui_widget = iter->lock();
-            if (!ui_widget->is_static_view() || _force_static_view_update) {
+            if (!ui_widget->isStaticView() || _force_static_view_update) {
                 ui_widget->update(t, dt);
             }
 
@@ -310,6 +310,8 @@ void World::updatePhysicsCollisions() {
             if (handleCollision(enemy_bullet, _player, false, false)) {
                 enemy_bullet->disappear();
                 _player->subtractHitPoints(1);
+                // todo: constants
+                _score->substractScore(100);
             }
         }
 
@@ -363,7 +365,7 @@ void World::clear() {
     _enemy_bullets.clear();
 
     _ui_entities.clear();
-    _static_ui.clear();
+    _screen_ui.clear();
     _bg_tiles.clear();
     _buttons.clear();
     _last_bg_tile_y_pos = -1.f;
@@ -373,48 +375,46 @@ void World::clear() {
 }
 
 void World::loadStartMenu() {
-    // background
-    _static_ui.push_back(std::make_shared<UIEntity>(
+    // ui screen and background
+    _screen_ui.push_back(std::make_shared<UIEntity>(
             UIEntity({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
                      _animation_players["background"])));
-    _ui_entities.push_back(_static_ui.back());
-    _entity_view_creator->createEntitySpriteView(_static_ui.back(), 1);
+    _ui_entities.push_back(_screen_ui.back());
+    _entity_view_creator->createEntitySpriteView(_screen_ui.back(), 1);
 
     // menu
-    _static_ui.push_back(std::make_shared<UIEntity>(
-            UIEntity({0, 1.5f}, _camera, {1.f, 1.5f},
-                     _animation_players["menu"])));
-    _ui_entities.push_back(_static_ui.back());
-    _entity_view_creator->createEntitySpriteView(_static_ui.back(), 1);
+    std::shared_ptr<UIEntity> menu = std::make_shared<UIEntity>(
+            UIEntity({0, 0}, _camera, {1.f, 1.5f},
+                     _animation_players["menu"]));
+    _entity_view_creator->createEntitySpriteView(menu, 1);
+    _screen_ui.back()->addChild(menu, _screen_ui.back());
 
     // buttons
-    Vector2f button_position = {0, 2.f};
+    Vector2f button_position = {0, 0.5f};
     _buttons.push_back(std::make_shared<Button>(
             Button(button_position, _camera, {0.5f, 0.25f},
                    _animation_players["button"])));
-    _ui_entities.push_back(_buttons.back());
+    menu->addChild(_buttons.back(), menu);
     _entity_view_creator->createEntitySpriteView(_buttons.back(), 2);
     _start_doodle_mode = _buttons.back()->getPressedPointer();
 
     std::shared_ptr<std::string> button_string = std::make_shared<std::string>("doodle jump");
     std::shared_ptr<TextBox> text_box = std::make_shared<TextBox>(
-            TextBox(button_position, _camera, {0.5f, 0.25f}, button_string));
-    _static_ui.push_back(text_box);
-    _ui_entities.push_back(_static_ui.back());
+            TextBox({0, 0}, _camera, {0.5f, 0.25f}, button_string));
+    _buttons.back()->addChild(text_box, _buttons.back());
     _entity_view_creator->createEntityTextView(text_box);
 
-    button_position = {0, 1.625f};
+    button_position = {0, 0.125f};
     _buttons.push_back(
             std::make_shared<Button>(Button(button_position, _camera, {0.5f, 0.25f}, _animation_players["button"])));
-    _ui_entities.push_back(_buttons.back());
+    menu->addChild(_buttons.back(), menu);
     _entity_view_creator->createEntitySpriteView(_buttons.back(), 2);
     _start_debug_mode = _buttons.back()->getPressedPointer();
 
     button_string = std::make_shared<std::string>("debug");
     text_box = std::make_shared<TextBox>(
-            TextBox(button_position, _camera, {0.5f, 0.25f}, button_string));
-    _static_ui.push_back(text_box);
-    _ui_entities.push_back(_static_ui.back());
+            TextBox({0, 0}, _camera, {0.5f, 0.25f}, button_string));
+    _buttons.back()->addChild(text_box, _buttons.back());
     _entity_view_creator->createEntityTextView(text_box);
 }
 
@@ -424,11 +424,11 @@ void World::startDebugMode() {
     clear();
 
     // background
-    _static_ui.push_back(std::make_shared<UIEntity>(
+    _screen_ui.push_back(std::make_shared<UIEntity>(
             UIEntity({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
                      _animation_players["background"])));
-    _ui_entities.push_back(_static_ui.back());
-    _entity_view_creator->createEntitySpriteView(_static_ui.back(), 1);
+    _ui_entities.push_back(_screen_ui.back());
+    _entity_view_creator->createEntitySpriteView(_screen_ui.back(), 1);
 
     spawnPlayer({0, 2.5f});
 
@@ -466,6 +466,7 @@ void World::startDebugMode() {
 
     // add bonus
     _platforms.back()->addBonus(_bonuses.back());
+    _bonuses.back()->addObserver(_score);
 }
 
 void World::updateDebugMode(double t, float dt) {
@@ -621,6 +622,7 @@ void World::spawnPlatforms() {
 //
 //            // add bonus
 //            _platforms.back()->addBonus(_bonuses.back());
+//            _bonuses.back()->addObserver(_score);
 //        } else if (place_bonus < 0.12f) {
 //            _bonuses.push_back(std::make_shared<JetpackBonus>(
 //                    JetpackBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["jetpack"])));
@@ -629,6 +631,7 @@ void World::spawnPlatforms() {
 //
 //            // add bonus
 //            _platforms.back()->addBonus(_bonuses.back());
+//            _bonuses.back()->addObserver(_score);
 //        }
 
         if (place_bonus < 0.4f) {
@@ -639,6 +642,7 @@ void World::spawnPlatforms() {
 
             // add bonus
             _platforms.back()->addBonus(_bonuses.back());
+            _bonuses.back()->addObserver(_score);
         } else if (place_bonus < 0.8f) {
             _bonuses.push_back(std::make_shared<HPBonus>(
                     HPBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["heart"])));
@@ -647,6 +651,7 @@ void World::spawnPlatforms() {
 
             // add bonus
             _platforms.back()->addBonus(_bonuses.back());
+            _bonuses.back()->addObserver(_score);
         }
     }
 }

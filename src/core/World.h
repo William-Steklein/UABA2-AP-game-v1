@@ -68,7 +68,7 @@ private:
     std::vector<std::shared_ptr<Bullet>> _enemy_bullets;
 
     std::vector<std::weak_ptr<UIEntity>> _ui_entities;
-    std::vector<std::shared_ptr<UIEntity>> _static_ui;
+    std::vector<std::shared_ptr<UIEntity>> _screen_ui;
     std::vector<std::shared_ptr<UIEntity>> _side_bars;
     std::vector<std::shared_ptr<BgTile>> _bg_tiles;
     float _last_bg_tile_y_pos;
