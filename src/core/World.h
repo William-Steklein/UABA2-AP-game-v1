@@ -26,6 +26,7 @@
 #include "entities/physics/bonus/hp-modifier/HPBonus.h"
 #include "entities/physics/bonus/hp-modifier/SpikeBonus.h"
 #include "entities/physics/bonus/enemy/Enemy.h"
+#include "entities/physics/bonus/enemy/AdvancedEnemy.h"
 #include "entities/physics/PortalRadio.h"
 #include "entities/physics/Bullet.h"
 
@@ -61,8 +62,10 @@ private:
     float _last_platform_y_pos;
     std::vector<std::shared_ptr<Bonus>> _bonuses;
     std::shared_ptr<Bonus> _active_bonus;
+    std::vector<std::weak_ptr<Enemy>> _enemies;
     std::vector<std::shared_ptr<PortalRadio>> _portal_radios;
-    std::vector<std::shared_ptr<Bullet>> _bullets;
+    std::vector<std::shared_ptr<Bullet>> _player_bullets;
+    std::vector<std::shared_ptr<Bullet>> _enemy_bullets;
 
     std::vector<std::weak_ptr<UIEntity>> _ui_entities;
     std::vector<std::shared_ptr<UIEntity>> _static_ui;
@@ -150,7 +153,9 @@ private:
 
     void updatePlayerHearts();
 
-    void spawnBullet(const Vector2f &position, bool up);
+    void spawnPlayerBullet(const Vector2f &position, bool up);
+
+    void spawnEnemyBullet(const Vector2f &position, bool up);
 };
 
 

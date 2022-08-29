@@ -262,6 +262,23 @@ void World::updatePhysicsEntities(double t, float dt) {
 }
 
 void World::updatePhysicsCollisions() {
+    // player bullets
+    for (const auto &player_bullet: _player_bullets) {
+        for (const auto &enemy_weak: _enemies) {
+            std::shared_ptr<Enemy> enemy = enemy_weak.lock();
+            if (enemy) {
+                if (handleCollision(player_bullet, enemy, false, false)) {
+                    player_bullet->disappear();
+                    enemy->subtractHitPoints(1);
+
+                    if (enemy->getCurrentHitPoints() > 0 && enemy->isShootBack()) {
+                        spawnEnemyBullet(enemy->getPosition(), false);
+                    }
+                }
+            }
+        }
+    }
+
     if (_player) {
         for (const auto &platform: _platforms) {
             handleCollision(_player, platform, true, true);
@@ -285,6 +302,14 @@ void World::updatePhysicsCollisions() {
                         _active_bonus = bonus;
                     }
                 }
+            }
+        }
+
+        // enemy bullets
+        for (const auto &enemy_bullet : _enemy_bullets) {
+            if (handleCollision(enemy_bullet, _player, false, false)) {
+                enemy_bullet->disappear();
+                _player->subtractHitPoints(1);
             }
         }
 
@@ -334,7 +359,8 @@ void World::clear() {
     _bonuses.clear();
     _active_bonus = nullptr;
     _portal_radios.clear();
-    _bullets.clear();
+    _player_bullets.clear();
+    _enemy_bullets.clear();
 
     _ui_entities.clear();
     _static_ui.clear();
@@ -426,9 +452,11 @@ void World::startDebugMode() {
     _physics_entities.push_back(_walls.back());
     _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
 
-    _bonuses.push_back(std::make_shared<Enemy>(
-            Enemy({0, 0}, _camera, {0.2f, 0.26f}, _animation_players["skeleton"])));
-    _physics_entities.push_back(_bonuses.back());
+    std::shared_ptr<Enemy> enemy = std::make_shared<AdvancedEnemy>(
+            AdvancedEnemy({0, 0}, _camera, {0.2f, 0.26f}, _animation_players["skeleton_red"]));
+    _physics_entities.push_back(enemy);
+    _bonuses.push_back(enemy);
+    _enemies.push_back(enemy);
     _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
 
     _platforms.push_back(std::make_shared<Platform>(
@@ -443,11 +471,11 @@ void World::startDebugMode() {
 void World::updateDebugMode(double t, float dt) {
     // camera
     _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
-//    std::cout << _player->getCurrentHitPoints() << std::endl;
+    std::cout << _player->getCurrentHitPoints() << std::endl;
 
     if (_input_map->f && _player->canShoot()) {
         _player->setCanShoot(false);
-        spawnBullet(_player->getPosition(), true);
+        spawnPlayerBullet(_player->getPosition(), true);
     }
 }
 
@@ -674,9 +702,16 @@ void World::updatePlayerHearts() {
 
 }
 
-void World::spawnBullet(const Vector2f &position, bool up) {
-    _bullets.push_back(
-            std::make_shared<Bullet>(Bullet(position, _camera, {0.1f, 0.1f}, up, _animation_players["bullet"])));
-    _physics_entities.push_back(_bullets.back());
-    _entity_view_creator->createEntitySpriteView(_bullets.back(), 80);
+void World::spawnPlayerBullet(const Vector2f &position, bool up) {
+    _player_bullets.push_back(
+            std::make_shared<Bullet>(Bullet(position, _camera, {0.075f, 0.075f}, up, _animation_players["bullet"])));
+    _physics_entities.push_back(_player_bullets.back());
+    _entity_view_creator->createEntitySpriteView(_player_bullets.back(), 80);
+}
+
+void World::spawnEnemyBullet(const Vector2f &position, bool up) {
+    _enemy_bullets.push_back(
+            std::make_shared<Bullet>(Bullet(position, _camera, {0.075f, 0.075f}, up, _animation_players["bullet"])));
+    _physics_entities.push_back(_enemy_bullets.back());
+    _entity_view_creator->createEntitySpriteView(_enemy_bullets.back(), 80);
 }
