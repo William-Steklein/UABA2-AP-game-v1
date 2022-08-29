@@ -20,19 +20,22 @@ TelePlatform::TelePlatform(const Vector2f &position, std::shared_ptr<Camera> cam
 
 void TelePlatform::update(double t, float dt) {
     // todo: constant
-    float min_tele_distance = 0.1f;
+    float min_tele_distance = 0.3f;
 
     if (_horizontal) {
         if (_collided) {
             _collided = false;
 
-            float new_position;
-            float distance;
+            float new_position = Random::get_instance().uniform_real(_bounderies.x, _bounderies.y);
+            float distance = std::abs(new_position - _position.x);
 
-            do {
-                new_position = Random::get_instance().uniform_real(_bounderies.x, _bounderies.y);
-                distance = std::abs(new_position - _position.x);
-            } while (distance < min_tele_distance);
+            if (distance < min_tele_distance) {
+                if (_position.x < (_bounderies.y - _bounderies.x) / 2) {
+                    new_position = _position.x + min_tele_distance;
+                } else {
+                    new_position = _position.x - min_tele_distance;
+                }
+            }
 
             setPosition({new_position, _position.y});
         }
@@ -41,13 +44,16 @@ void TelePlatform::update(double t, float dt) {
         if (_collided) {
             _collided = false;
 
-            float new_position;
-            float distance;
+            float new_position = Random::get_instance().uniform_real(_bounderies.x, _bounderies.y);
+            float distance = std::abs(new_position - _position.y);
 
-            do {
-                new_position = Random::get_instance().uniform_real(_bounderies.x, _bounderies.y);
-                distance = std::abs(new_position - _position.y);
-            } while (distance < min_tele_distance);
+            if (distance < min_tele_distance) {
+                if (_position.y < (_bounderies.y - _bounderies.x) / 2) {
+                    new_position = _position.y + min_tele_distance;
+                } else {
+                    new_position = _position.y - min_tele_distance;
+                }
+            }
 
             setPosition({_position.x, new_position});
         }

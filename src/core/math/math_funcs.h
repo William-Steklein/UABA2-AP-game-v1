@@ -21,4 +21,6 @@ bool linesegmentIntersection(const Vector2f &l1p1, const Vector2f &l1p2, const V
                              const Vector2f &l2p2, Vector2f &intersection1,
                              Vector2f &intersection2, bool &is_collinear);
 
+float sigmoid(float x);
+
 #endif // GAMEENGINE_MATH_FUNCS_H

@@ -25,7 +25,7 @@ namespace constants {
     }
 
     namespace bonus {
-        const float spring_jump_velocity_multiplier = 5.f;
+        const float spring_jump_velocity_multiplier = 1.5f;
 
         const float jetpack_force_amount = 250.f;
         const float jetpack_duration = 3.f;

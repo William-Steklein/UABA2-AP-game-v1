@@ -7,6 +7,7 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
                bool is_static)
         : PhysicsEntity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player),
                         is_static), _input_map(std::move(input_map)), _standing(false), _jumped(false) {
+    // hitbox
     _hitbox->setSize({_view_size.x / 3.75f, _view_size.y / 1.25f});
     _hitbox->setOffset({0, -0.072f * _view_size.y});
 
@@ -29,6 +30,11 @@ Doodle::Doodle(const Vector2f &position, std::shared_ptr<Camera> camera, const V
 
     setupPlayerPhysics(jump_dt, jump_height);
 
+    // HP
+    _max_hit_points = 3;
+    _current_hit_points = 3;
+
+    // animation
     playAnimation("jump");
 }
 

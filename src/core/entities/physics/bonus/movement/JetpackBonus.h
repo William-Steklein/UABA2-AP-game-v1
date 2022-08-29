@@ -3,7 +3,7 @@
 
 
 #include <utility>
-#include "Bonus.h"
+#include "../Bonus.h"
 
 class JetpackBonus : public Bonus {
 private:

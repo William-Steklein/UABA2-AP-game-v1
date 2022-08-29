@@ -3,7 +3,8 @@
 PhysicsEntity::PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
                              AnimationPlayer animation_player, AudioPlayer audio_player, bool is_static) :
         Entity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player)),
-        _is_static(is_static), _mass(1), _gravitational_acceleration({0, 0}), _passthrough(false), _collided(false) {
+        _is_static(is_static), _mass(1), _gravitational_acceleration({0, 0}), _passthrough(false), _collided(false),
+        _max_hit_points(0), _current_hit_points(0) {
     _hitbox = std::make_shared<Hitbox>(_position, _view_size);
 
 }
@@ -248,4 +249,36 @@ void PhysicsEntity::disappear() {
     setHitbox({0, 0}, {0, 0});
     setViewSize({0, 0});
     _rays.clear();
+    _collided = false;
+}
+
+unsigned int PhysicsEntity::getMaxHitPoints() const {
+    return _max_hit_points;
+}
+
+void PhysicsEntity::setMaxHitPoints(unsigned int maxHitPoints) {
+    _max_hit_points = maxHitPoints;
+}
+
+unsigned int PhysicsEntity::getCurrentHitPoints() const {
+    return _current_hit_points;
+}
+
+void PhysicsEntity::setCurrentHitPoints(unsigned int currentHitPoints) {
+    _current_hit_points = currentHitPoints;
+}
+
+void PhysicsEntity::addHitPoints(unsigned int hit_points) {
+    _current_hit_points += hit_points;
+    if (_current_hit_points > _max_hit_points) {
+        _current_hit_points = _max_hit_points;
+    }
+}
+
+void PhysicsEntity::subtractHitPoints(unsigned int hit_points) {
+    if (_current_hit_points <= hit_points) {
+        _current_hit_points = 0;
+    } else {
+        _current_hit_points -= hit_points;
+    }
 }

@@ -17,6 +17,7 @@ const std::map<std::string, std::string> texture_data = {
         {"portal_radio",    "data/sprites/portal/portal_radio.png"},
         {"spring",          "data/sprites/bonus/spring.png"},
         {"jetpack",         "data/sprites/bonus/raketa_on_panel.png"},
+        {"spikes",         "data/sprites/spikes/spikes.png"},
 };
 
 const std::map<std::string, std::map<std::string, AnimationResource>> animation_groups_data =
@@ -60,6 +61,10 @@ const std::map<std::string, std::map<std::string, AnimationResource>> animation_
                                                         "data/sprites/adventurer/adventurer-run-04.png",
                                                         "data/sprites/adventurer/adventurer-run-05.png",
                                                 }, 0.10f, true}},
+                               }},
+                {"heart", {
+                                       {"red", {{"data/sprites/heart/heart_red.png",}}},
+                                       {"black", {{"data/sprites/heart/heart_black.png",}}},
                                }},
         };
 

@@ -21,8 +21,10 @@
 #include "entities/physics/platform/TelePlatform.h"
 #include "entities/physics/platform/TempPlatform.h"
 #include "entities/physics/bonus/Bonus.h"
-#include "entities/physics/bonus/SpringBonus.h"
-#include "entities/physics/bonus/JetpackBonus.h"
+#include "entities/physics/bonus/movement/SpringBonus.h"
+#include "entities/physics/bonus/movement/JetpackBonus.h"
+#include "entities/physics/bonus/hp-modifier/HPBonus.h"
+#include "entities/physics/bonus/hp-modifier/SpikeBonus.h"
 #include "entities/physics/PortalRadio.h"
 
 #include "entities/ui/UIEntity.h"
@@ -66,6 +68,7 @@ private:
     float _last_bg_tile_y_pos;
     std::shared_ptr<TextBox> _score_text_box;
     std::vector<std::shared_ptr<Button>> _buttons;
+    std::vector<std::shared_ptr<UIEntity>> _player_hearts;
 
     // resource players
     std::map<std::string, AnimationPlayer> _animation_players;
@@ -141,6 +144,8 @@ private:
     void spawnBgTiles();
 
     void destroyPhysicsEntities();
+
+    void updatePlayerHearts();
 };
 
 

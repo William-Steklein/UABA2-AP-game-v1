@@ -104,3 +104,8 @@ bool linesegmentIntersection(const Vector2f &l1p1, const Vector2f &l1p2, const V
     // line segments are not parallel but do not intersect
     return false;
 }
+
+float sigmoid(float x) {
+    float euler = 2.71828;
+    return x / (std::pow(euler, x));
+}

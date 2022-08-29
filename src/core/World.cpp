@@ -276,9 +276,6 @@ void World::updatePhysicsCollisions() {
         // bonuses
         if (!_active_bonus) {
             for (const auto &bonus: _bonuses) {
-                if (handleCollision(_player, bonus, true, false)) {
-                    std::cout << "baba" << std::endl;
-                }
                 handleCollision(_player, bonus, true, false);
 
                 if (bonus->isCollided()) {
@@ -342,6 +339,7 @@ void World::clear() {
     _last_bg_tile_y_pos = -1.f;
     _buttons.clear();
     _score_text_box = nullptr;
+    _player_hearts.clear();
 }
 
 void World::loadStartMenu() {
@@ -484,6 +482,8 @@ void World::updateDoodleMode(double t, float dt) {
 
     destroyPhysicsEntities();
 
+    std::cout << _player->getCurrentHitPoints() << std::endl;
+
     // reset
     if (_input_map->r) {
         startDoodleMode();
@@ -497,6 +497,12 @@ void World::spawnPlayer(const Vector2f &spawn) {
     _physics_entities.push_back(_player);
     _entity_view_creator->createEntitySpriteView(_player, 5);
 //    _entity_audio_creator->createEntityAudio(_player);
+
+    // HP
+    _player_hearts.push_back(std::make_shared<UIEntity>(
+            UIEntity({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["heart"], {}, false)));
+    _ui_entities.push_back(_player_hearts.back());
+    _entity_view_creator->createEntitySpriteView(_player_hearts.back(), 1000);
 }
 
 float World::getSpawnPosY() {
@@ -569,17 +575,35 @@ void World::spawnPlatforms() {
         // bonus
         float place_bonus = Random::get_instance().uniform_real(0, 1);
 
-        if (place_bonus < 0.1f) {
-            _bonuses.push_back(std::make_shared<SpringBonus>(
-                    SpringBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["spring"])));
+//        if (place_bonus < 0.1f) {
+//            _bonuses.push_back(std::make_shared<SpringBonus>(
+//                    SpringBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["spring"])));
+//            _physics_entities.push_back(_bonuses.back());
+//            _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+//
+//            // add bonus
+//            _platforms.back()->addBonus(_bonuses.back());
+//        } else if (place_bonus < 0.12f) {
+//            _bonuses.push_back(std::make_shared<JetpackBonus>(
+//                    JetpackBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["jetpack"])));
+//            _physics_entities.push_back(_bonuses.back());
+//            _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+//
+//            // add bonus
+//            _platforms.back()->addBonus(_bonuses.back());
+//        }
+
+        if (place_bonus < 0.4f) {
+            _bonuses.push_back(std::make_shared<SpikeBonus>(
+                    SpikeBonus({0, 0}, _camera, {0.15f, 0.075f}, _animation_players["spikes"])));
             _physics_entities.push_back(_bonuses.back());
             _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
 
             // add bonus
             _platforms.back()->addBonus(_bonuses.back());
-        } else if (place_bonus < 0.12f) {
-            _bonuses.push_back(std::make_shared<JetpackBonus>(
-                    JetpackBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["jetpack"])));
+        } else if (place_bonus < 0.8f) {
+            _bonuses.push_back(std::make_shared<HPBonus>(
+                    HPBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["heart"])));
             _physics_entities.push_back(_bonuses.back());
             _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
 
@@ -634,15 +658,8 @@ void World::destroyPhysicsEntities() {
     if (_active_bonus && !_active_bonus->isActive()) {
         _active_bonus = nullptr;
     }
+}
 
-//    if (!_bonuses.empty()) {
-//        for (auto iter = _bonuses.begin(); iter != _bonuses.end();) {
-////            std::cout << (*iter)->getPosition().y << std::endl;
-//            if ((*iter)->getPosition().y < destroy_pos && !(*iter)->isActive()) {
-//                iter = _bonuses.erase(iter);
-//            } else {
-//                iter++;
-//            }
-//        }
-//    }
+void World::updatePlayerHearts() {
+
 }

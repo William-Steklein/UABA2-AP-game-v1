@@ -24,6 +24,9 @@ protected:
 
     bool _passthrough;
 
+    unsigned int _max_hit_points;
+    unsigned int _current_hit_points;
+
 public:
     PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
                   AnimationPlayer animation_player = {}, AudioPlayer audio_player = {},
@@ -86,6 +89,18 @@ public:
     void setCollided();
 
     void disappear();
+
+    unsigned int getMaxHitPoints() const;
+
+    void setMaxHitPoints(unsigned int maxHitPoints);
+
+    unsigned int getCurrentHitPoints() const;
+
+    void setCurrentHitPoints(unsigned int currentHitPoints);
+
+    void addHitPoints(unsigned int hit_points);
+
+    void subtractHitPoints(unsigned int hit_points);
 };
 
 
