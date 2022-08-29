@@ -280,7 +280,10 @@ void World::updatePhysicsCollisions() {
 
                 if (bonus->isCollided()) {
                     bonus->applyEntity(_player);
-                    _active_bonus = bonus;
+
+                    if (bonus->isActive()) {
+                        _active_bonus = bonus;
+                    }
                 }
             }
         }
@@ -422,8 +425,8 @@ void World::startDebugMode() {
     _physics_entities.push_back(_walls.back());
     _entity_view_creator->createEntitySpriteView(_walls.back(), 3);
 
-    _bonuses.push_back(std::make_shared<SpringBonus>(
-            SpringBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["spring"])));
+    _bonuses.push_back(std::make_shared<Enemy>(
+            Enemy({0, 0}, _camera, {0.2f, 0.26f}, _animation_players["skeleton"])));
     _physics_entities.push_back(_bonuses.back());
     _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
 
@@ -439,6 +442,7 @@ void World::startDebugMode() {
 void World::updateDebugMode(double t, float dt) {
     // camera
     _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
+    std::cout << _player->getCurrentHitPoints() << std::endl;
 }
 
 void World::startDoodleMode() {

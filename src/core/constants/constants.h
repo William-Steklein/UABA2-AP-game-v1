@@ -35,6 +35,10 @@ namespace constants {
         extern const float spring_jump_velocity_multiplier;
         extern const float jetpack_force_amount;
         extern const float jetpack_duration;
+
+        namespace enemy {
+            extern const float can_damage_duration;
+        }
     }
 }
 

@@ -2,8 +2,9 @@
 
 Enemy::Enemy(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
              AnimationPlayer animationPlayer, AudioPlayer audioPlayer, bool isStatic)
-        : PhysicsEntity(position, std::move(camera), viewSize, std::move(animationPlayer), std::move(audioPlayer),
-                        isStatic) {
+        : SpikeBonus(position, std::move(camera), viewSize, std::move(animationPlayer), std::move(audioPlayer),
+                        isStatic), _can_damage(true), _time_passed(0) {
+    _passthrough = false;
     _max_hit_points = 1;
     _current_hit_points = 1;
 }
@@ -13,6 +14,25 @@ void Enemy::update(double t, float dt) {
         disappear();
     }
 
-    PhysicsEntity::update(t, dt);
+    if (!_can_damage) {
+        _time_passed += dt;
+    }
+
+    if (_time_passed > constants::bonus::enemy::can_damage_duration) {
+        _time_passed = 0;
+        _can_damage = true;
+    }
+
+    SpikeBonus::update(t, dt);
 }
 
+void Enemy::applyEffect() {
+    if (_can_damage) {
+        _can_damage = false;
+
+        SpikeBonus::applyEffect();
+    }
+
+    _active = false;
+    _collided = false;
+}

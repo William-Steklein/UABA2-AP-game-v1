@@ -29,5 +29,9 @@ namespace constants {
 
         const float jetpack_force_amount = 250.f;
         const float jetpack_duration = 3.f;
+
+        namespace enemy {
+            const float can_damage_duration = 1.f;
+        }
     }
 }

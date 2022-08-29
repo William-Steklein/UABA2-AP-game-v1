@@ -25,6 +25,7 @@
 #include "entities/physics/bonus/movement/JetpackBonus.h"
 #include "entities/physics/bonus/hp-modifier/HPBonus.h"
 #include "entities/physics/bonus/hp-modifier/SpikeBonus.h"
+#include "entities/physics/bonus/enemy/Enemy.h"
 #include "entities/physics/PortalRadio.h"
 
 #include "entities/ui/UIEntity.h"
