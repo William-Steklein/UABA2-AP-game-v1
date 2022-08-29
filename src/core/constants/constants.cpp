@@ -39,4 +39,9 @@ namespace constants {
         const float velocity = 2.f;
         const float time_delay = 0.4f;
     }
+
+    namespace hpbarhearts {
+        const float horizontal_distance = 0.05f;
+        const Vector2f size = {0.2f, 0.2f};
+    }
 }

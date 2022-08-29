@@ -237,6 +237,9 @@ void World::physicsUpdate(double t, float dt) {
     // collisions update
     updatePhysicsCollisions();
 
+    // update screen ui position
+    _screen_ui_tree->setPosition(_camera->getPosition());
+
 //    std::cout << _physics_entities.size() << std::endl;
 //    std::cout << _ui_entities.size() << std::endl;
 //    std::cout << "*******************************" << std::endl;
@@ -306,7 +309,7 @@ void World::updatePhysicsCollisions() {
         }
 
         // enemy bullets
-        for (const auto &enemy_bullet : _enemy_bullets) {
+        for (const auto &enemy_bullet: _enemy_bullets) {
             if (handleCollision(enemy_bullet, _player, false, false)) {
                 enemy_bullet->disappear();
                 _player->subtractHitPoints(1);
@@ -365,7 +368,11 @@ void World::clear() {
     _enemy_bullets.clear();
 
     _ui_entities.clear();
-    _screen_ui.clear();
+    _screen_ui_tree = std::make_shared<UIEntity>(
+            UIEntity({0, _camera->getPosition().y}, _camera, {_camera->getWidth(), _camera->getHeight()}, {}, {},
+                     false));
+    _ui_entities.push_back(_screen_ui_tree);
+
     _bg_tiles.clear();
     _buttons.clear();
     _last_bg_tile_y_pos = -1.f;
@@ -376,18 +383,18 @@ void World::clear() {
 
 void World::loadStartMenu() {
     // ui screen and background
-    _screen_ui.push_back(std::make_shared<UIEntity>(
+    _screen_ui_tree = std::make_shared<UIEntity>(
             UIEntity({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
-                     _animation_players["background"])));
-    _ui_entities.push_back(_screen_ui.back());
-    _entity_view_creator->createEntitySpriteView(_screen_ui.back(), 1);
+                     _animation_players["background"]));
+    _ui_entities.push_back(_screen_ui_tree);
+    _entity_view_creator->createEntitySpriteView(_screen_ui_tree, 1);
 
     // menu
     std::shared_ptr<UIEntity> menu = std::make_shared<UIEntity>(
             UIEntity({0, 0}, _camera, {1.f, 1.5f},
                      _animation_players["menu"]));
     _entity_view_creator->createEntitySpriteView(menu, 1);
-    _screen_ui.back()->addChild(menu, _screen_ui.back());
+    _screen_ui_tree->addChild(menu, _screen_ui_tree);
 
     // buttons
     Vector2f button_position = {0, 0.5f};
@@ -423,12 +430,12 @@ void World::startDebugMode() {
     _doodle_mode = false;
     clear();
 
-    // background
-    _screen_ui.push_back(std::make_shared<UIEntity>(
+    // ui screen and background
+    _screen_ui_tree = std::make_shared<UIEntity>(
             UIEntity({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
-                     _animation_players["background"])));
-    _ui_entities.push_back(_screen_ui.back());
-    _entity_view_creator->createEntitySpriteView(_screen_ui.back(), 1);
+                     _animation_players["background"], {}, false));
+    _ui_entities.push_back(_screen_ui_tree);
+    _entity_view_creator->createEntitySpriteView(_screen_ui_tree, 1);
 
     spawnPlayer({0, 2.5f});
 
@@ -521,7 +528,7 @@ void World::updateDoodleMode(double t, float dt) {
 
     destroyPhysicsEntities();
 
-    std::cout << _player->getCurrentHitPoints() << std::endl;
+//    std::cout << _player->getCurrentHitPoints() << std::endl;
 
     // reset
     if (_input_map->r) {
@@ -538,10 +545,16 @@ void World::spawnPlayer(const Vector2f &spawn) {
 //    _entity_audio_creator->createEntityAudio(_player);
 
     // HP
-    _player_hearts.push_back(std::make_shared<UIEntity>(
-            UIEntity({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["heart"], {}, false)));
-    _ui_entities.push_back(_player_hearts.back());
-    _entity_view_creator->createEntitySpriteView(_player_hearts.back(), 1000);
+//    _player_hearts.push_back(std::make_shared<UIEntity>(
+//            UIEntity({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["heart"], {}, false)));
+//    _ui_entities.push_back(_player_hearts.back());
+//    _entity_view_creator->createEntitySpriteView(_player_hearts.back(), 1000);
+    std::shared_ptr<HPBar> hp_bar = createHPBar(_player);
+    hp_bar->setPosition({-(_screen_ui_tree->getViewSize().x / 2) + (hp_bar->getViewSize().x / 2),
+                         -(_screen_ui_tree->getViewSize().y / 2) + (hp_bar->getViewSize().y / 2)});
+    _screen_ui_tree->addChild(hp_bar, _screen_ui_tree);
+    std::cout << hp_bar->getPosition() << std::endl;
+
 }
 
 float World::getSpawnPosY() {
@@ -703,10 +716,6 @@ void World::destroyPhysicsEntities() {
     }
 }
 
-void World::updatePlayerHearts() {
-
-}
-
 void World::spawnPlayerBullet(const Vector2f &position, bool up) {
     _player_bullets.push_back(
             std::make_shared<Bullet>(Bullet(position, _camera, {0.075f, 0.075f}, up, _animation_players["bullet"])));
@@ -719,4 +728,17 @@ void World::spawnEnemyBullet(const Vector2f &position, bool up) {
             std::make_shared<Bullet>(Bullet(position, _camera, {0.075f, 0.075f}, up, _animation_players["bullet"])));
     _physics_entities.push_back(_enemy_bullets.back());
     _entity_view_creator->createEntitySpriteView(_enemy_bullets.back(), 80);
+}
+
+std::shared_ptr<HPBar> World::createHPBar(const std::weak_ptr<PhysicsEntity> &entity) {
+    std::shared_ptr<HPBar> hp_bar = std::make_shared<HPBar>(
+            HPBar({0, 0}, _camera, {0, 0}, _animation_players["heart"]));
+
+    hp_bar->setHearts(entity, hp_bar, true);
+
+    for (const auto &heart: hp_bar->getHearts()) {
+        _entity_view_creator->createEntitySpriteView(heart, 200);
+    }
+
+    return hp_bar;
 }

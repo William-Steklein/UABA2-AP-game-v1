@@ -34,6 +34,7 @@
 #include "entities/ui/BgTile.h"
 #include "entities/ui/Button.h"
 #include "entities/ui/TextBox.h"
+#include "entities/ui/hp-bar/HPBar.h"
 
 #include "constants/resources.h"
 #include "animation/Animation.h"
@@ -68,7 +69,8 @@ private:
     std::vector<std::shared_ptr<Bullet>> _enemy_bullets;
 
     std::vector<std::weak_ptr<UIEntity>> _ui_entities;
-    std::vector<std::shared_ptr<UIEntity>> _screen_ui;
+    std::shared_ptr<UIEntity> _screen_ui_tree;
+//    std::vector<std::shared_ptr<UIEntity>> _screen_ui;
     std::vector<std::shared_ptr<UIEntity>> _side_bars;
     std::vector<std::shared_ptr<BgTile>> _bg_tiles;
     float _last_bg_tile_y_pos;
@@ -151,11 +153,11 @@ private:
 
     void destroyPhysicsEntities();
 
-    void updatePlayerHearts();
-
     void spawnPlayerBullet(const Vector2f &position, bool up);
 
     void spawnEnemyBullet(const Vector2f &position, bool up);
+
+    std::shared_ptr<HPBar> createHPBar(const std::weak_ptr<PhysicsEntity> &entity);
 };
 
 

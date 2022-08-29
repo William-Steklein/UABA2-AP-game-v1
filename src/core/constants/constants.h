@@ -45,6 +45,11 @@ namespace constants {
         extern const float velocity;
         extern const float time_delay;
     }
+
+    namespace hpbarhearts {
+        extern const float horizontal_distance;
+        extern const Vector2f size;
+    }
 }
 
 
