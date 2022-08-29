@@ -334,6 +334,7 @@ void World::clear() {
     _bonuses.clear();
     _active_bonus = nullptr;
     _portal_radios.clear();
+    _bullets.clear();
 
     _ui_entities.clear();
     _static_ui.clear();
@@ -442,7 +443,12 @@ void World::startDebugMode() {
 void World::updateDebugMode(double t, float dt) {
     // camera
     _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
-    std::cout << _player->getCurrentHitPoints() << std::endl;
+//    std::cout << _player->getCurrentHitPoints() << std::endl;
+
+    if (_input_map->f && _player->canShoot()) {
+        _player->setCanShoot(false);
+        spawnBullet(_player->getPosition(), true);
+    }
 }
 
 void World::startDoodleMode() {
@@ -666,4 +672,11 @@ void World::destroyPhysicsEntities() {
 
 void World::updatePlayerHearts() {
 
+}
+
+void World::spawnBullet(const Vector2f &position, bool up) {
+    _bullets.push_back(
+            std::make_shared<Bullet>(Bullet(position, _camera, {0.1f, 0.1f}, up, _animation_players["bullet"])));
+    _physics_entities.push_back(_bullets.back());
+    _entity_view_creator->createEntitySpriteView(_bullets.back(), 80);
 }

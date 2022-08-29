@@ -34,4 +34,9 @@ namespace constants {
             const float can_damage_duration = 1.f;
         }
     }
+
+    namespace bullet {
+        const float velocity = 2.f;
+        const float time_delay = 0.4f;
+    }
 }

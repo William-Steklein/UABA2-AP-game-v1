@@ -8,7 +8,7 @@
 class Enemy : public SpikeBonus {
 private:
     bool _can_damage;
-    float _time_passed;
+    float _damage_delay_time_passed;
 
 public:
     Enemy(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,

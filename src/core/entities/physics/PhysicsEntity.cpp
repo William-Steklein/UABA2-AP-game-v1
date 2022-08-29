@@ -4,7 +4,7 @@ PhysicsEntity::PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> c
                              AnimationPlayer animation_player, AudioPlayer audio_player, bool is_static) :
         Entity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player)),
         _is_static(is_static), _mass(1), _gravitational_acceleration({0, 0}), _passthrough(false), _collided(false),
-        _max_hit_points(0), _current_hit_points(0) {
+        _max_hit_points(0), _current_hit_points(0), _can_shoot(true), _shoot_delay_time_passed(0) {
     _hitbox = std::make_shared<Hitbox>(_position, _view_size);
 
 }
@@ -22,6 +22,17 @@ void PhysicsEntity::update(double t, float dt) {
         Entity::update(t, dt);
         return;
     }
+
+    // shooting
+    if (!_can_shoot) {
+        _shoot_delay_time_passed += dt;
+    }
+
+    if (_shoot_delay_time_passed > constants::bullet::time_delay) {
+        _shoot_delay_time_passed = 0;
+        _can_shoot = true;
+    }
+
     // max velocity
     _velocity = {std::clamp(_velocity.x, _min_neg_velocity.x, _max_pos_velocity.x),
                  std::clamp(_velocity.y, _min_neg_velocity.y, _max_pos_velocity.y)};
@@ -281,4 +292,12 @@ void PhysicsEntity::subtractHitPoints(unsigned int hit_points) {
     } else {
         _current_hit_points -= hit_points;
     }
+}
+
+bool PhysicsEntity::canShoot() const {
+    return _can_shoot;
+}
+
+void PhysicsEntity::setCanShoot(bool can_shoot) {
+    _can_shoot = can_shoot;
 }

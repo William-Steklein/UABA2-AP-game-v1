@@ -27,6 +27,7 @@
 #include "entities/physics/bonus/hp-modifier/SpikeBonus.h"
 #include "entities/physics/bonus/enemy/Enemy.h"
 #include "entities/physics/PortalRadio.h"
+#include "entities/physics/Bullet.h"
 
 #include "entities/ui/UIEntity.h"
 #include "entities/ui/BgTile.h"
@@ -61,6 +62,7 @@ private:
     std::vector<std::shared_ptr<Bonus>> _bonuses;
     std::shared_ptr<Bonus> _active_bonus;
     std::vector<std::shared_ptr<PortalRadio>> _portal_radios;
+    std::vector<std::shared_ptr<Bullet>> _bullets;
 
     std::vector<std::weak_ptr<UIEntity>> _ui_entities;
     std::vector<std::shared_ptr<UIEntity>> _static_ui;
@@ -147,6 +149,8 @@ private:
     void destroyPhysicsEntities();
 
     void updatePlayerHearts();
+
+    void spawnBullet(const Vector2f &position, bool up);
 };
 
 

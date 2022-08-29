@@ -3,7 +3,7 @@
 Enemy::Enemy(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
              AnimationPlayer animationPlayer, AudioPlayer audioPlayer, bool isStatic)
         : SpikeBonus(position, std::move(camera), viewSize, std::move(animationPlayer), std::move(audioPlayer),
-                        isStatic), _can_damage(true), _time_passed(0) {
+                        isStatic), _can_damage(true), _damage_delay_time_passed(0) {
     _passthrough = false;
     _max_hit_points = 1;
     _current_hit_points = 1;
@@ -15,11 +15,11 @@ void Enemy::update(double t, float dt) {
     }
 
     if (!_can_damage) {
-        _time_passed += dt;
+        _damage_delay_time_passed += dt;
     }
 
-    if (_time_passed > constants::bonus::enemy::can_damage_duration) {
-        _time_passed = 0;
+    if (_damage_delay_time_passed > constants::bonus::enemy::can_damage_duration) {
+        _damage_delay_time_passed = 0;
         _can_damage = true;
     }
 

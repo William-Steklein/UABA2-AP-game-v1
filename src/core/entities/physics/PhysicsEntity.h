@@ -26,6 +26,8 @@ protected:
 
     unsigned int _max_hit_points;
     unsigned int _current_hit_points;
+    bool _can_shoot;
+    float _shoot_delay_time_passed;
 
 public:
     PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
@@ -101,6 +103,10 @@ public:
     void addHitPoints(unsigned int hit_points);
 
     void subtractHitPoints(unsigned int hit_points);
+
+    bool canShoot() const;
+
+    void setCanShoot(bool can_shoot);
 };
 
 

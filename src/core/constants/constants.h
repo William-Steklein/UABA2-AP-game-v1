@@ -40,6 +40,11 @@ namespace constants {
             extern const float can_damage_duration;
         }
     }
+
+    namespace bullet {
+        extern const float velocity;
+        extern const float time_delay;
+    }
 }
 
 
