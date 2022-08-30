@@ -259,7 +259,7 @@ void Game::resizeWindow(unsigned int screen_width, unsigned int screen_height) {
     _screen_width = screen_width;
     _screen_height = screen_height;
 
-    // update the view to the new size of the window
+    // update the view to the new screen_ui_size of the window
     sf::FloatRect visibleArea(0, 0, static_cast<float>(screen_width), static_cast<float>(screen_height));
     _window->setView(sf::View(visibleArea));
 

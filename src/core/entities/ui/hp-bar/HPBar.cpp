@@ -7,17 +7,16 @@ HPBar::HPBar(const Vector2f &position, std::shared_ptr<Camera> camera, const Vec
 
 }
 
-void HPBar::setHearts(std::weak_ptr<PhysicsEntity> entity, const std::weak_ptr<HPBar> &hp_bar_ptr, bool left_alligned) {
+void HPBar::setHearts(std::weak_ptr<PhysicsEntity> entity, const std::weak_ptr<HPBar> &hp_bar_ptr, bool left_alligned,
+                      const Vector2f &heart_size, const Vector2f &offset) {
     _affected_entity = std::move(entity);
-
-    std::cout << _position << std::endl;
 
     if (!_affected_entity.expired()) {
         std::shared_ptr<PhysicsEntity> affected_entity = _affected_entity.lock();
         _nr_hp_max = affected_entity->getMaxHitPoints();
-        _view_size = constants::hpbarhearts::size;
+        _view_size = heart_size;
 
-        float x_spacing = constants::hpbarhearts::size.x + constants::hpbarhearts::horizontal_distance;
+        float x_spacing = _view_size.x + _view_size.x * constants::hpbarhearts::horizontal_distance_multiplier;
         float current_x_pos;
         if (left_alligned) {
             current_x_pos = 0;
@@ -25,16 +24,13 @@ void HPBar::setHearts(std::weak_ptr<PhysicsEntity> entity, const std::weak_ptr<H
             current_x_pos = -(static_cast<float>(_nr_hp_max - 1) * x_spacing) / 2;
         }
 
-        std::cout << current_x_pos << std::endl;
-
         for (unsigned int i = 0; i < _nr_hp_max; i++) {
+            Vector2f heart_position = Vector2f(current_x_pos, 0) + offset;
             _hearts.push_back(std::make_shared<Heart>(
-                    Heart({current_x_pos, 0}, _camera, constants::hpbarhearts::size, _animation_player)));
+                    Heart(heart_position, _camera, _view_size, _animation_player)));
             current_x_pos += x_spacing;
             addChild(_hearts.back(), hp_bar_ptr);
         }
-
-        std::cout << _hearts.front()->getPosition() << std::endl;
 
         // update if hp not max
         if (_nr_hp_max != affected_entity->getCurrentHitPoints()) {

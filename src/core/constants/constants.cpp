@@ -41,7 +41,8 @@ namespace constants {
     }
 
     namespace hpbarhearts {
-        const float horizontal_distance = 0.05f;
-        const Vector2f size = {0.2f, 0.2f};
+        const float horizontal_distance_multiplier = 0.2f;
+        const Vector2f screen_ui_size = {0.2f, 0.2f};
+        const Vector2f entity_ui_size = {0.05f, 0.05f};
     }
 }

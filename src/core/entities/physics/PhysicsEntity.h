@@ -4,6 +4,7 @@
 
 #include "../Entity.h"
 #include "../../physics/Ray.h"
+#include "../ui/UIEntity.h"
 
 class PhysicsEntity : public Entity {
 protected:
@@ -26,6 +27,7 @@ protected:
 
     unsigned int _max_hit_points;
     unsigned int _current_hit_points;
+    std::shared_ptr<UIEntity> _hp_bar;
     bool _can_shoot;
     float _shoot_delay_time_passed;
 
@@ -39,6 +41,8 @@ public:
     void setupPlayerPhysics(float jump_dt, float jump_height);
 
     void update(double t, float dt) override;
+
+    void setPosition(const Vector2f &position) override;
 
     bool isIsStatic() const;
 
@@ -107,6 +111,8 @@ public:
     bool canShoot() const;
 
     void setCanShoot(bool can_shoot);
+
+    void setHPBar(const std::shared_ptr<UIEntity> &hp_bar);
 };
 
 

@@ -47,8 +47,9 @@ namespace constants {
     }
 
     namespace hpbarhearts {
-        extern const float horizontal_distance;
-        extern const Vector2f size;
+        extern const float horizontal_distance_multiplier;
+        extern const Vector2f screen_ui_size;
+        extern const Vector2f entity_ui_size;
     }
 }
 

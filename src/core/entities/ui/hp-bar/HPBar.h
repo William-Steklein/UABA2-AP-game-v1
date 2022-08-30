@@ -17,7 +17,8 @@ public:
     HPBar(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
           AnimationPlayer animationPlayer = {}, AudioPlayer audioPlayer = {}, bool staticView = false);
 
-    void setHearts(std::weak_ptr<PhysicsEntity> entity, const std::weak_ptr<HPBar>& hp_bar_ptr, bool left_alligned);
+    void setHearts(std::weak_ptr<PhysicsEntity> entity, const std::weak_ptr<HPBar>& hp_bar_ptr, bool left_alligned,
+                   const Vector2f &heart_size, const Vector2f &offset = {0, 0});
 
     std::vector<std::shared_ptr<Heart>> getHearts();
 

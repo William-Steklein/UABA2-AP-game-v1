@@ -76,7 +76,7 @@ private:
     float _last_bg_tile_y_pos;
     std::shared_ptr<TextBox> _score_text_box;
     std::vector<std::shared_ptr<Button>> _buttons;
-    std::vector<std::shared_ptr<UIEntity>> _player_hearts;
+    std::vector<std::shared_ptr<HPBar>> _enemy_hp_bars;
 
     // resource players
     std::map<std::string, AnimationPlayer> _animation_players;
@@ -157,7 +157,8 @@ private:
 
     void spawnEnemyBullet(const Vector2f &position, bool up);
 
-    std::shared_ptr<HPBar> createHPBar(const std::weak_ptr<PhysicsEntity> &entity);
+    std::shared_ptr<HPBar> createHPBar(const std::weak_ptr<PhysicsEntity> &entity, bool left_alligned,
+                                       const Vector2f &heart_size, const Vector2f &offset = {0, 0});
 };
 
 

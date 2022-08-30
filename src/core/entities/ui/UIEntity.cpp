@@ -3,7 +3,7 @@
 UIEntity::UIEntity(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &view_size,
                    AnimationPlayer animation_player, AudioPlayer audio_player, bool static_view)
         : Entity(position, std::move(camera), view_size, std::move(animation_player), std::move(audio_player)),
-          _static_view(static_view) {
+          _static_view(static_view), _relative_positioning(false) {
 
 }
 
@@ -19,11 +19,11 @@ void UIEntity::setRelativePositioning(bool relative_positioning) {
     _relative_positioning = relative_positioning;
 }
 
-const std::weak_ptr<Entity> &UIEntity::getParent() const {
+const std::weak_ptr<UIEntity> &UIEntity::getParent() const {
     return _parent;
 }
 
-void UIEntity::setParent(const std::weak_ptr<Entity> &parent) {
+void UIEntity::setParent(const std::weak_ptr<UIEntity> &parent) {
     _parent = parent;
 }
 
@@ -39,9 +39,9 @@ void UIEntity::setChildren(const std::vector<std::shared_ptr<UIEntity>> &childre
     _children = children;
 }
 
-void UIEntity::addChild(const std::shared_ptr<UIEntity> &child, const std::weak_ptr<Entity> &parent,
+void UIEntity::addChild(const std::shared_ptr<UIEntity> &child, const std::weak_ptr<UIEntity> &parent,
                         bool relative_positioning) {
-    child->setParent(parent);
+    child->_parent = parent;
     child->_relative_positioning = relative_positioning;
     if (relative_positioning) {
         child->setRelativePosition(child->getPosition());

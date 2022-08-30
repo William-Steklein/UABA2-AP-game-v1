@@ -11,7 +11,7 @@ private:
     bool _static_view;
     bool _relative_positioning;
 
-    std::weak_ptr<Entity> _parent;
+    std::weak_ptr<UIEntity> _parent;
     std::vector<std::shared_ptr<UIEntity>> _children;
 
 public:
@@ -26,9 +26,9 @@ public:
 
     void setRelativePositioning(bool relative_positioning);
 
-    const std::weak_ptr<Entity> &getParent() const;
+    const std::weak_ptr<UIEntity> &getParent() const;
 
-    void setParent(const std::weak_ptr<Entity> &parent);
+    void setParent(const std::weak_ptr<UIEntity> &parent);
 
     bool hasParent() const;
 
@@ -36,7 +36,7 @@ public:
 
     void setChildren(const std::vector<std::shared_ptr<UIEntity>> &children);
 
-    void addChild(const std::shared_ptr<UIEntity> &child, const std::weak_ptr<Entity> &parent,
+    void addChild(const std::shared_ptr<UIEntity> &child, const std::weak_ptr<UIEntity> &parent,
                   bool relative_positioning = true);
 
     bool hasChildren() const;

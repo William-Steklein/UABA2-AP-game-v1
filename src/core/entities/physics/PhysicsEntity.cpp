@@ -4,7 +4,7 @@ PhysicsEntity::PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> c
                              AnimationPlayer animation_player, AudioPlayer audio_player, bool is_static) :
         Entity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player)),
         _is_static(is_static), _mass(1), _gravitational_acceleration({0, 0}), _passthrough(false), _collided(false),
-        _max_hit_points(0), _current_hit_points(0), _can_shoot(true), _shoot_delay_time_passed(0) {
+        _max_hit_points(0), _current_hit_points(0), _can_shoot(true), _shoot_delay_time_passed(0){
     _hitbox = std::make_shared<Hitbox>(_position, _view_size);
 
 }
@@ -21,6 +21,11 @@ void PhysicsEntity::update(double t, float dt) {
     if (_is_static) {
         Entity::update(t, dt);
         return;
+    }
+
+    // update hp_bar
+    if (_hp_bar) {
+        _hp_bar->update(t, dt);
     }
 
     // shooting
@@ -58,6 +63,14 @@ void PhysicsEntity::update(double t, float dt) {
     _acceleration = {0, 0};
 
     Entity::update(t, dt);
+}
+
+void PhysicsEntity::setPosition(const Vector2f &position) {
+    if (_hp_bar) {
+        _hp_bar->move(position - _position);
+    }
+
+    Entity::setPosition(position);
 }
 
 bool PhysicsEntity::isIsStatic() const {
@@ -261,6 +274,7 @@ void PhysicsEntity::disappear() {
     setViewSize({0, 0});
     _rays.clear();
     _collided = false;
+    _hp_bar = nullptr;
 }
 
 unsigned int PhysicsEntity::getMaxHitPoints() const {
@@ -300,4 +314,8 @@ bool PhysicsEntity::canShoot() const {
 
 void PhysicsEntity::setCanShoot(bool can_shoot) {
     _can_shoot = can_shoot;
+}
+
+void PhysicsEntity::setHPBar(const std::shared_ptr<UIEntity> &hp_bar) {
+    _hp_bar = hp_bar;
 }
