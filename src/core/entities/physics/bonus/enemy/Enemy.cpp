@@ -35,6 +35,7 @@ void Enemy::applyEffect() {
     }
 
     _active = false;
+    _collided = false;
 }
 
 bool Enemy::isShootBack() const {
