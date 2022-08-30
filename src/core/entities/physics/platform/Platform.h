@@ -4,11 +4,12 @@
 
 #include "../PhysicsEntity.h"
 #include "../bonus/Bonus.h"
+#include "../../../Random.h"
 
 class Platform : public PhysicsEntity {
 protected:
     std::weak_ptr<Bonus> _bonus;
-    float _bonus_y_offset;
+    Vector2f _bonus_offset;
 
 public:
     Platform(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,

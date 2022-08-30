@@ -70,7 +70,6 @@ private:
 
     std::vector<std::weak_ptr<UIEntity>> _ui_entities;
     std::shared_ptr<UIEntity> _screen_ui_tree;
-//    std::vector<std::shared_ptr<UIEntity>> _screen_ui;
     std::vector<std::shared_ptr<UIEntity>> _side_bars;
     std::vector<std::shared_ptr<BgTile>> _bg_tiles;
     float _last_bg_tile_y_pos;
