@@ -47,10 +47,14 @@ private:
     std::shared_ptr<Score> _score;
 
     // game states
+    std::shared_ptr<bool> _start_main_menu;
     std::shared_ptr<bool> _start_debug_mode;
     bool _debug_mode;
     std::shared_ptr<bool> _start_doodle_mode;
     bool _doodle_mode;
+    std::shared_ptr<bool> _start_pauze_overlay;
+    bool _pauze_overlay;
+    std::shared_ptr<bool> _resume;
 
     // entities
     std::shared_ptr<IEntityViewCreator> _entity_view_creator;
@@ -70,11 +74,12 @@ private:
 
     std::vector<std::weak_ptr<UIEntity>> _ui_entities;
     std::shared_ptr<UIEntity> _screen_ui_tree;
+    std::shared_ptr<UIEntity> _ingame_ui_tree;
     std::vector<std::shared_ptr<UIEntity>> _side_bars;
     std::vector<std::shared_ptr<BgTile>> _bg_tiles;
     float _last_bg_tile_y_pos;
     std::shared_ptr<TextBox> _score_text_box;
-    std::vector<std::shared_ptr<Button>> _buttons;
+    std::vector<std::weak_ptr<Button>> _buttons;
     std::vector<std::shared_ptr<HPBar>> _enemy_hp_bars;
 
     // resource players
@@ -132,11 +137,19 @@ private:
     // scenes
     void loadStartMenu();
 
+    void startPauzeOverlay();
+
+    void stopPauzeOverlay();
+
     void startDebugMode();
+
+    void startDebugUI();
 
     void updateDebugMode(double t, float dt);
 
     void startDoodleMode();
+
+    void startDoodleUI();
 
     void updateDoodleMode(double t, float dt);
 
@@ -158,6 +171,8 @@ private:
 
     std::shared_ptr<HPBar> createHPBar(const std::weak_ptr<PhysicsEntity> &entity, bool left_alligned,
                                        const Vector2f &heart_size, const Vector2f &offset = {0, 0});
+
+    std::shared_ptr<UIEntity> craeteEmptyUI();
 };
 
 

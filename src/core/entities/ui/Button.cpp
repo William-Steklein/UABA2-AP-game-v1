@@ -20,11 +20,11 @@ void Button::setPressed(bool pressed) {
 
 void Button::update(double t, float dt) {
     if (_pressed_button) {
-        std::cout << "clicked button!" << std::endl;
+//        std::cout << "clicked button!" << std::endl;
         _pressed_button = false;
     }
 
-    Entity::update(t, dt);
+    UIEntity::update(t, dt);
 }
 
 std::shared_ptr<bool> Button::getPressedPointer() {

@@ -7,10 +7,11 @@ World::World(float x_min, float x_max, float y_min, float y_max,
           _entity_audio_creator(std::move(entity_audio_creator)), _force_static_view_update(true),
           _input_map(new InputMap), _audio_listener_position(new Vector2f(0, 0)),
           _start_debug_mode(new bool(false)), _debug_mode(false),
-          _start_doodle_mode(new bool(false)), _doodle_mode(false), _score(new Score()),
-          _last_platform_y_pos(-1.f), _last_bg_tile_y_pos(-1.f), _screen_ui_tree(std::make_shared<UIEntity>(
-                UIEntity({0, _camera->getPosition().y}, _camera, {_camera->getWidth(), _camera->getHeight()}, {}, {},
-                         false))) {
+          _start_doodle_mode(new bool(false)), _doodle_mode(false),
+          _start_pauze_overlay(new bool(false)), _pauze_overlay(false), _start_main_menu(new bool(false)),
+          _score(new Score()), _resume(new bool(false)),
+          _last_platform_y_pos(-1.f), _last_bg_tile_y_pos(-1.f),
+          _screen_ui_tree(craeteEmptyUI()), _ingame_ui_tree(craeteEmptyUI()) {
 
     loadResources();
     initializeSideBars();
@@ -27,12 +28,14 @@ void World::sleep() {
 void World::update() {
     gameUpdate(Stopwatch::getInstance().getPhysicsTime(), Stopwatch::getInstance().getDeltaTime());
 
-    Stopwatch::getInstance().increaseAccumulator();
-    while (Stopwatch::getInstance().getAccumulator() >= Stopwatch::getInstance().getPhysicsDeltaTime()) {
-        physicsUpdate(Stopwatch::getInstance().getPhysicsTime(), Stopwatch::getInstance().getPhysicsDeltaTime());
+    if (!_pauze_overlay) {
+        Stopwatch::getInstance().increaseAccumulator();
+        while (Stopwatch::getInstance().getAccumulator() >= Stopwatch::getInstance().getPhysicsDeltaTime()) {
+            physicsUpdate(Stopwatch::getInstance().getPhysicsTime(), Stopwatch::getInstance().getPhysicsDeltaTime());
 
-        Stopwatch::getInstance().increasePhysicsTime();
-        Stopwatch::getInstance().decreaseAccumulator();
+            Stopwatch::getInstance().increasePhysicsTime();
+            Stopwatch::getInstance().decreaseAccumulator();
+        }
     }
 }
 
@@ -169,19 +172,35 @@ void World::updateSidebars() {
 
 void World::gameUpdate(double t, float dt) {
     // game flow
-    if (_input_map->esc) {
+    if (*_start_main_menu) {
+        *_start_main_menu = false;
         _debug_mode = false;
         _doodle_mode = false;
+        _pauze_overlay = false;
         clear();
         loadStartMenu();
     }
 
     if (*_start_debug_mode) {
         *_start_debug_mode = false;
+        _pauze_overlay = false;
         startDebugMode();
     } else if (*_start_doodle_mode) {
         *_start_doodle_mode = false;
+        _pauze_overlay = false;
         startDoodleMode();
+    }
+
+    if ((_debug_mode || _doodle_mode) && (*_start_pauze_overlay || _input_map->esc)) {
+        *_start_pauze_overlay = false;
+        _screen_ui_tree = craeteEmptyUI();
+        _ui_entities.push_back(_screen_ui_tree);
+
+        startPauzeOverlay();
+    }
+
+    if (_pauze_overlay && *_resume) {
+        stopPauzeOverlay();
     }
 
     handleUpdatePhysicsSpeed();
@@ -213,11 +232,28 @@ void World::updateUIEntities(double t, float dt) {
     // button clicks
     if (_input_map->mouse_button_left) {
 //        std::cout << _input_map->mouse_pos_core << std::endl;
-        for (const auto &button: _buttons) {
-            if (button->getHitbox() && button->getHitbox()->collides(_input_map->mouse_pos_core) &&
-                !_input_map->mouse_button_left_clicked) {
-                button->setPressed(true);
-                _input_map->mouse_button_left_clicked = true;
+
+//        for (const auto &button_weak: _buttons) {
+//            std::shared_ptr<Button> button = button_weak.lock();
+//            if (button->getHitbox() && button->getHitbox()->collides(_input_map->mouse_pos_core) &&
+//                !_input_map->mouse_button_left_clicked) {
+//                button->setPressed(true);
+//                _input_map->mouse_button_left_clicked = true;
+//            }
+//        }
+
+        for (auto iter = _buttons.begin(); iter != _buttons.end();) {
+            if (iter->expired()) {
+                iter = _buttons.erase(iter);
+            } else {
+                std::shared_ptr<Button> button = iter->lock();
+                if (button->getHitbox() && button->getHitbox()->collides(_input_map->mouse_pos_core) &&
+                    !_input_map->mouse_button_left_clicked) {
+                    button->setPressed(true);
+                    _input_map->mouse_button_left_clicked = true;
+                }
+
+                iter++;
             }
         }
     }
@@ -239,8 +275,9 @@ void World::physicsUpdate(double t, float dt) {
     // collisions update
     updatePhysicsCollisions();
 
-    // update screen ui position
+    // update ui position
     _screen_ui_tree->setPosition(_camera->getPosition());
+    _ingame_ui_tree->setPosition(_camera->getPosition());
 
 //    std::cout << _physics_entities.screen_ui_size() << std::endl;
 //    std::cout << _ui_entities.screen_ui_size() << std::endl;
@@ -370,10 +407,10 @@ void World::clear() {
     _enemy_bullets.clear();
 
     _ui_entities.clear();
-    _screen_ui_tree = std::make_shared<UIEntity>(
-            UIEntity({0, _camera->getPosition().y}, _camera, {_camera->getWidth(), _camera->getHeight()}, {}, {},
-                     false));
+    _screen_ui_tree = craeteEmptyUI();
     _ui_entities.push_back(_screen_ui_tree);
+    _ingame_ui_tree = craeteEmptyUI();
+    _ui_entities.push_back(_ingame_ui_tree);
 
     _bg_tiles.clear();
     _buttons.clear();
@@ -399,32 +436,92 @@ void World::loadStartMenu() {
     _screen_ui_tree->addChild(menu, _screen_ui_tree);
 
     // buttons
-    Vector2f button_position = {0, 0.5f};
-    _buttons.push_back(std::make_shared<Button>(
-            Button(button_position, _camera, {0.5f, 0.25f},
-                   _animation_players["button"])));
-    menu->addChild(_buttons.back(), menu);
-    _entity_view_creator->createEntitySpriteView(_buttons.back(), 2);
-    _start_doodle_mode = _buttons.back()->getPressedPointer();
+    std::shared_ptr<Button> button = std::make_shared<Button>(
+            Button({0, 0.5f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
+    menu->addChild(button, menu);
+    _buttons.push_back(button);
+    _entity_view_creator->createEntitySpriteView(button, 2);
+    _start_doodle_mode = button->getPressedPointer();
 
     std::shared_ptr<std::string> button_string = std::make_shared<std::string>("doodle jump");
     std::shared_ptr<TextBox> text_box = std::make_shared<TextBox>(
             TextBox({0, 0}, _camera, {0.5f, 0.25f}, button_string));
-    _buttons.back()->addChild(text_box, _buttons.back());
+    button->addChild(text_box, button);
     _entity_view_creator->createEntityTextView(text_box);
 
-    button_position = {0, 0.125f};
-    _buttons.push_back(
-            std::make_shared<Button>(Button(button_position, _camera, {0.5f, 0.25f}, _animation_players["button"])));
-    menu->addChild(_buttons.back(), menu);
-    _entity_view_creator->createEntitySpriteView(_buttons.back(), 2);
-    _start_debug_mode = _buttons.back()->getPressedPointer();
+    button = std::make_shared<Button>(Button({0, 0.125f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
+    menu->addChild(button, menu);
+    _buttons.push_back(button);
+    _entity_view_creator->createEntitySpriteView(button, 2);
+    _start_debug_mode = button->getPressedPointer();
 
     button_string = std::make_shared<std::string>("debug");
     text_box = std::make_shared<TextBox>(
             TextBox({0, 0}, _camera, {0.5f, 0.25f}, button_string));
-    _buttons.back()->addChild(text_box, _buttons.back());
+    button->addChild(text_box, button);
     _entity_view_creator->createEntityTextView(text_box);
+}
+
+void World::startPauzeOverlay() {
+    _pauze_overlay = true;
+    unsigned int layer = 500;
+
+    // menu
+    std::shared_ptr<UIEntity> menu = std::make_shared<UIEntity>(
+            UIEntity({0, 0}, _camera, {1.f, 1.5f},
+                     _animation_players["menu"]));
+    _entity_view_creator->createEntitySpriteView(menu, layer);
+    _screen_ui_tree->addChild(menu, _screen_ui_tree);
+
+    std::shared_ptr button = std::make_shared<Button>(Button({0, 0.5f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
+    menu->addChild(button, menu);
+    _buttons.push_back(button);
+    _entity_view_creator->createEntitySpriteView(button, layer + 1);
+    _resume = button->getPressedPointer();
+
+    std::shared_ptr<std::string> button_string = std::make_shared<std::string>("resume");
+    std::shared_ptr<TextBox> text_box = std::make_shared<TextBox>(
+            TextBox({0, 0}, _camera, {0.5f, 0.25f}, button_string));
+    button->addChild(text_box, button);
+    _entity_view_creator->createEntityTextView(text_box);
+
+    button = std::make_shared<Button>(Button({0, 0.125f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
+    menu->addChild(button, menu);
+    _buttons.push_back(button);
+    _entity_view_creator->createEntitySpriteView(button, layer + 1);
+    if (_doodle_mode) {
+        _start_doodle_mode = button->getPressedPointer();
+    } else {
+        _start_debug_mode = button->getPressedPointer();
+    }
+
+    button_string = std::make_shared<std::string>("restart");
+    text_box = std::make_shared<TextBox>(
+            TextBox({0, 0}, _camera, {0.5f, 0.25f}, button_string));
+    button->addChild(text_box, button);
+    _entity_view_creator->createEntityTextView(text_box);
+
+    button = std::make_shared<Button>(Button({0, -0.25f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
+    menu->addChild(button, menu);
+    _buttons.push_back(button);
+    _entity_view_creator->createEntitySpriteView(button, layer + 1);
+    _start_main_menu = button->getPressedPointer();
+
+    button_string = std::make_shared<std::string>("return\nto menu");
+    text_box = std::make_shared<TextBox>(
+            TextBox({0, 0}, _camera, {0.5f, 0.25f}, button_string));
+    button->addChild(text_box, button);
+    _entity_view_creator->createEntityTextView(text_box);
+}
+
+void World::stopPauzeOverlay() {
+    *_resume = false;
+    _pauze_overlay = false;
+
+    _screen_ui_tree = craeteEmptyUI();
+    _ui_entities.push_back(_screen_ui_tree);
+
+    startDebugUI();
 }
 
 void World::startDebugMode() {
@@ -433,11 +530,13 @@ void World::startDebugMode() {
     clear();
 
     // ui screen and background
-    _screen_ui_tree = std::make_shared<UIEntity>(
-            UIEntity({0, 1.5f}, _camera, {_camera->getWidth(), _camera->getHeight()},
-                     _animation_players["background"], {}, false));
-    _ui_entities.push_back(_screen_ui_tree);
-    _entity_view_creator->createEntitySpriteView(_screen_ui_tree, 1);
+    startDebugUI();
+
+    std::shared_ptr<UIEntity> background = std::make_shared<UIEntity>(
+            UIEntity({0, 0}, _camera, {_camera->getWidth(), _camera->getHeight()}, _animation_players["background"],
+                     {}, false));
+    _ingame_ui_tree->addChild(background, _ingame_ui_tree);
+    _entity_view_creator->createEntitySpriteView(background, 1);
 
     spawnPlayer({0, 2.5f});
 
@@ -472,7 +571,6 @@ void World::startDebugMode() {
                                                 {0, (enemy->getViewSize().y / 2) +
                                                     (constants::hpbarhearts::entity_ui_size.y / 2)});
     enemy->setHPBar(hp_bar);
-
     _ui_entities.push_back(hp_bar);
 
     _platforms.push_back(std::make_shared<Platform>(
@@ -483,6 +581,17 @@ void World::startDebugMode() {
     // add bonus
     _platforms.back()->addBonus(_bonuses.back());
     _bonuses.back()->addObserver(_score);
+}
+
+void World::startDebugUI() {
+    Vector2f button_size = {0.2f, 0.2f};
+    std::shared_ptr<Button> button = std::make_shared<Button>(
+            Button({_camera->getWidth() / 2 - button_size.x, _camera->getHeight() / 2 - button_size.y}, _camera,
+                   button_size, _animation_players["hamburger"]));
+    _screen_ui_tree->addChild(button, _screen_ui_tree);
+    _buttons.push_back(button);
+    _entity_view_creator->createEntitySpriteView(button, 500);
+    _start_pauze_overlay = button->getPressedPointer();
 }
 
 void World::updateDebugMode(double t, float dt) {
@@ -500,6 +609,9 @@ void World::startDoodleMode() {
     _doodle_mode = true;
     _debug_mode = false;
     clear();
+
+    // ui
+    startDebugUI();
 
     spawnPlayer();
     _player->addVelocity({0.f, _player->getInitialJumpVelocity() * 1.2f});
@@ -536,11 +648,6 @@ void World::updateDoodleMode(double t, float dt) {
     spawnBgTiles();
 
     destroyPhysicsEntities();
-
-    // reset
-    if (_input_map->r) {
-        startDoodleMode();
-    }
 }
 
 void World::spawnPlayer(const Vector2f &spawn) {
@@ -553,9 +660,9 @@ void World::spawnPlayer(const Vector2f &spawn) {
 
     // HP
     std::shared_ptr<HPBar> hp_bar = createHPBar(_player, true, constants::hpbarhearts::screen_ui_size);
-    hp_bar->setPosition({-(_screen_ui_tree->getViewSize().x / 2) + (hp_bar->getViewSize().x / 2),
-                         -(_screen_ui_tree->getViewSize().y / 2) + (hp_bar->getViewSize().y / 2)});
-    _screen_ui_tree->addChild(hp_bar, _screen_ui_tree);
+    hp_bar->setPosition({-(_ingame_ui_tree->getViewSize().x / 2) + (hp_bar->getViewSize().x / 2),
+                         -(_ingame_ui_tree->getViewSize().y / 2) + (hp_bar->getViewSize().y / 2)});
+    _ingame_ui_tree->addChild(hp_bar, _ingame_ui_tree);
 }
 
 float World::getSpawnPosY() {
@@ -743,4 +850,10 @@ std::shared_ptr<HPBar> World::createHPBar(const std::weak_ptr<PhysicsEntity> &en
     }
 
     return hp_bar;
+}
+
+std::shared_ptr<UIEntity> World::craeteEmptyUI() {
+    return std::make_shared<UIEntity>(
+            UIEntity({0, _camera->getPosition().y}, _camera, {_camera->getWidth(), _camera->getHeight()}, {}, {},
+                     false));
 }
