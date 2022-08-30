@@ -687,7 +687,7 @@ void World::startDoodleMode() {
     spawnPlayer();
     _player->addVelocity({0.f, _player->getInitialJumpVelocity() * 1.2f});
 
-    doodleModeSpawnPlatforms();
+    doodleModeSpawnPlatformsAndBonuses();
     spawnBgTiles(_camera->getPosition().y + _camera->getHeight(), true);
 
     // score
@@ -726,51 +726,59 @@ void World::updateDoodleMode(double t, float dt) {
         spawnPlayerBullet(_player->getPosition(), true);
     }
 
-    doodleModeSpawnPlatforms();
+    doodleModeSpawnPlatformsAndBonuses();
     spawnBgTiles(_camera->getPosition().y + _camera->getHeight(), true);
 
     doodleModeDestroyPhysicsEntities();
 }
 
-void World::doodleModeSpawnPlatforms() {
+void World::doodleModeSpawnPlatformsAndBonuses() {
     // todo: constants
-    float y_distance = 0.7f;
     float platform_width = 0.4f;
     float platform_height = 0.075f;
     unsigned int platform_render_layer = 3;
 
-    float y_spawn_pos = _camera->getPosition().y + (_camera->getHeight() / 2) * 1.1f;
 
+    float sig_val = sigmoid(static_cast<float>(_score->getScore()), 0.00125, 2);
+    float y_variation = Random::get_instance().uniform_real(-0.15f, 0.15f);
+
+//    std::cout << sig_val << std::endl;
+    Vector2f rand_y_bounderies = {0.1f, constants::player::jump_height - 0.1f};
+
+//    std::cout << y_variation << std::endl;
+    float rand_y_distance = lerp(rand_y_bounderies.x, rand_y_bounderies.y, sig_val) + y_variation;
+    rand_y_distance = std::clamp(rand_y_distance, rand_y_bounderies.x, rand_y_bounderies.y);
+
+    float y_spawn_pos = _camera->getPosition().y + (_camera->getHeight() / 2) * 1.1f;
     while (_last_platform_y_pos < y_spawn_pos) {
         float x_pos = Random::get_instance().uniform_real(-0.8, 0.8);
-        _last_platform_y_pos += y_distance;
+        _last_platform_y_pos += rand_y_distance;
 
-        float platform_type = Random::get_instance().uniform_real(0, 1);
+        float platform_type = Random::get_instance().uniform_real(0, sig_val);
 
-        if (platform_type < 0.25f) {
+        if (platform_type <= 0.20f) {
             // static platform
             _platforms.push_back(std::make_shared<Platform>(
                     Platform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height},
                              _animation_players["green"])));
 
-        } else if (platform_type < 0.40f) {
+        } else if (platform_type <= 0.40f) {
+            // temporary platform
+            _platforms.push_back(std::make_shared<TempPlatform>(
+                    TempPlatform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height},
+                                 _animation_players["white"])));
+        } else if (platform_type <= 0.55f) {
             // moving platform
             _platforms.push_back(std::make_shared<MovPlatform>(
                     MovPlatform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height}, true,
                                 _animation_players["blue"])));
 
-        } else if (platform_type < 0.55f) {
+        } else if (platform_type <= 0.70f) {
             _platforms.push_back(std::make_shared<MovPlatform>(
                     MovPlatform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height}, false,
                                 _animation_players["yellow"])));
 
-        } else if (platform_type < 0.70f) {
-            // temporary platform
-            _platforms.push_back(std::make_shared<TempPlatform>(
-                    TempPlatform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height},
-                                 _animation_players["white"])));
-
-        } else if (platform_type < 0.85f) {
+        } else if (platform_type <= 0.85f) {
             // teleporting platform
             _platforms.push_back(std::make_shared<TelePlatform>(
                     TelePlatform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height}, true,
@@ -786,42 +794,63 @@ void World::doodleModeSpawnPlatforms() {
         _entity_view_creator->createEntitySpriteView(_platforms.back(), platform_render_layer);
 
         // bonus
-        float place_bonus = Random::get_instance().uniform_real(0, 1);
+        int place_bonus = Random::get_instance().bernoulli(0.2f);
 
-//        if (place_bonus < 0.1f) {
-//            _bonuses.push_back(std::make_shared<SpringBonus>(
-//                    SpringBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["spring"])));
-//            _physics_entities.push_back(_bonuses.back());
-//            _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
-//
-//            // add bonus
-//            _platforms.back()->addBonus(_bonuses.back());
-//            _bonuses.back()->addObserver(_score);
-//        } else if (place_bonus < 0.12f) {
-//            _bonuses.push_back(std::make_shared<JetpackBonus>(
-//                    JetpackBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["jetpack"])));
-//            _physics_entities.push_back(_bonuses.back());
-//            _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
-//
-//            // add bonus
-//            _platforms.back()->addBonus(_bonuses.back());
-//            _bonuses.back()->addObserver(_score);
-//        }
+        if (place_bonus) {
+            float bonus_type = Random::get_instance().uniform_real(0, sig_val);
 
-        if (place_bonus < 0.4f) {
-            _bonuses.push_back(std::make_shared<SpikeBonus>(
-                    SpikeBonus({0, 0}, _camera, {0.15f, 0.075f}, _animation_players["spikes"])));
-            _physics_entities.push_back(_bonuses.back());
-            _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+            if (bonus_type <= 0.30f) {
+                _bonuses.push_back(std::make_shared<SpringBonus>(
+                        SpringBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["spring"])));
+                _physics_entities.push_back(_bonuses.back());
+                _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+            } else if (bonus_type <= 0.40f) {
+                _bonuses.push_back(std::make_shared<JetpackBonus>(
+                        JetpackBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["jetpack"])));
+                _physics_entities.push_back(_bonuses.back());
+                _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+            } else if (bonus_type <= 0.8f) {
+                float equal_rand_choice = Random::get_instance().uniform_real(0, 1);
 
-            // add bonus
-            _platforms.back()->addBonus(_bonuses.back());
-            _bonuses.back()->addObserver(_score);
-        } else if (place_bonus < 0.8f) {
-            _bonuses.push_back(std::make_shared<HPBonus>(
-                    HPBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["heart"])));
-            _physics_entities.push_back(_bonuses.back());
-            _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+                if (equal_rand_choice <= 0.333f) {
+                    _bonuses.push_back(std::make_shared<SpikeBonus>(
+                            SpikeBonus({0, 0}, _camera, {0.15f, 0.075f}, _animation_players["spikes"])));
+                    _physics_entities.push_back(_bonuses.back());
+                    _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+                } else if (equal_rand_choice <= 0.666f) {
+                    _bonuses.push_back(std::make_shared<HPBonus>(
+                            HPBonus({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["heart"])));
+                    _physics_entities.push_back(_bonuses.back());
+                    _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+                } else if (equal_rand_choice <= 1.f) {
+                    std::shared_ptr<Enemy> enemy = std::make_shared<Enemy>(
+                            Enemy({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["skeleton"]));
+                    _physics_entities.push_back(enemy);
+                    _bonuses.push_back(enemy);
+                    _enemies.push_back(enemy);
+                    _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+                }
+            } else if (bonus_type <= 1.f) {
+                _bonuses.push_back(std::make_shared<AdvancedEnemy>(
+                        AdvancedEnemy({0, 0}, _camera, {0.2f, 0.2f}, _animation_players["skeleton_red"])));
+                _physics_entities.push_back(_bonuses.back());
+                _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+
+
+
+                std::shared_ptr<Enemy> enemy = std::make_shared<AdvancedEnemy>(
+                        AdvancedEnemy({0, 0}, _camera, {0.2f, 0.26f}, _animation_players["skeleton_red"]));
+                _physics_entities.push_back(enemy);
+                _bonuses.push_back(enemy);
+                _enemies.push_back(enemy);
+                _entity_view_creator->createEntitySpriteView(_bonuses.back(), 4);
+
+                std::shared_ptr<HPBar> hp_bar = createHPBar(enemy, false, constants::hpbarhearts::entity_ui_size,
+                                                            {0, (enemy->getViewSize().y / 2) +
+                                                                (constants::hpbarhearts::entity_ui_size.y / 2)});
+                enemy->setHPBar(hp_bar);
+                _ui_entities.push_back(hp_bar);
+            }
 
             // add bonus
             _platforms.back()->addBonus(_bonuses.back());
@@ -829,30 +858,6 @@ void World::doodleModeSpawnPlatforms() {
         }
     }
 }
-
-//void World::doodleModeSpawnBgTiles() {
-//    // todo: constant
-//    unsigned int amount = 30;
-//    float bg_tile_size = _camera->getWidth() / static_cast<float>(amount);
-//
-//    float y_spawn_pos = _camera->getPosition().y + (_camera->getHeight() / 2) * 1.1f;
-//
-//    while (_last_bg_tile_y_pos < y_spawn_pos) {
-//        // floating precision errors
-//        _last_bg_tile_y_pos += bg_tile_size - 0.001f;
-//
-//        float current_x_pos = constants::camera_view_x_min + bg_tile_size / 2;
-//        for (unsigned int i = 0; i < amount; i++) {
-//            _bg_tiles.push_back(std::make_shared<BgTile>(
-//                    BgTile({current_x_pos, _last_bg_tile_y_pos}, _camera, {bg_tile_size, bg_tile_size},
-//                           _animation_players["background_tile"])));
-//            _ui_entities.push_back(_bg_tiles.back());
-//            _entity_view_creator->createEntitySpriteView(_bg_tiles.back(), 1);
-//
-//            current_x_pos += bg_tile_size;
-//        }
-//    }
-//}
 
 void World::doodleModeDestroyPhysicsEntities() {
     // todo: constant

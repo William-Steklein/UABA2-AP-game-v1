@@ -178,7 +178,7 @@ void PhysicsEntity::resolveCollision(PhysicsEntity &other, bool resolve, bool se
     Vector2f new_velocity_other = other._velocity;
 
     if (other._passthrough) {
-        if (_velocity.y < 0 && displacement.y > 0) {
+        if (_velocity.y < 0 && displacement.y > 0 && displacement.y < 0.05) {
             move_vector.y = displacement.y;
 
             if (resolve) {

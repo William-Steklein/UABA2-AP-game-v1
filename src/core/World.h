@@ -161,7 +161,7 @@ private:
 
     void updateDoodleMode(double t, float dt);
 
-    void doodleModeSpawnPlatforms();
+    void doodleModeSpawnPlatformsAndBonuses();
 
     void doodleModeDestroyPhysicsEntities();
 

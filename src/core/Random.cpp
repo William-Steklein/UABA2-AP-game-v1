@@ -10,21 +10,21 @@ Random &Random::get_instance() {
 }
 
 int Random::uniform_int(int a, int b) {
-    std::uniform_int_distribution<int> d(a, b);
-    return d(generator);
+    std::uniform_int_distribution<int> distribution(a, b);
+    return distribution(generator);
 }
 
 float Random::uniform_real(float a, float b) {
-    std::uniform_real_distribution<float> d(a, b);
-    return d(generator);
+    std::uniform_real_distribution<float> distribution(a, b);
+    return distribution(generator);
 }
 
 int Random::bernoulli(float p) {
-    std::bernoulli_distribution d(p);
-    return d(generator);
+    std::bernoulli_distribution distribution(p);
+    return distribution(generator);
 }
 
 float Random::normal(float m, float n) {
-    std::normal_distribution<float> d(m, n);
-    return d(generator);
+    std::normal_distribution<float> distribution(m, n);
+    return distribution(generator);
 }

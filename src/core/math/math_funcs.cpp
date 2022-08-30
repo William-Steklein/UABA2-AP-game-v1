@@ -105,7 +105,7 @@ bool linesegmentIntersection(const Vector2f &l1p1, const Vector2f &l1p2, const V
     return false;
 }
 
-float sigmoid(float x) {
+float sigmoid(float x, float a, float b) {
     float euler = 2.71828;
-    return x / (std::pow(euler, x));
+    return 1 / (1 + std::pow(euler, -(a * x) + b));
 }
