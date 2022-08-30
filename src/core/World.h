@@ -55,6 +55,9 @@ private:
     std::shared_ptr<bool> _start_pauze_overlay;
     bool _pauze_overlay;
     std::shared_ptr<bool> _resume;
+    bool _start_gameover;
+    bool _gameover;
+    float _gameover_time_passed;
 
     // entities
     std::shared_ptr<IEntityViewCreator> _entity_view_creator;
@@ -78,7 +81,7 @@ private:
     std::vector<std::shared_ptr<UIEntity>> _side_bars;
     std::vector<std::shared_ptr<BgTile>> _bg_tiles;
     float _last_bg_tile_y_pos;
-    std::shared_ptr<TextBox> _score_text_box;
+    std::weak_ptr<TextBox> _score_text_box;
     std::vector<std::weak_ptr<Button>> _buttons;
     std::vector<std::shared_ptr<HPBar>> _enemy_hp_bars;
 
@@ -119,6 +122,8 @@ private:
 
     void updateSidebars();
 
+    void clear();
+
     // update
     void gameUpdate(double t, float dt);
 
@@ -132,38 +137,38 @@ private:
 
     void handleUpdatePhysicsSpeed();
 
-    void clear();
-
-    // scenes
+    // menus
     void loadStartMenu();
+
+    void loadPauseOverlayButton();
 
     void startPauzeOverlay();
 
-    void stopPauzeOverlay();
+    void startGameoverOverlay();
 
+    // game over mode
+    void startGameOverMode();
+
+    void updateGameOverMode(double t, float dt);
+
+    // debug mode
     void startDebugMode();
-
-    void startDebugUI();
 
     void updateDebugMode(double t, float dt);
 
+    // doodle mode
     void startDoodleMode();
-
-    void startDoodleUI();
 
     void updateDoodleMode(double t, float dt);
 
+    void doodleModeSpawnPlatforms();
+
+    void doodleModeDestroyPhysicsEntities();
+
+    // create / destroy entities
     void spawnPlayer(const Vector2f &spawn = constants::player::spawn_position);
 
-    float getSpawnPosY();
-
-    float getDestroyPosY();
-
-    void spawnPlatforms();
-
-    void spawnBgTiles();
-
-    void destroyPhysicsEntities();
+    void spawnBgTiles(float y_spawn_position, bool up);
 
     void spawnPlayerBullet(const Vector2f &position, bool up);
 
@@ -172,7 +177,7 @@ private:
     std::shared_ptr<HPBar> createHPBar(const std::weak_ptr<PhysicsEntity> &entity, bool left_alligned,
                                        const Vector2f &heart_size, const Vector2f &offset = {0, 0});
 
-    std::shared_ptr<UIEntity> craeteEmptyUI();
+    std::shared_ptr<UIEntity> craeteEmptyScreenUI();
 };
 
 

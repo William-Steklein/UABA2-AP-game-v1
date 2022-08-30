@@ -4,7 +4,7 @@ Random::Random() : generator(device()) {
 
 }
 
-Random& Random::get_instance() {
+Random &Random::get_instance() {
     static Random instance;
     return instance;
 }
@@ -25,6 +25,6 @@ int Random::bernoulli(float p) {
 }
 
 float Random::normal(float m, float n) {
-    std::normal_distribution<float> d(m,n);
+    std::normal_distribution<float> d(m, n);
     return d(generator);
 }

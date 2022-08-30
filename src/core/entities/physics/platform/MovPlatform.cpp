@@ -6,15 +6,15 @@ MovPlatform::MovPlatform(const Vector2f &position, std::shared_ptr<Camera> camer
                    isStatic), _horizontal(horizontal), _going_left(Random::get_instance().uniform_int(0, 1)) {
     if (_horizontal) {
         _bounderies = {constants::camera_view_x_min + _hitbox->getSize().x / 2,
-                                  constants::camera_view_x_max - _hitbox->getSize().x / 2};
+                       constants::camera_view_x_max - _hitbox->getSize().x / 2};
     } else {
         // todo: constant
         float y_boundery_scale = 0.3f;
 
         _bounderies = {_position.y -
-                                ((constants::camera_view_y_max - constants::camera_view_y_min) / 2) * y_boundery_scale,
-                                _position.y +
-                                ((constants::camera_view_y_max - constants::camera_view_y_min) / 2) * y_boundery_scale};
+                       ((constants::camera_view_y_max - constants::camera_view_y_min) / 2) * y_boundery_scale,
+                       _position.y +
+                       ((constants::camera_view_y_max - constants::camera_view_y_min) / 2) * y_boundery_scale};
     }
 }
 

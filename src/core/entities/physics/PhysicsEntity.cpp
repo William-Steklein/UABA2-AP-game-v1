@@ -4,7 +4,7 @@ PhysicsEntity::PhysicsEntity(const Vector2f &position, std::shared_ptr<Camera> c
                              AnimationPlayer animation_player, AudioPlayer audio_player, bool is_static) :
         Entity(position, std::move(camera), viewSize, std::move(animation_player), std::move(audio_player)),
         _is_static(is_static), _mass(1), _gravitational_acceleration({0, 0}), _passthrough(false), _collided(false),
-        _max_hit_points(0), _current_hit_points(0), _can_shoot(true), _shoot_delay_time_passed(0){
+        _max_hit_points(0), _current_hit_points(0), _can_shoot(true), _shoot_delay_time_passed(0) {
     _hitbox = std::make_shared<Hitbox>(_position, _view_size);
 
 }

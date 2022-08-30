@@ -16,7 +16,7 @@ private:
 public:
     Hitbox() = default;
 
-    Hitbox(const Vector2f &position, const Vector2f &size, const Vector2f &offset={0, 0});
+    Hitbox(const Vector2f &position, const Vector2f &size, const Vector2f &offset = {0, 0});
 
     const Vector2f &getPosition() const;
 

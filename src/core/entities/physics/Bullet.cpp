@@ -10,7 +10,7 @@ Bullet::Bullet(const Vector2f &position, std::shared_ptr<Camera> camera, const V
     if (_up) {
         _velocity.y = constants::bullet::velocity;
     } else {
-        _velocity.y = - constants::bullet::velocity;
+        _velocity.y = -constants::bullet::velocity;
     }
 }
 

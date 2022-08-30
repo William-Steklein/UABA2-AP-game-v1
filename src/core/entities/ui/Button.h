@@ -11,7 +11,7 @@ private:
 
 public:
     Button(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-           AnimationPlayer animationPlayer = {}, AudioPlayer audioPlayer = {}, bool staticView=false);
+           AnimationPlayer animationPlayer = {}, AudioPlayer audioPlayer = {}, bool staticView = false);
 
     virtual void update(double t, float dt) override;
 

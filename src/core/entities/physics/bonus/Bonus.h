@@ -16,7 +16,7 @@ public:
 
     void update(double t, float dt) override;
 
-    virtual void applyEntity(const std::weak_ptr<PhysicsEntity>& other);
+    virtual void applyEntity(const std::weak_ptr<PhysicsEntity> &other);
 
     bool isActive() const;
 

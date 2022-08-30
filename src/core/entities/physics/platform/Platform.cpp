@@ -14,7 +14,7 @@ void Platform::addBonus(const std::weak_ptr<Bonus> &bonus) {
     std::shared_ptr<Bonus> bonus_shared = _bonus.lock();
     float x_rand = Random::get_instance().uniform_real(-(_hitbox->getSize().x / 2 - bonus_shared->getViewSize().x / 2),
                                                        _hitbox->getSize().x / 2 - bonus_shared->getViewSize().x / 2);
-    _bonus_offset = {x_rand , bonus_shared->getViewSize().y / 2 + _view_size.y / 2};
+    _bonus_offset = {x_rand, bonus_shared->getViewSize().y / 2 + _view_size.y / 2};
     setPosition(_position);
 }
 

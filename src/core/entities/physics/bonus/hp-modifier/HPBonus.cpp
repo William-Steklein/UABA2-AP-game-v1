@@ -1,7 +1,7 @@
 #include "HPBonus.h"
 
 HPBonus::HPBonus(const Vector2f &position, std::shared_ptr<Camera> camera, const Vector2f &viewSize,
-                       AnimationPlayer animationPlayer, AudioPlayer audioPlayer, bool isStatic)
+                 AnimationPlayer animationPlayer, AudioPlayer audioPlayer, bool isStatic)
         : Bonus(position, std::move(camera), viewSize, std::move(animationPlayer), std::move(audioPlayer), isStatic),
           _hp_addition(1) {
     playAnimation("red");

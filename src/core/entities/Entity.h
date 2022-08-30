@@ -94,9 +94,9 @@ public:
 
     void playAnimation(const std::string &animation_name);
 
-    void playSound(const std::string &sound_name, bool finish=false, bool loop=false);
+    void playSound(const std::string &sound_name, bool finish = false, bool loop = false);
 
-    void playMusic(const std::string &music_name, bool finish=false, bool loop=false);
+    void playMusic(const std::string &music_name, bool finish = false, bool loop = false);
 
     void stopSound();
 

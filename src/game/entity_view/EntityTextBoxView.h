@@ -17,7 +17,7 @@ private:
     std::weak_ptr<TextBox> _entity_text_box;
 
 public:
-    EntityTextBoxView(const std::weak_ptr<TextBox>& entity_text_box);
+    EntityTextBoxView(const std::weak_ptr<TextBox> &entity_text_box);
 
     void handleEvent() override;
 
@@ -27,7 +27,7 @@ public:
 
     void updateText();
 
-    void updateTextWrap(const Vector2f& view_size);
+    void updateTextWrap(const Vector2f &view_size);
 };
 
 

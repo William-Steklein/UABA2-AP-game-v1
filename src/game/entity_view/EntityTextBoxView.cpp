@@ -1,6 +1,6 @@
 #include "EntityTextBoxView.h"
 
-EntityTextBoxView::EntityTextBoxView(const std::weak_ptr<TextBox>& entity_text_box)
+EntityTextBoxView::EntityTextBoxView(const std::weak_ptr<TextBox> &entity_text_box)
         : EntityView(entity_text_box), _entity_text_box(entity_text_box) {
     if (!_font.loadFromFile("data/fonts/PT_Sans/PTSans-Regular.ttf")) {
         // todo: exception handling

@@ -21,7 +21,7 @@ public:
 
     void handleEvent(const unsigned int &event, const unsigned int &channel) override;
 
-    void setTexture(unsigned int texture_index, bool h_mirror=false);
+    void setTexture(unsigned int texture_index, bool h_mirror = false);
 
     sf::Sprite getSprite() const;
 

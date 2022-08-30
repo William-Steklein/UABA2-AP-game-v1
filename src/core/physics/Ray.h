@@ -29,7 +29,7 @@ public:
 
     void move(const Vector2f &vector);
 
-    void scale(const Vector2f &scale, const Vector2f &origin={0, 0});
+    void scale(const Vector2f &scale, const Vector2f &origin = {0, 0});
 
     bool isCollided() const;
 

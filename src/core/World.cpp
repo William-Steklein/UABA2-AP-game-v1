@@ -9,9 +9,9 @@ World::World(float x_min, float x_max, float y_min, float y_max,
           _start_debug_mode(new bool(false)), _debug_mode(false),
           _start_doodle_mode(new bool(false)), _doodle_mode(false),
           _start_pauze_overlay(new bool(false)), _pauze_overlay(false), _start_main_menu(new bool(false)),
-          _score(new Score()), _resume(new bool(false)),
+          _score(new Score()), _resume(new bool(false)), _gameover(false), _start_gameover(false),
           _last_platform_y_pos(-1.f), _last_bg_tile_y_pos(-1.f),
-          _screen_ui_tree(craeteEmptyUI()), _ingame_ui_tree(craeteEmptyUI()) {
+          _screen_ui_tree(craeteEmptyScreenUI()), _ingame_ui_tree(craeteEmptyScreenUI()) {
 
     loadResources();
     initializeSideBars();
@@ -170,6 +170,34 @@ void World::updateSidebars() {
     }
 }
 
+void World::clear() {
+    _camera->reset();
+    _score->reset();
+
+    _physics_entities.clear();
+    _player = nullptr;
+    _walls.clear();
+    _platforms.clear();
+    _last_platform_y_pos = -1.f;
+    _bonuses.clear();
+    _active_bonus = nullptr;
+    _portal_radios.clear();
+    _player_bullets.clear();
+    _enemy_bullets.clear();
+
+    _ui_entities.clear();
+    _screen_ui_tree = craeteEmptyScreenUI();
+    _ui_entities.push_back(_screen_ui_tree);
+    _ingame_ui_tree = craeteEmptyScreenUI();
+    _ui_entities.push_back(_ingame_ui_tree);
+
+    _bg_tiles.clear();
+    _buttons.clear();
+    _last_bg_tile_y_pos = -1.f;
+    _buttons.clear();
+    _enemy_hp_bars.clear();
+}
+
 void World::gameUpdate(double t, float dt) {
     // game flow
     if (*_start_main_menu) {
@@ -191,16 +219,29 @@ void World::gameUpdate(double t, float dt) {
         startDoodleMode();
     }
 
-    if ((_debug_mode || _doodle_mode) && (*_start_pauze_overlay || _input_map->esc)) {
+    if ((_debug_mode || _doodle_mode) && (*_start_pauze_overlay || _input_map->esc) && !_gameover) {
         *_start_pauze_overlay = false;
-        _screen_ui_tree = craeteEmptyUI();
+        _screen_ui_tree = craeteEmptyScreenUI();
         _ui_entities.push_back(_screen_ui_tree);
 
         startPauzeOverlay();
     }
 
     if (_pauze_overlay && *_resume) {
-        stopPauzeOverlay();
+        *_resume = false;
+        _pauze_overlay = false;
+
+        _screen_ui_tree = craeteEmptyScreenUI();
+        _ui_entities.push_back(_screen_ui_tree);
+
+        loadPauseOverlayButton();
+    }
+
+    if ((_debug_mode || _doodle_mode) && _start_gameover) {
+        _screen_ui_tree = craeteEmptyScreenUI();
+        _ui_entities.push_back(_screen_ui_tree);
+
+        startGameOverMode();
     }
 
     handleUpdatePhysicsSpeed();
@@ -215,7 +256,7 @@ void World::updateUIEntities(double t, float dt) {
         }
     }
 
-    // update ui entities and delete expired weak ui entities pointers
+    // update ui entities and delete expired
     for (auto iter = _ui_entities.begin(); iter != _ui_entities.end();) {
         if (iter->expired()) {
             iter = _ui_entities.erase(iter);
@@ -229,19 +270,8 @@ void World::updateUIEntities(double t, float dt) {
         }
     }
 
-    // button clicks
+    // button mouse clicks
     if (_input_map->mouse_button_left) {
-//        std::cout << _input_map->mouse_pos_core << std::endl;
-
-//        for (const auto &button_weak: _buttons) {
-//            std::shared_ptr<Button> button = button_weak.lock();
-//            if (button->getHitbox() && button->getHitbox()->collides(_input_map->mouse_pos_core) &&
-//                !_input_map->mouse_button_left_clicked) {
-//                button->setPressed(true);
-//                _input_map->mouse_button_left_clicked = true;
-//            }
-//        }
-
         for (auto iter = _buttons.begin(); iter != _buttons.end();) {
             if (iter->expired()) {
                 iter = _buttons.erase(iter);
@@ -264,10 +294,14 @@ void World::updateUIEntities(double t, float dt) {
 
 void World::physicsUpdate(double t, float dt) {
     // game logic
-    if (_debug_mode) {
-        updateDebugMode(t, dt);
-    } else if (_doodle_mode) {
-        updateDoodleMode(t, dt);
+    if (_gameover) {
+        updateGameOverMode(t, dt);
+    } else {
+        if (_debug_mode) {
+            updateDebugMode(t, dt);
+        } else if (_doodle_mode) {
+            updateDoodleMode(t, dt);
+        }
     }
 
     // physics entities update
@@ -278,10 +312,6 @@ void World::physicsUpdate(double t, float dt) {
     // update ui position
     _screen_ui_tree->setPosition(_camera->getPosition());
     _ingame_ui_tree->setPosition(_camera->getPosition());
-
-//    std::cout << _physics_entities.screen_ui_size() << std::endl;
-//    std::cout << _ui_entities.screen_ui_size() << std::endl;
-//    std::cout << "*******************************" << std::endl;
 }
 
 void World::updatePhysicsEntities(double t, float dt) {
@@ -321,7 +351,7 @@ void World::updatePhysicsCollisions() {
         }
     }
 
-    if (_player) {
+    if (_player && !_gameover) {
         for (const auto &platform: _platforms) {
             handleCollision(_player, platform, true, true);
 
@@ -391,35 +421,6 @@ void World::handleUpdatePhysicsSpeed() {
     }
 }
 
-void World::clear() {
-    _camera->reset();
-    _score->reset();
-
-    _physics_entities.clear();
-    _player = nullptr;
-    _walls.clear();
-    _platforms.clear();
-    _last_platform_y_pos = -1.f;
-    _bonuses.clear();
-    _active_bonus = nullptr;
-    _portal_radios.clear();
-    _player_bullets.clear();
-    _enemy_bullets.clear();
-
-    _ui_entities.clear();
-    _screen_ui_tree = craeteEmptyUI();
-    _ui_entities.push_back(_screen_ui_tree);
-    _ingame_ui_tree = craeteEmptyUI();
-    _ui_entities.push_back(_ingame_ui_tree);
-
-    _bg_tiles.clear();
-    _buttons.clear();
-    _last_bg_tile_y_pos = -1.f;
-    _buttons.clear();
-    _score_text_box = nullptr;
-    _enemy_hp_bars.clear();
-}
-
 void World::loadStartMenu() {
     // ui screen and background
     _screen_ui_tree = std::make_shared<UIEntity>(
@@ -428,14 +429,14 @@ void World::loadStartMenu() {
     _ui_entities.push_back(_screen_ui_tree);
     _entity_view_creator->createEntitySpriteView(_screen_ui_tree, 1);
 
-    // menu
+    // menu frame
     std::shared_ptr<UIEntity> menu = std::make_shared<UIEntity>(
             UIEntity({0, 0}, _camera, {1.f, 1.5f},
                      _animation_players["menu"]));
     _entity_view_creator->createEntitySpriteView(menu, 1);
     _screen_ui_tree->addChild(menu, _screen_ui_tree);
 
-    // buttons
+    // play button
     std::shared_ptr<Button> button = std::make_shared<Button>(
             Button({0, 0.5f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
     menu->addChild(button, menu);
@@ -449,6 +450,7 @@ void World::loadStartMenu() {
     button->addChild(text_box, button);
     _entity_view_creator->createEntityTextView(text_box);
 
+    // debug button
     button = std::make_shared<Button>(Button({0, 0.125f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
     menu->addChild(button, menu);
     _buttons.push_back(button);
@@ -462,18 +464,31 @@ void World::loadStartMenu() {
     _entity_view_creator->createEntityTextView(text_box);
 }
 
+void World::loadPauseOverlayButton() {
+    Vector2f button_size = {0.2f, 0.2f};
+    std::shared_ptr<Button> button = std::make_shared<Button>(
+            Button({_camera->getWidth() / 2 - button_size.x, _camera->getHeight() / 2 - button_size.y}, _camera,
+                   button_size, _animation_players["hamburger"]));
+    _screen_ui_tree->addChild(button, _screen_ui_tree);
+    _buttons.push_back(button);
+    _entity_view_creator->createEntitySpriteView(button, 500);
+    _start_pauze_overlay = button->getPressedPointer();
+}
+
 void World::startPauzeOverlay() {
     _pauze_overlay = true;
     unsigned int layer = 500;
 
-    // menu
+    // menu frame
     std::shared_ptr<UIEntity> menu = std::make_shared<UIEntity>(
             UIEntity({0, 0}, _camera, {1.f, 1.5f},
                      _animation_players["menu"]));
     _entity_view_creator->createEntitySpriteView(menu, layer);
     _screen_ui_tree->addChild(menu, _screen_ui_tree);
 
-    std::shared_ptr button = std::make_shared<Button>(Button({0, 0.5f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
+    // resume button
+    std::shared_ptr button = std::make_shared<Button>(
+            Button({0, 0.5f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
     menu->addChild(button, menu);
     _buttons.push_back(button);
     _entity_view_creator->createEntitySpriteView(button, layer + 1);
@@ -485,6 +500,7 @@ void World::startPauzeOverlay() {
     button->addChild(text_box, button);
     _entity_view_creator->createEntityTextView(text_box);
 
+    // restart button
     button = std::make_shared<Button>(Button({0, 0.125f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
     menu->addChild(button, menu);
     _buttons.push_back(button);
@@ -496,6 +512,57 @@ void World::startPauzeOverlay() {
     }
 
     button_string = std::make_shared<std::string>("restart");
+    text_box = std::make_shared<TextBox>(
+            TextBox({0, 0}, _camera, {0.5f, 0.25f}, button_string));
+    button->addChild(text_box, button);
+    _entity_view_creator->createEntityTextView(text_box);
+
+    // return to menu button
+    button = std::make_shared<Button>(Button({0, -0.25f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
+    menu->addChild(button, menu);
+    _buttons.push_back(button);
+    _entity_view_creator->createEntitySpriteView(button, layer + 1);
+    _start_main_menu = button->getPressedPointer();
+
+    button_string = std::make_shared<std::string>("return\nto menu");
+    text_box = std::make_shared<TextBox>(
+            TextBox({0, 0}, _camera, {0.5f, 0.25f}, button_string));
+    button->addChild(text_box, button);
+    _entity_view_creator->createEntityTextView(text_box);
+}
+
+void World::startGameoverOverlay() {
+    _pauze_overlay = true;
+    unsigned int layer = 500;
+    _ingame_ui_tree = craeteEmptyScreenUI();
+    _ui_entities.push_back(_ingame_ui_tree);
+
+    // menu
+    std::shared_ptr<UIEntity> menu = std::make_shared<UIEntity>(
+            UIEntity({0, 0}, _camera, {1.f, 1.5f},
+                     _animation_players["menu"]));
+    _entity_view_creator->createEntitySpriteView(menu, layer);
+    _screen_ui_tree->addChild(menu, _screen_ui_tree);
+
+    std::shared_ptr<std::string> score_string = std::make_shared<std::string>(
+            "SCORE\n" + std::to_string(_score->getScore()));
+    std::shared_ptr<TextBox> text_box = std::make_shared<TextBox>(
+            TextBox({0, 0.5f}, _camera, {0.5f, 0.25f}, score_string));
+    menu->addChild(text_box, menu);
+    _entity_view_creator->createEntityTextView(text_box);
+
+    std::shared_ptr button = std::make_shared<Button>(
+            Button({0, 0.125f}, _camera, {0.5f, 0.25f}, _animation_players["button"]));
+    menu->addChild(button, menu);
+    _buttons.push_back(button);
+    _entity_view_creator->createEntitySpriteView(button, layer + 1);
+    if (_doodle_mode) {
+        _start_doodle_mode = button->getPressedPointer();
+    } else {
+        _start_debug_mode = button->getPressedPointer();
+    }
+
+    std::shared_ptr<std::string> button_string = std::make_shared<std::string>("restart");
     text_box = std::make_shared<TextBox>(
             TextBox({0, 0}, _camera, {0.5f, 0.25f}, button_string));
     button->addChild(text_box, button);
@@ -514,14 +581,27 @@ void World::startPauzeOverlay() {
     _entity_view_creator->createEntityTextView(text_box);
 }
 
-void World::stopPauzeOverlay() {
-    *_resume = false;
-    _pauze_overlay = false;
+void World::startGameOverMode() {
+    _start_gameover = false;
+    _gameover = true;
+    _gameover_time_passed = 0;
 
-    _screen_ui_tree = craeteEmptyUI();
-    _ui_entities.push_back(_screen_ui_tree);
+    _bg_tiles.clear();
+    spawnBgTiles(_camera->getPosition().y - _camera->getHeight(), false);
+}
 
-    startDebugUI();
+void World::updateGameOverMode(double t, float dt) {
+    _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
+
+    if (_gameover_time_passed < 2.f) {
+        _gameover_time_passed += dt;
+    } else {
+        _gameover_time_passed = 0;
+        _gameover = false;
+        startGameoverOverlay();
+    }
+
+    spawnBgTiles(_camera->getPosition().y - _camera->getHeight(), false);
 }
 
 void World::startDebugMode() {
@@ -530,7 +610,7 @@ void World::startDebugMode() {
     clear();
 
     // ui screen and background
-    startDebugUI();
+    loadPauseOverlayButton();
 
     std::shared_ptr<UIEntity> background = std::make_shared<UIEntity>(
             UIEntity({0, 0}, _camera, {_camera->getWidth(), _camera->getHeight()}, _animation_players["background"],
@@ -583,25 +663,16 @@ void World::startDebugMode() {
     _bonuses.back()->addObserver(_score);
 }
 
-void World::startDebugUI() {
-    Vector2f button_size = {0.2f, 0.2f};
-    std::shared_ptr<Button> button = std::make_shared<Button>(
-            Button({_camera->getWidth() / 2 - button_size.x, _camera->getHeight() / 2 - button_size.y}, _camera,
-                   button_size, _animation_players["hamburger"]));
-    _screen_ui_tree->addChild(button, _screen_ui_tree);
-    _buttons.push_back(button);
-    _entity_view_creator->createEntitySpriteView(button, 500);
-    _start_pauze_overlay = button->getPressedPointer();
-}
-
 void World::updateDebugMode(double t, float dt) {
-    // camera
     _camera->setPosition({_camera->getPosition().x, _player->getPosition().y});
-//    std::cout << _player->getCurrentHitPoints() << std::endl;
 
     if (_input_map->f && _player->canShoot()) {
         _player->setCanShoot(false);
         spawnPlayerBullet(_player->getPosition(), true);
+    }
+
+    if (_input_map->k) {
+        _start_gameover = true;
     }
 }
 
@@ -611,20 +682,21 @@ void World::startDoodleMode() {
     clear();
 
     // ui
-    startDebugUI();
+    loadPauseOverlayButton();
 
     spawnPlayer();
     _player->addVelocity({0.f, _player->getInitialJumpVelocity() * 1.2f});
 
-    spawnPlatforms();
-    spawnBgTiles();
+    doodleModeSpawnPlatforms();
+    spawnBgTiles(_camera->getPosition().y + _camera->getHeight(), true);
 
     // score
     std::shared_ptr<std::string> text_box_string = std::make_shared<std::string>("score");
-    _score_text_box = std::make_shared<TextBox>(
-            TextBox({0, constants::camera_view_y_max - 0.25f}, _camera, {0.5f, 0.25f}, text_box_string));
-    _ui_entities.push_back(_score_text_box);
-    _entity_view_creator->createEntityTextView(_score_text_box);
+    std::shared_ptr<TextBox> score_text_box = std::make_shared<TextBox>(
+            TextBox({0, (constants::camera_view_y_max / 2) - 0.25f}, _camera, {0.5f, 0.25f}, text_box_string));
+    _score_text_box = score_text_box;
+    _ingame_ui_tree->addChild(score_text_box, _ingame_ui_tree);
+    _entity_view_creator->createEntityTextView(score_text_box);
 
     _player->addObserver(_score);
     _camera->addObserver(_score);
@@ -634,65 +706,46 @@ void World::updateDoodleMode(double t, float dt) {
     // camera movement
     if (_player->getPosition().y > _camera->getPosition().y + 0.4f) {
         _camera->setPosition({_camera->getPosition().x, _player->getPosition().y - 0.4f});
-
-        _score_text_box->setPosition(
-                {_camera->getPosition().x, _camera->getPosition().y + constants::camera_view_y_max / 2 - 0.25f});
     }
 
     // score
-    if (_score_text_box) {
-        _score_text_box->setText("score\n" + std::to_string(_score->getScore()));
+    if (!_score_text_box.expired()) {
+        std::shared_ptr<TextBox> score_text_box = _score_text_box.lock();
+        score_text_box->setText("score\n" + std::to_string(_score->getScore()));
     }
 
-    spawnPlatforms();
-    spawnBgTiles();
+    // game over
+    if (_player->getCurrentHitPoints() == 0 ||
+        _player->getPosition().y < _camera->getPosition().y - _camera->getHeight() / 2 - _player->getViewSize().y / 2) {
+        _start_gameover = true;
+    }
 
-    destroyPhysicsEntities();
+    // shooting
+    if (_input_map->f && _player->canShoot()) {
+        _player->setCanShoot(false);
+        spawnPlayerBullet(_player->getPosition(), true);
+    }
+
+    doodleModeSpawnPlatforms();
+    spawnBgTiles(_camera->getPosition().y + _camera->getHeight(), true);
+
+    doodleModeDestroyPhysicsEntities();
 }
 
-void World::spawnPlayer(const Vector2f &spawn) {
-    _player = std::make_shared<Doodle>(
-            Doodle(spawn, _camera, constants::player::view_size, _input_map, _animation_players["adventurer"],
-                   _audio_player));
-    _physics_entities.push_back(_player);
-    _entity_view_creator->createEntitySpriteView(_player, 5);
-//    _entity_audio_creator->createEntityAudio(_player);
-
-    // HP
-    std::shared_ptr<HPBar> hp_bar = createHPBar(_player, true, constants::hpbarhearts::screen_ui_size);
-    hp_bar->setPosition({-(_ingame_ui_tree->getViewSize().x / 2) + (hp_bar->getViewSize().x / 2),
-                         -(_ingame_ui_tree->getViewSize().y / 2) + (hp_bar->getViewSize().y / 2)});
-    _ingame_ui_tree->addChild(hp_bar, _ingame_ui_tree);
-}
-
-float World::getSpawnPosY() {
-    // todo constant
-    return _camera->getPosition().y + (_camera->getHeight() / 2) * 1.1f;
-}
-
-float World::getDestroyPosY() {
-    // todo constant
-    return _camera->getPosition().y - (_camera->getHeight() / 2) - 1.f;
-}
-
-void World::spawnPlatforms() {
+void World::doodleModeSpawnPlatforms() {
     // todo: constants
     float y_distance = 0.7f;
     float platform_width = 0.4f;
     float platform_height = 0.075f;
     unsigned int platform_render_layer = 3;
 
-    while (_last_platform_y_pos < getSpawnPosY()) {
+    float y_spawn_pos = _camera->getPosition().y + (_camera->getHeight() / 2) * 1.1f;
+
+    while (_last_platform_y_pos < y_spawn_pos) {
         float x_pos = Random::get_instance().uniform_real(-0.8, 0.8);
         _last_platform_y_pos += y_distance;
 
         float platform_type = Random::get_instance().uniform_real(0, 1);
-
-//        _platforms.push_back(std::make_shared<Platform>(
-//                Platform({x_pos, _last_platform_y_pos}, _camera, {platform_width, platform_height},
-//                         _animation_players["green"])));
-//
-//        continue;
 
         if (platform_type < 0.25f) {
             // static platform
@@ -777,33 +830,35 @@ void World::spawnPlatforms() {
     }
 }
 
-void World::spawnBgTiles() {
+//void World::doodleModeSpawnBgTiles() {
+//    // todo: constant
+//    unsigned int amount = 30;
+//    float bg_tile_size = _camera->getWidth() / static_cast<float>(amount);
+//
+//    float y_spawn_pos = _camera->getPosition().y + (_camera->getHeight() / 2) * 1.1f;
+//
+//    while (_last_bg_tile_y_pos < y_spawn_pos) {
+//        // floating precision errors
+//        _last_bg_tile_y_pos += bg_tile_size - 0.001f;
+//
+//        float current_x_pos = constants::camera_view_x_min + bg_tile_size / 2;
+//        for (unsigned int i = 0; i < amount; i++) {
+//            _bg_tiles.push_back(std::make_shared<BgTile>(
+//                    BgTile({current_x_pos, _last_bg_tile_y_pos}, _camera, {bg_tile_size, bg_tile_size},
+//                           _animation_players["background_tile"])));
+//            _ui_entities.push_back(_bg_tiles.back());
+//            _entity_view_creator->createEntitySpriteView(_bg_tiles.back(), 1);
+//
+//            current_x_pos += bg_tile_size;
+//        }
+//    }
+//}
+
+void World::doodleModeDestroyPhysicsEntities() {
     // todo: constant
-    unsigned int amount = 30;
-    float bg_tile_size = _camera->getWidth() / static_cast<float>(amount);
-
-    while (_last_bg_tile_y_pos < getSpawnPosY()) {
-        // floating precision errors
-        _last_bg_tile_y_pos += bg_tile_size - 0.001f;
-
-        float current_x_pos = constants::camera_view_x_min + bg_tile_size / 2;
-        for (unsigned int i = 0; i < amount; i++) {
-            _bg_tiles.push_back(std::make_shared<BgTile>(
-                    BgTile({current_x_pos, _last_bg_tile_y_pos}, _camera, {bg_tile_size, bg_tile_size},
-                           _animation_players["background_tile"])));
-            _ui_entities.push_back(_bg_tiles.back());
-            _entity_view_creator->createEntitySpriteView(_bg_tiles.back(), 1);
-
-            current_x_pos += bg_tile_size;
-        }
-    }
-}
-
-void World::destroyPhysicsEntities() {
-    float destroy_pos = getDestroyPosY();
+    float destroy_pos = _camera->getPosition().y - (_camera->getHeight() / 2) - 1.f;
 
     if (!_platforms.empty()) {
-        // todo: constant
         while (_platforms.front()->getPosition().y < destroy_pos) {
             _platforms.erase(_platforms.begin());
         }
@@ -821,6 +876,46 @@ void World::destroyPhysicsEntities() {
 
     if (_active_bonus && !_active_bonus->isActive()) {
         _active_bonus = nullptr;
+    }
+}
+
+void World::spawnPlayer(const Vector2f &spawn) {
+    _player = std::make_shared<Doodle>(
+            Doodle(spawn, _camera, constants::player::view_size, _input_map, _animation_players["adventurer"],
+                   _audio_player));
+    _physics_entities.push_back(_player);
+    _entity_view_creator->createEntitySpriteView(_player, 5);
+//    _entity_audio_creator->createEntityAudio(_player);
+
+    // HP
+    std::shared_ptr<HPBar> hp_bar = createHPBar(_player, true, constants::hpbarhearts::screen_ui_size);
+    hp_bar->setPosition({-(_ingame_ui_tree->getViewSize().x / 2) + (hp_bar->getViewSize().x / 2),
+                         -(_ingame_ui_tree->getViewSize().y / 2) + (hp_bar->getViewSize().y / 2)});
+    _ingame_ui_tree->addChild(hp_bar, _ingame_ui_tree);
+}
+
+void World::spawnBgTiles(float y_spawn_position, bool up) {
+    unsigned int amount = 30;
+    float bg_tile_size = _camera->getWidth() / static_cast<float>(amount);
+
+    while ((up && _last_bg_tile_y_pos < y_spawn_position) || (!up && _last_bg_tile_y_pos > y_spawn_position)) {
+        // floating precision errors
+        if (up) {
+            _last_bg_tile_y_pos += bg_tile_size - 0.001f;
+        } else {
+            _last_bg_tile_y_pos -= bg_tile_size - 0.001f;
+        }
+
+        float current_x_pos = constants::camera_view_x_min + bg_tile_size / 2;
+        for (unsigned int i = 0; i < amount; i++) {
+            _bg_tiles.push_back(std::make_shared<BgTile>(
+                    BgTile({current_x_pos, _last_bg_tile_y_pos}, _camera, {bg_tile_size, bg_tile_size},
+                           _animation_players["background_tile"])));
+            _ui_entities.push_back(_bg_tiles.back());
+            _entity_view_creator->createEntitySpriteView(_bg_tiles.back(), 1);
+
+            current_x_pos += bg_tile_size;
+        }
     }
 }
 
@@ -852,7 +947,7 @@ std::shared_ptr<HPBar> World::createHPBar(const std::weak_ptr<PhysicsEntity> &en
     return hp_bar;
 }
 
-std::shared_ptr<UIEntity> World::craeteEmptyUI() {
+std::shared_ptr<UIEntity> World::craeteEmptyScreenUI() {
     return std::make_shared<UIEntity>(
             UIEntity({0, _camera->getPosition().y}, _camera, {_camera->getWidth(), _camera->getHeight()}, {}, {},
                      false));
